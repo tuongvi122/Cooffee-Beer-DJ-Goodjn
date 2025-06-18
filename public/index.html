@@ -1,236 +1,233 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
   <meta charset="utf-8">
   <title>Coffee & Beer GooDjn</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --main-green: #219a50;
-      --main-green-dark: #186a36;
-      --header-height-desktop: 64px;
-      --header-height-tablet: 56px;
-      --header-height-mobile: 52px;
-    }
     html, body {
-      margin: 0; padding: 0;
       height: 100%;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
     }
     body {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      font-family: Arial, sans-serif;
+      padding: 0;
+      margin: 0;
+      background-color: #f9f9f9;
     }
-
-    /* Navbar */
-    .navbar {
-      width: 100vw;
+    #navbar-container {
       position: fixed;
-      top: 0; left: 0;
-      z-index: 10000;
-      background: var(--main-green);
-      color: #fff;
-      height: var(--header-height-desktop);
-      display: flex;
-      align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
-      transition: height 0.2s;
-    }
-    .navbar__left {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      gap: 8px;
-    }
-    .navbar__logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: 18px;
-      margin-right: 18px;
-    }
-    .navbar__logo img {
-      width: 44px; height: 44px; object-fit: contain;
-      background: #fff;
-      border-radius: 10px;
-      border: 2px solid #fff;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-      margin-right: 8px;
-    }
-    .navbar__brand {
-      font-size: 1.2em;
-      font-weight: bold;
-      color: #ffcb38;
-      line-height: 1.1;
-      text-shadow: 0 1px 1px #0003;
-    }
-    .navbar__hotline {
-      background: #fff;
-      color: #d32f2f;
-      border-radius: 18px;
-      padding: 3px 10px;
-      font-size: 1.06em;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      margin-right: 16px;
-      margin-left: 10px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-    }
-    .navbar__hotline svg {
-      margin-right: 6px;
-    }
-    .navbar__right {
-      display: flex;
-      align-items: center;
-      margin-left: auto;
-      gap: 12px;
-      margin-right: 14px;
-    }
-    .navbar__menu {
-      display: flex;
-      gap: 24px;
-      align-items: center;
-    }
-    .navbar__menu a {
-      color: #fff;
-      text-decoration: none;
-      font-size: 1.07em;
-      font-weight: 500;
-      transition: color 0.15s;
-      padding: 4px 0;
-      border-bottom: 2px solid transparent;
-    }
-    .navbar__menu a:hover {
-      color: #ffecb4;
-      border-bottom: 2px solid #ffcb38;
-    }
-    /* Hamburger */
-    .navbar__hamburger {
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 38px;
-      height: 38px;
-      margin-left: 10px;
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      z-index: 15001;
-    }
-    .navbar__hamburger span {
-      width: 27px;
-      height: 4px;
-      background: #fff;
-      margin: 3px 0;
-      display: block;
-      border-radius: 2px;
-      transition: all .3s;
-    }
-    /* Mobile nav menu overlay */
-    .mobile-nav {
-      display: none;
-      position: fixed;
-      top: var(--header-height-mobile);
+      top: 0;
       left: 0;
-      width: 80vw;
-      max-width: 270px;
-      height: calc(100vh - var(--header-height-mobile));
-      background: var(--main-green);
-      box-shadow: 2px 0 8px rgba(0,0,0,0.13);
-      z-index: 15000;
-      animation: slideInLeft .22s;
-      padding-top: 20px;
-      flex-direction: column;
+      width: 100vw;
+      z-index: 10000;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
     }
-    .mobile-nav.open {
-      display: flex;
-    }
-    .mobile-nav a {
-      color: #fff;
-      font-size: 1.12em;
-      padding: 13px 24px;
-      text-decoration: none;
-      font-weight: 500;
-      border-bottom: 1px solid #ffffff1c;
-      transition: background 0.16s;
-    }
-    .mobile-nav a:hover {
-      background: #186a36;
-    }
-    @keyframes slideInLeft {
-      from { transform: translateX(-100%);}
-      to { transform: translateX(0);}
-    }
-
-    /* Responsive */
-    @media (max-width: 1100px) {
-      .navbar__logo img { width: 38px; height: 38px; }
-      .navbar__brand { font-size: 1.08em; }
-    }
-    @media (max-width: 900px) {
-      .navbar__logo img { width: 32px; height: 32px; }
-      .navbar__brand { font-size: 1em; }
-      .navbar { height: var(--header-height-tablet);}
-    }
-    @media (max-width: 850px) {
-      .navbar__menu { gap: 13px;}
-      .navbar__right { gap: 7px;}
-    }
-    @media (max-width: 770px) {
-      .navbar__menu { gap: 8px;}
-    }
-    @media (max-width: 768px) {
-      .navbar {
-        height: var(--header-height-tablet);
-      }
-      .navbar__logo img { width: 29px; height: 29px; }
-      .navbar__brand { font-size: 0.97em; }
-      .navbar__menu a { font-size: 0.98em;}
-    }
-    /* Tablet: hide hamburger, show horizontal menu */
-    @media (max-width: 900px) and (min-width: 601px) {
-      .navbar__menu { display: flex !important;}
-      .navbar__hamburger { display: none !important;}
-      .mobile-nav { display: none !important;}
-    }
-    /* Mobile: show hamburger, hide horizontal menu */
-    @media (max-width: 600px) {
-      .navbar {
-        height: var(--header-height-mobile);
-        min-height: var(--header-height-mobile);
-        padding: 0 0 0 0;
-      }
-      .navbar__brand { font-size: 1em;}
-      .navbar__menu { display: none !important;}
-      .navbar__right { margin-right: 4px;}
-      .navbar__hamburger { display: flex;}
-      .mobile-nav { top: var(--header-height-mobile);}
-    }
-
     .site-content {
       flex: 1 0 auto;
       display: flex;
       flex-direction: column;
-      padding-top: var(--header-height-desktop);
+      padding-top: 64px;  /* Điều chỉnh nếu navbar cao/thấp hơn */
       padding-bottom: 0;
     }
-    @media (max-width: 900px) {
-      .site-content {
-        padding-top: var(--header-height-tablet);
-      }
-    }
-    @media (max-width: 600px) {
-      .site-content {
-        padding-top: var(--header-height-mobile);
-      }
+    #footer-container {
+      width: 100vw;
+      background: #fff;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+      /* KHÔNG dùng position: fixed */
     }
 
-    /* Marquee */
+    h2 { text-align: center; }
+    #products { 
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: center; 
+      gap: 15px; 
+      margin-top: 20px; 
+    }
+    .product-card { 
+      background: #fff; 
+      border: 1px solid #ccc; 
+      border-radius: 10px; 
+      padding: 10px; 
+      width: 100%; 
+      max-width: 260px; 
+      text-align: center; 
+      box-sizing: border-box; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+      margin-bottom: 12px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: stretch; 
+      position: relative;
+    }
+    .product-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
+    .product-card .full-note { color: #d32f2f; font-weight: bold; font-size: 15px; margin-top: 5px; }
+    .product-card.disabled { opacity: 0.65; pointer-events: none; }
+
+    /* MOBILE: 2 cột sản phẩm */
+    @media screen and (max-width: 600px) {
+      #products {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px 9px;
+        margin-top: 12px;
+        padding: 0 3px;
+      }
+      .product-card {
+        max-width: 100%;
+        margin-bottom: 7px;
+        padding: 8px 6px;
+      }
+    }
+    /* MOBILE: Nếu chỉ 1 sản phẩm thì vẫn căn giữa */
+    @media screen and (max-width: 600px) {
+      #products:only-child {
+        justify-content: center;
+      }
+    }
+    /* MOBILE: Modal nhỏ lại */
+    @media screen and (max-width: 600px) {
+      .form-buttons { flex-direction: column; }
+      .modal-dialog { max-width: 350px !important; width: 95vw !important; }
+      .ca-item-row { flex-wrap: wrap; }
+      .ca-remove-btn2 { margin-top: 4px; }
+      #navbar-container { padding-top: 0; }
+    }
+
+    .ca-list { margin: 12px 0 0 0; padding: 0; list-style: none; }
+    .ca-item-row { display: flex; align-items: center; gap: 0; margin-bottom: 5px; font-size: 15px; line-height: 1.4; width: 100%; box-sizing: border-box; }
+    .ca-label { flex: 0 0 52px; text-align: left; font-weight: 500; color: #333; font-size: 15px; margin-right: 2px; white-space: nowrap; }
+    .ca-price { flex: 1 1 70px; text-align: left; color: #086824; font-weight: 600; font-size: 15px; margin-right: 3px; min-width: 65px; max-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ca-checkbox { flex: 0 0 22px; margin-left: 0; margin-right: 0; align-self: center; transform: scale(1.1); display: inline-block; accent-color: #219a50; }
+    .ca-remove-btn2 {
+      flex: 0 0 auto;
+      border: 2px solid #d32f2f;
+      background: #d32f2f;
+      color: #fff;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 2px 13px 2px 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      margin-left: 9px;
+      white-space: nowrap;
+      min-width: 0;
+      width: auto;
+      height: 28px;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+    .ca-remove-btn2:disabled { opacity: 0.45; cursor: not-allowed; background: #f8bbbc; border-color: #e57373; color: #fff; }
+    .ca-remove-btn2:hover:not(:disabled) { background: #b71c1c; border-color: #b71c1c; }
+    .note-already-added { color: red; font-size: 13px; margin-left: 8px; min-width: 120px; display:inline-block; }
+    .ca-busy-note { color: #d32f2f; font-size: 13px; font-weight: bold; margin-left: 7px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100vw; height: 100vh; overflow: auto; background: rgba(0,0,0,0.2);}
+    .modal.show { display: block; }
+    #modalOrder { z-index: 1100 !important; }
+    .modal-dialog { position: relative; margin: 5% auto; max-width: 500px; width: 95%; }
+    .modal-content { background: #fff; border-radius: 10px; padding: 0 0 15px 0; box-shadow: 0 0 20px rgba(0,0,0,0.3);}
+    .modal-header { padding: 15px 20px 0 20px; border-bottom: 1px solid #eee; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;}
+    .modal-title { margin: 0; font-size: 21px;}
+    .close { background: none; border: none; font-size: 28px; font-weight: bold; color: #888; cursor: pointer; line-height: 1;}
+    .modal-body { padding: 15px 20px; }
+    .alert { padding: 8px 12px; margin-bottom: 12px; border-radius: 5px; font-size: 14px; display: none;}
+    .alert-danger { background: #ffd9d9; color: #a94442; border: 1px solid #f5c6cb;}
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+    #order-thankyou { background: #daf7e1; color: #1e7e34; border: 1px solid #b7e4c7; padding: 12px; border-radius: 7px; text-align: center; font-weight: bold; font-size: 17px; margin-bottom: 10px; display: none;}
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px;}
+    th, td { padding: 8px; border: 1px solid #ddd; text-align: center;}
+    .remove-btn, .remove-cart-btn { cursor: pointer; color: red; font-weight: bold; background: none; border: none; font-size: 18px;}
+    input, textarea { width: 100%; margin: 5px 0; padding: 8px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;}
+    .form-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 20px;}
+    .confirm-btn { background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 15px; cursor: pointer; transition: background-color 0.3s;}
+    .confirm-btn:hover { background-color: #218838;}
+    .close-btn { background-color: #999; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 15px; cursor: pointer; transition: background-color 0.3s;}
+    .close-btn:hover { background-color: #777;}
+    #tbl_carts th, #tbl_carts td { padding-top: 3px; padding-bottom: 3px; font-size: 15px; }
+    #tbl_carts tr { height: 15px; }
+    .product-card input[type="checkbox"]:disabled { filter: grayscale(80%); cursor: not-allowed;}
+    #search-bar-area {
+      position: fixed;
+      right: 2px;
+      top: 90px;
+      z-index: 10002;
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      gap: 0;
+    }
+    #search-bar-area.hide { display: none !important; }
+    #search-fab {
+      width: 28px;
+      height: 28px;
+      background: #fff;
+      color: #219a50;
+      border: 2px solid #219a50;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.13);
+      transition: background 0.2s, color 0.2s;
+      margin-bottom: 0;
+      margin-right: 3px;
+    }
+    #search-fab:hover {
+      background: #219a50;
+      color: #fff;
+    }
+    #search-bar-wrapper {
+      display: none;
+      align-items: center;
+      flex-direction: row;
+      gap: 0;
+      position: relative;
+      z-index: 10003;
+    }
+    #search-bar {
+      width: 175px;
+      background: #fff;
+      border: 1.8px solid #28a745;
+      border-radius: 7px 0 0 7px;
+      padding: 6px 10px;
+      outline: none;
+      font-size: 15px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.09);
+      border-right: none;
+    }
+    #search-close {
+      border: 1.8px solid #28a745;
+      border-radius: 0 7px 7px 0;
+      background: #f8d7da;
+      color: #c82333;
+      font-weight: bold;
+      font-size: 15px;
+      margin: 0;
+      padding: 7px 13px 7px 9px;
+      cursor: pointer;
+      vertical-align: middle;
+      border-left: none;
+      transition: background 0.2s, color 0.2s;
+      position: relative;
+      left: -4px;
+    }
+    #search-close:hover { background: #c82333; color: #fff; }
+    @media (max-width: 600px) {
+      #search-bar-area { right: 2px; top: 75px; }
+      #search-bar { width: 90px; font-size: 14px; }
+    }
     .marquee-flex-wrap {
       width: 100%;
       overflow: hidden;
@@ -248,173 +245,239 @@
       animation: slide-right 15s linear infinite;
     }
     @keyframes slide-right {
-      0% { transform: translateX(-100%);}
-      100% { transform: translateX(100vw);}
-    }
-    @media (max-width: 600px) {
-      .marquee-flex-text { font-size: 1.1em;}
-    }
-
-    /* PRODUCT GRID */
-    #products {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 18px;
-      justify-content: center;
-      margin: 0 auto;
-      width: 97%;
-      margin-top: 18px;
-    }
-    @media (max-width: 1100px) {
-      #products { grid-template-columns: repeat(4, 1fr);}
-    }
-    @media (max-width: 900px) {
-      #products { grid-template-columns: repeat(3, 1fr);}
-    }
-    @media (max-width: 800px) {
-      #products { grid-template-columns: repeat(2, 1fr);}
-    }
-    @media (max-width: 600px) {
-      #products {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        width: 99%;
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100vw);
       }
     }
-    .product-card {
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      width: 100%;
-      max-width: 260px;
-      text-align: center;
-      box-sizing: border-box;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.11);
-      margin-bottom: 8px;
+    @media (max-width: 600px) {
+      #footer-container { font-size: 14px; }
+    }
+
+    /* === Navbar Responsive & Hamburger Menu === */
+    .navbar-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2.1em;
+      margin-right: 12px;
+      margin-left: 2px;
+      cursor: pointer;
+      z-index: 99999;
+      align-items: center;
+    }
+    @media (max-width: 600px) {
+      .navbar-hamburger {
+        display: flex;
+        position: relative;
+      }
+      #navbar-main-container {
+        flex-direction: row !important;
+        min-height: 54px !important;
+        padding: 0 10px !important;
+      }
+      .navbar-logo-title {
+        flex-direction: row !important;
+        align-items: center !important;
+      }
+      .navbar-logo-title img {
+        height: 40px !important;
+        margin-right: 9px !important;
+        margin-left: 2px !important;
+      }
+      .navbar-title-area {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+      .navbar-title-main {
+        font-size: 1.18em !important;
+      }
+      .navbar-title-sub {
+        font-size: 1em !important;
+      }
+      .navbar-hotline-area {
+        margin-left: auto !important;
+        margin-right: 2px !important;
+        padding: 4px 7px !important;
+        border-radius: 18px !important;
+        font-size: 1em !important;
+      }
+      .navbar-tabs {
+        display: none !important;
+      }
+    }
+    /* Hamburger menu drawer */
+    .navbar-mobile-menu-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.16);
+      z-index: 10020;
+      transition: background 0.2s;
+    }
+    .navbar-mobile-menu {
       display: flex;
       flex-direction: column;
-      align-items: stretch;
-      position: relative;
-      min-width: 0;
+      position: fixed;
+      left: 0; top: 0;
+      width: 210px;
+      height: 100vh;
+      background: #228B22;
+      box-shadow: 2px 0 16px rgba(0,0,0,0.15);
+      z-index: 10021;
+      padding-top: 62px;
+      transform: translateX(-100%);
+      transition: transform 0.22s cubic-bezier(0.82,0,0.18,1);
     }
-    .product-card img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 6px;
-      background: #e6e6e6;
-    }
-    .product-card .full-note {
-      color: #d32f2f;
-      font-weight: bold;
-      font-size: 15px;
-      margin-top: 5px;
-    }
-    .product-card.disabled { opacity: 0.65; pointer-events: none; }
-    @media (max-width: 600px) {
-      .product-card { max-width: 100%; min-width: 0;}
-    }
-
-    /* Footer */
-    #footer-container {
-      width: 100vw;
-      background: var(--main-green);
+    .navbar-mobile-menu.show { transform: translateX(0); }
+    .navbar-mobile-menu .menu-link {
+      padding: 14px 24px;
       color: #fff;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 400;
-      padding: 15px 0 5px 0;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-      flex-shrink: 0;
+      font-weight: bold;
+      font-size: 1.14em;
+      text-decoration: none;
+      border-bottom: 1px solid #2ea054;
+      letter-spacing: 0.01em;
+      transition: background 0.18s;
     }
-    #footer-container .footer-address {
-      font-size: 15px;
-      color: #d9ffdf;
+    .navbar-mobile-menu .menu-link:hover {
+      background: #20a24f;
+      color: #fff;
     }
-    @media (max-width: 600px) {
-      #footer-container { font-size: 13.5px; padding: 10px 0 4px 0;}
-      #footer-container .footer-address { font-size: 13px; }
+    .navbar-mobile-menu .menu-link:last-child {
+      border-bottom: none;
     }
-
-    /* Other UI elements (cart, search, modal...) - keep as in original */
-    #floating-cart {
-      position: fixed;
-      top: 140px;
-      right: 2px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-      z-index: 9999;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    #scrollToTopBtn {
-      position: fixed;
-      bottom: 20px;
+    .navbar-mobile-menu-close {
+      display: block;
+      position: absolute;
+      top: 15px;
       right: 10px;
-      background-color: red;
-      color: white;
+      font-size: 2em;
+      color: #fff;
+      background: none;
       border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
-      font-size: 18px;
-      line-height: 30px;
-      text-align: center;
       cursor: pointer;
-      display: none;
-      z-index: 9999;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      z-index: 10022;
     }
-    /* ...keep all modal, table, alert, input, button, search bar styles from original... */
-    /* For brevity, only changed the responsive grid & navbar, rest is unchanged from your file */
+    .navbar-mobile-menu-logo {
+      position: absolute;
+      top: 10px;
+      left: 18px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .navbar-mobile-menu-logo img {
+      height: 36px;
+      border-radius: 8px;
+    }
+    .navbar-mobile-menu-logo-title {
+      color: #e1ba0a;
+      font-weight: bold;
+      font-size: 1.1em;
+      letter-spacing: 0.01em;
+    }
+    @media (min-width: 601px) {
+      .navbar-mobile-menu, .navbar-mobile-menu-backdrop, .navbar-hamburger { display: none !important; }
+      .navbar-tabs { display: flex !important; }
+    }
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <header class="navbar" id="navbar">
-    <button class="navbar__hamburger" id="navbarHamburger" aria-label="Mở menu">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="navbar__left">
-      <div class="navbar__logo">
-        <img src="https://via.placeholder.com/44x44.png?text=LOGO" alt="Logo">
-        <span class="navbar__brand">Coffee & Beer<br>DJ GooDjn</span>
+  <!-- Navbar cấu hình lại cho mobile/desktop -->
+  <div id="navbar-container">
+    <nav id="navbar-main-container" style="background:#228B22; display:flex; align-items:center; min-height:70px; padding:0 20px; position:relative;">
+      <!-- Hamburger (mobile only) -->
+      <button class="navbar-hamburger" id="navbarHamburgerBtn" aria-label="Open menu">
+        <i class="fa fa-bars"></i>
+      </button>
+      <!-- Logo + tên quán -->
+      <div class="navbar-logo-title" style="display:flex; align-items:center;">
+        <img src="https://tse4.mm.bing.net/th?id=OIP.retlmg0icVWKULyKF3ng8AHaEr&pid=Api&P=0" alt="Logo quán" style="height:48px; margin-right:14px;">
+        <div class="navbar-title-area">
+          <div class="navbar-title-main" style="color:#e1ba0a; font-weight:bold; font-size:1.6em; line-height:1;">Coffee & Beer</div>
+          <div class="navbar-title-sub" style="color:#e1ba0a; font-weight:bold; font-size:1.4em; line-height:1;">DJ GooDjn</div>
+        </div>
       </div>
-    </div>
-    <div class="navbar__hotline">
-      <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
-        <circle cx="10" cy="10" r="10" fill="#fff" />
-        <path d="M13.5 11.17c-.39 0-.77-.06-1.13-.17a1 1 0 0 0-1.04.24l-.5.5a7.94 7.94 0 0 1-3.54-3.54l.5-.5a1 1 0 0 0 .24-1.04A5.91 5.91 0 0 1 8.83 6.5a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1C5 13.07 11.93 20 18 20a1 1 0 0 0 1-1v-1.83a1 1 0 0 0-1-1z" fill="#d32f2f"/>
-      </svg>
-      <span>Hotline: <a href="tel:0902926636" style="color:#086824; text-decoration:underline;">0902 926 636</a></span>
-    </div>
-    <nav class="navbar__right">
-      <div class="navbar__menu" id="navbarMenu">
-        <a href="#order">Đặt dịch vụ</a>
-        <a href="#rating">Đánh giá dịch vụ</a>
-        <a href="#login">Login</a>
+      <!-- Hotline (mobile: dịch phải) -->
+      <div class="navbar-hotline-area" style="display:flex; align-items:center; background: #fff; border-radius: 30px; padding: 8px 22px; box-shadow:0 0 8px #1113; text-decoration:none; margin-left:24px;">
+        <i class="fa-solid fa-phone fa-lg" style="color: #e53935; margin-right:7px;"></i>
+        <span style="color:#d52724; font-weight:bold; font-size: 1.16em; letter-spacing:1px;">Hotline:</span>
+        <span style="color:#0011ff; font-weight:bold; font-size:1.18em; margin-left:7px;">0902 926 636</span>
+      </div>
+      <div style="flex:1"></div>
+      <!-- Desktop Tabs -->
+      <div class="navbar-tabs" style="display:flex; align-items:center;">
+        <a href="index.html" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none;">Đặt dịch vụ</a>
+        <a href="danhgiakh.html" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none;">Đánh giá dịch vụ</a>
+        <a href="login.html" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none;">Login</a>
+        <a href="#" id="logoutTab" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none; display:none;" onclick="logout()">Đăng xuất</a>
       </div>
     </nav>
-    <nav class="mobile-nav" id="mobileNav" aria-label="Menu di động">
-      <a href="#order" onclick="closeMobileMenu()">Đặt dịch vụ</a>
-      <a href="#rating" onclick="closeMobileMenu()">Đánh giá dịch vụ</a>
-      <a href="#login" onclick="closeMobileMenu()">Login</a>
-    </nav>
-  </header>
-
+    <!-- Hamburger Drawer Menu (mobile only) -->
+    <div class="navbar-mobile-menu-backdrop" id="navbarMobileMenuBackdrop"></div>
+    <div class="navbar-mobile-menu" id="navbarMobileMenu">
+      <button class="navbar-mobile-menu-close" id="navbarMobileMenuCloseBtn" aria-label="Đóng menu">
+        &times;
+      </button>
+      <div class="navbar-mobile-menu-logo">
+        <img src="https://tse4.mm.bing.net/th?id=OIP.retlmg0icVWKULyKF3ng8AHaEr&pid=Api&P=0" alt="Logo" />
+        <span class="navbar-mobile-menu-logo-title">DJ GooDjn</span>
+      </div>
+      <a class="menu-link" href="index.html">Đặt dịch vụ</a>
+      <a class="menu-link" href="danhgiakh.html">Đánh giá dịch vụ</a>
+      <a class="menu-link" href="login.html">Login</a>
+      <a class="menu-link" id="logoutTabMobile" href="#" style="display:none;" onclick="logout()">Đăng xuất</a>
+    </div>
+  </div>
+  <script>
+    // Hamburger menu logic
+    const navbarHamburgerBtn = document.getElementById('navbarHamburgerBtn');
+    const navbarMobileMenu = document.getElementById('navbarMobileMenu');
+    const navbarMobileMenuBackdrop = document.getElementById('navbarMobileMenuBackdrop');
+    const navbarMobileMenuCloseBtn = document.getElementById('navbarMobileMenuCloseBtn');
+    function openMobileMenu() {
+      navbarMobileMenu.classList.add('show');
+      navbarMobileMenuBackdrop.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu() {
+      navbarMobileMenu.classList.remove('show');
+      navbarMobileMenuBackdrop.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    navbarHamburgerBtn && navbarHamburgerBtn.addEventListener('click', openMobileMenu);
+    navbarMobileMenuBackdrop && navbarMobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+    navbarMobileMenuCloseBtn && navbarMobileMenuCloseBtn.addEventListener('click', closeMobileMenu);
+    // Đóng menu khi chọn một tab (menu-link)
+    navbarMobileMenu && Array.from(navbarMobileMenu.getElementsByClassName('menu-link')).forEach(link => {
+      link.addEventListener('click', function(e){
+        closeMobileMenu();
+        // Nếu là # thì không chuyển trang
+        if (link.getAttribute('href') === '#') e.preventDefault();
+      });
+    });
+    // Đồng bộ logic logout tab (nếu có)
+    function logout() {
+      // Thực hiện logic đăng xuất ở đây
+      alert('Bạn đã đăng xuất!');
+      document.getElementById('logoutTab').style.display = 'none';
+      document.getElementById('logoutTabMobile').style.display = 'none';
+      // ... Xử lý session nếu có ...
+    }
+    window.logout = logout;
+  </script>
   <div class="site-content">
-    <!-- MARQUEE -->
     <div class="marquee-flex-wrap">
       <div class="marquee-flex-text">
         Chào mừng đến với Coffee & Beer DJ GooDjn!
       </div>
     </div>
-    <!-- PRODUCT GRID -->
+
     <div id="products"></div>
     <!-- Modal đặt hàng - POPUP GIỎ HÀNG -->
     <div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-labelledby="modalOrderLabel" aria-hidden="true">
@@ -488,42 +551,6 @@
       </div>
     </div>
   </div>
-  <!-- FOOTER -->
-  <footer id="footer-container">
-    <div>© 2025 Coffee & Beer DJ GooDjn. All rights reserved.</div>
-    <div class="footer-address">Địa chỉ: 63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh</div>
-  </footer>
-  <!-- SCRIPT for Navbar Responsive/Hamburger -->
-  <script>
-    const hamburger = document.getElementById('navbarHamburger');
-    const mobileNav = document.getElementById('mobileNav');
-    function closeMobileMenu() {
-      mobileNav.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    hamburger.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (mobileNav.classList.contains('open')) {
-        closeMobileMenu();
-      } else {
-        mobileNav.classList.add('open');
-        document.body.style.overflow = 'hidden';
-      }
-    });
-    document.addEventListener('click', function(e){
-      if (mobileNav.classList.contains('open')) {
-        if (!mobileNav.contains(e.target) && e.target !== hamburger) {
-          closeMobileMenu();
-        }
-      }
-    });
-    window.addEventListener('resize', function() {
-      if (window.innerWidth > 600) {
-        closeMobileMenu();
-      }
-    });
-  </script>
-  <!-- MAIN APP LOGIC: copy your existing JS here -->
   <script>
     let cart = [];
     let productsList = [];
@@ -537,6 +564,7 @@
       return Number(num).toLocaleString('vi-VN') + "₫";
     }
 
+    // --- Tự động reload sản phẩm sau mỗi 60s (để luôn cập nhật trạng thái mới nhất) ---
     let reloadProductsInterval = null;
     function startAutoReloadProducts() {
       if (reloadProductsInterval) clearInterval(reloadProductsInterval);
@@ -546,6 +574,7 @@
     async function loadProducts() {
       try {
         productsList = await fetch('/api/getProducts').then(r=>r.json());
+        // Xử lý trường hợp API trả về lỗi
         if (!Array.isArray(productsList) || productsList.length === 0) {
           document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Không lấy được dữ liệu sản phẩm! Hãy kiểm tra API hoặc dữ liệu Google Sheets!</div>';
           return;
@@ -558,6 +587,7 @@
       }
     }
 
+    // Gom nhóm sản phẩm theo mã NV
     function groupByEmployee(products) {
       const map = {};
       products.forEach(prod => {
@@ -570,10 +600,12 @@
       return map;
     }
 
+    // Hiển thị danh sách thẻ sản phẩm
     function renderProducts(empMap) {
       const container = document.getElementById('products');
       let html = '';
       Object.entries(empMap).forEach(([maNV, emp]) => {
+        // Nếu BẤT KỲ ca nào của mã NV này có daFull = "Đã full" thì disable toàn bộ thẻ
         let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
         let cardClass = isFull ? "product-card disabled" : "product-card";
         html += `
@@ -591,6 +623,7 @@
       return cart.some(item => item.maNV === maNV && item.caLV === caLV);
     }
 
+    // Hiển thị popup chi tiết sản phẩm
     function showProductDetail(maNV) {
       currentProductDetail = maNV;
       const emp = currentEmployeeMap[maNV];
@@ -605,6 +638,7 @@
         <ul class="ca-list" style="margin-top:18px;">
       `;
       emp.caList.forEach((ca, idx) => {
+        // Ẩn ca nếu nghỉ phép/nghỉ việc
         if (ca.trangThai !== "Làm việc") return;
         const idCheckbox = `modal_ck_${maNV}_${ca.caLV}`;
         const isLocked = isCaInCart(maNV, ca.caLV);
@@ -909,6 +943,12 @@
         }
       }
     });
+  </script>
+ <div id="footer-container"></div>
+  <script>
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(html => { document.getElementById('footer-container').innerHTML = html });
   </script>
 </body>
 </html>
