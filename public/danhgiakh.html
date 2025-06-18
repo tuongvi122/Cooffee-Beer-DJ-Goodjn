@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đánh giá dịch vụ – Coffee & Beer DJ GooDjn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #fafbfc;
+      color: #23272f;
+      min-height: 100vh;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #fafbfc;
+    }
+    #navbar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 10000;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+    }
+    .site-content {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding-top: 64px;  /* Điều chỉnh nếu navbar cao/thấp hơn */
+      padding-bottom: 0;
+    }
+    #footer-container {
+      width: 100vw;
+      background: #fff;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+    @media (max-width: 600px) {
+      #footer-container { font-size: 14px; }
+    }
+
+    * { box-sizing: border-box; }
+    a { color: inherit; text-decoration: none; }
+    .container {
+      max-width: 870px;
+      margin: 22px auto 18px;
+      padding: 18px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin: 12px 0 18px;
+      font-size: 1.21em;
+      color: #145a32;
+    }
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .search-row label { font-weight: 600; }
+    .search-row input[type="text"] {
+      padding: 6px 10px;
+      border: 1px solid #888;
+      border-radius: 4px;
+      width: 170px;
+    }
+    .search-row button {
+      padding: 7px 23px;
+      background: #1252b9;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .search-row button:hover { background: #0e3f8f; }
+    .search-row .label-point { font-size: 0.97em; }
+    .search-row .point-box {
+      min-width: 36px;
+      text-align: center;
+      padding: 6px 12px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      font-weight: 700;
+      color: #d32f2f;
+      background: #fff;
+    }
+    .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+    table {
+      width: 100%;
+      min-width: 700px;
+      border-collapse: collapse;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #cfd8dc;
+      text-align: center;
+      font-size: 0.95em;
+    }
+    th { background: #eafce4; color: #20581f; font-weight: 600; }
+    .sum-row td { background: #e2f0f6; font-weight: 600; }
+    .btn-eval {
+      padding: 4px 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+    }
+    .btn-eval.green { background: #15b316; }
+    .btn-eval.red   { background: #e53935; }
+    .btn-eval:disabled { opacity: 0.7; cursor: not-allowed; }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 12000 !important;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;           /* ← THÊM DÒNG NÀY - cho phép cuộn toàn modal */
+      background: rgba(0,0,0,0.2);
+    }
+    .modal.show { display: block; }
+    #modalOrder { z-index: 1100 !important; }
+    .modal-dialog {
+      position: relative;
+      margin: 5% auto;
+      max-width: 460px;
+      width: 95%;
+      min-height: auto;           /* ← THÊM DÒNG NÀY */
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 0 0 15px 0;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      padding: 15px 20px 0 20px;
+      border-bottom: 1px solid #eee;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      margin: 0;
+      font-size: 21px;
+      flex: 1;
+      text-align: center;
+      color: #0007da;
+      font-weight: bold;
+    }
+    .close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      color: #e53935;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .close:hover {
+      color: #c62828;
+    }
+    .modal-body { padding: 15px 20px; }
+    form { display: flex; flex-direction: column; gap: 8px; }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+    .input-row label {
+      width: 120px;
+      font-weight: 500;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      background: #f8f8ff;
+    }
+    .input-row input[readonly] { background: #eee; }
+    fieldset {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+    legend { font-weight: 600; color: #1052e3; }
+    .staff-label, .service-review-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .staff-name { min-width: 60px; font-weight: 500; color: #183d1a; }
+    .staff-shift { min-width: 40px; color: #666; }
+    .staff-stars .star,
+    .service-stars .star {
+      font-size: 1.3em;
+      cursor: pointer;
+    }
+    .star { color: #FFD600; }
+    .star.gray { color: #ccc; }
+    .service-review-row.speed-row { flex-wrap: nowrap; }
+    .service-review-row.speed-row label { white-space: nowrap; margin-right: 12px; }
+    .speed-options { display: flex; gap: 16px; }
+    .speed-options label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .speed-quick { color: #15b316; font-weight: 600; }
+    .speed-normal { color: #120be8; font-weight: 600; }
+    .speed-slow  { color: #e53935; font-weight: 600; }
+    .section-title {
+      display: block;
+      font-weight: 600;
+      color: #1052e3;
+      margin-bottom: 6px;
+      margin-top: 8px;
+    }
+    #popupComment {
+      width: 100%;
+      min-height: 60px;
+      padding: 6px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background: #f9f9fc;
+      font-size: 1.2em;
+      line-height: 1.4;
+    }
+    .popup-btns {
+      text-align: center;
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .popup-btns button {
+      padding: 8px 20px;
+      border-radius: 5px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 15px;
+      min-width: 100px;
+    }
+    .popup-btns .send  { background: #10b314; color: #fff; }
+    .popup-btns .close { background: #e53935; color: #fff; }
+    .popup-thank {
+      padding: 22px;
+      text-align: center;
+      border: 1px solid #222;
+      background: #e1f1fb;
+      border-radius: 9px;
+    }
+    .popup-thank .title {
+      font-size: 1.18em;
+      font-weight: 600;
+      color: #0e3f8f;
+      margin-bottom: 8px;
+    }
+    .popup-thank .btn-back {
+      margin-top: 12px;
+      padding: 7px 20px;
+      background: #03a9f4;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+    @media (max-width: 700px) {
+      .container { padding: 12px; }
+      table { font-size: 0.9em; }
+      .input-row { flex-direction: column; align-items: flex-start; }
+      .search-row { flex-direction: column; align-items: flex-start; }
+      .modal-dialog { max-width: 350px !important; width: 95vw !important; }
+      .popup-btns { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header/Navbar -->
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('navbar-container').innerHTML = html);
+  </script>
+  <!-- Main content -->
+  <div class="site-content">
+    <div class="container">
+      <div class="search-row">
+        <label for="phoneInput">Số ĐT đặt dịch vụ:</label>
+        <input type="text" id="phoneInput" maxlength="15" placeholder="Nhập SĐT…" />
+        <button id="searchBtn">Tìm kiếm</button>
+        <span class="label-point">Tổng điểm tích lũy trong 24h <span id="currentMonth"></span>:</span>
+        <span class="point-box" id="totalPointBox">0</span>
+      </div>
+      <h2>Danh sách dịch vụ đã sử dụng trong 24h</h2>
+      <div class="table-wrap">
+        <table id="ordersTable">
+          <thead>
+            <tr>
+              <th>STT</th><th>Mã đơn</th><th>Thời gian</th><th>Số bàn</th>
+              <th>NV phụ trách</th><th>Tổng tiền</th><th>Đánh giá</th>
+              <th>Trạng thái</th><th>Điểm</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+          <tfoot>
+            <tr class="sum-row">
+              <td colspan="5" style="text-align:right;">Tổng cộng</td>
+              <td id="sumTotal">0</td>
+              <td colspan="3" id="sumPoint"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <!-- Popup đánh giá -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+      <div class="modal-dialog mt-4">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="reviewModalLabel">Form đánh giá dịch vụ</h5>
+            <button type="button" class="close" onclick="closePopup()" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="popupOrderId" style="text-align: center; color: #18b318; margin-bottom: 10px; font-size: 1em; font-weight: 500;"></div>
+            <form id="reviewForm" autocomplete="off" novalidate>
+              <div class="input-row">
+                <label for="popupName">Khách hàng:</label>
+                <input type="text" id="popupName" name="name" readonly />
+              </div>
+              <div class="input-row">
+                <label for="popupPhone">Số điện thoại:</label>
+                <input type="text" id="popupPhone" name="phone" readonly />
+              </div>
+              <div class="input-row">
+                <label for="popupEmail">Địa chỉ Email:</label>
+                <input type="email" id="popupEmail" name="email" readonly />
+              </div>
+              <div class="input-row">
+                <label for="popupTable">Số bàn:</label>
+                <input type="text" id="popupTable" name="table" readonly />
+              </div>
+              <div class="input-row">
+                <label for="popupTotal">Tổng tiền:</label>
+                <input type="text" id="popupTotal" name="total" readonly />
+              </div>
+              <fieldset>
+                <legend>1. Đánh giá thái độ phục vụ nhân viên</legend>
+                <div id="popupStaffList"></div>
+              </fieldset>
+              <fieldset>
+                <legend>2. Đánh giá dịch vụ quán</legend>
+                <div class="service-review-row">
+                  <label for="serviceStars">Chất lượng phục vụ:</label>
+                  <div id="popupServiceStars" class="service-stars"></div>
+                </div>
+                <div class="service-review-row">
+                  <label>Tốc độ phục vụ:</label>
+                  <div class="speed-options">
+                    <label><input type="radio" name="speed" value="Nhanh" /><span class="speed-quick">Nhanh</span></label>
+                    <label><input type="radio" name="speed" value="Bình Thường" /><span class="speed-normal">Bình Thường</span></label>
+                    <label><input type="radio" name="speed" value="Chậm" /><span class="speed-slow">Chậm</span></label>
+                  </div>
+                </div>
+              </fieldset>
+              <div>
+                <label for="popupComment" class="section-title">3. Nhận xét chung:</label>
+                <textarea id="popupComment" name="comment" placeholder="Ghi nhận xét…" required></textarea>
+              </div>
+              <div class="popup-btns">
+                <button type="submit" class="send">Gửi phiếu</button>
+                <button type="button" class="close" onclick="closePopup()">Đóng</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Popup cảm ơn -->
+    <div class="modal fade" id="thankModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="popup-thank" role="alert">
+          <div class="title">Cảm ơn bạn đã đánh giá!</div>
+          <div>Chúc quý khách một ngày vui vẻ.</div>
+          <button class="btn-back" onclick="closeThankPopup()">Quay lại</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer -->
+  <div id="footer-container"></div>
+  <script>
+    fetch('footer.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('footer-container').innerHTML = html);
+  </script>
+  <!-- JS xử lý tìm đơn và gửi đánh giá -->
+  <script>
+    document.getElementById('currentMonth').innerText =
+      new Date().toLocaleString('vi-VN',{month:'numeric',year:'numeric'});
+
+    let ordersData = [];
+
+    document.getElementById('searchBtn').addEventListener('click', async()=>{
+      const phone = document.getElementById('phoneInput').value.trim();
+      if(!phone){ alert('Nhập số điện thoại!'); return; }
+      try {
+        const res = await fetch('/api/searchOrders',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({phone})
+        });
+        const data = await res.json();
+        ordersData = data.orders||[];
+        document.getElementById('totalPointBox').innerText = data.totalPoint||0;
+        renderTable();
+      } catch(e){
+        console.error(e);
+        alert('Lỗi tìm đơn, xem console.');
+      }
+    });
+
+    function renderTable(){
+      const b = document.getElementById('ordersTableBody');
+      b.innerHTML = '';
+      let sumT=0, sumP=0;
+      ordersData.forEach((o,i)=>{
+        sumT += o.total; sumP += o.point||0;
+        const btn = o.reviewed
+          ? '<button class="btn-eval red" disabled>Đã đánh giá</button>'
+          : `<button class="btn-eval green" onclick="openPopup(${i})">Đánh giá</button>`;
+
+        b.insertAdjacentHTML('beforeend',`
+          <tr>
+            <td>${i+1}</td>
+            <td>${o.orderId}</td>
+            <td>${o.time}</td>
+            <td>${o.table}</td>
+            <td style="text-align:left">${o.staffCodes.join(', ')}</td>
+            <td>${o.total.toLocaleString()}</td>
+            <td>${btn}</td>
+            <td>${o.reviewed?'Đã đánh giá':''}</td>
+            <td>${o.reviewed?o.point:''}</td>
+          </tr>`);
+      });
+      document.getElementById('sumTotal').innerText = sumT.toLocaleString();
+      document.getElementById('sumPoint').innerText = sumP||'';
+    }
+
+    function renderStaffList(idx){
+      const d = document.getElementById('popupStaffList');
+      d.innerHTML = '';
+      ordersData[idx].staffList.forEach((nv,i)=>{
+        d.insertAdjacentHTML('beforeend',`
+          <div class="staff-label">
+            <span class="staff-name">${nv.code}</span>
+            <span class="staff-shift">Ca ${nv.shift}</span>
+            <span class="staff-stars" data-i="${i}">${renderStars('staff',i,0)}</span>
+          </div>`);
+      });
+    }
+
+    function renderStars(type,row,val){
+      let html='';
+      for(let i=1;i<=5;i++){
+        html += `<i class="fa fa-star star${val<i?' gray':''}"
+                   data-type="${type}" data-row="${row}" data-val="${i}"
+                   onclick="setStar(this)"></i>`;
+      }
+      return html;
+    }
+
+    window.setStar = e=>{
+      const t=e.dataset.type, r=+e.dataset.row, v=+e.dataset.val;
+      const idx = +document.getElementById('reviewForm').dataset.idx;
+      if(t==='staff'){
+        const stars = document.querySelectorAll(`#popupStaffList .staff-stars[data-i="${r}"] .star`);
+        stars.forEach((s,i)=>s.classList.toggle('gray',i>=v));
+        ordersData[idx].staffList[r].stars = v;
+      } else {
+        document.querySelectorAll('#popupServiceStars .star')
+          .forEach((s,i)=>s.classList.toggle('gray',i>=v));
+        ordersData[idx].serviceStars = v;
+      }
+    };
+
+    window.openPopup = idx=>{
+      const o=ordersData[idx];
+      document.getElementById('reviewModal').classList.add('show');
+      document.getElementById('reviewModal').style.display = 'block';
+      document.getElementById('reviewForm').dataset.idx=idx;
+      document.getElementById('popupOrderId').textContent = `Mã đơn hàng: ${o.orderId}`;
+      ['Name','Phone','Email','Table','Total'].forEach(k=>{
+        const el=document.getElementById('popup'+k);
+        el.value = k==='Total' ? o.total.toLocaleString() : o[k.toLowerCase()];
+      });
+      o.staffList.forEach(nv=>nv.stars=0);
+      o.serviceStars=0;
+      renderStaffList(idx);
+      document.getElementById('popupServiceStars').innerHTML = renderStars('service',0,0);
+      document.querySelectorAll('input[name="speed"]').forEach(r=>r.checked=(r.value==='Nhanh'));
+      document.getElementById('popupComment').value='';
+    };
+
+    window.closePopup = ()=>{
+      document.getElementById('reviewModal').classList.remove('show');
+      document.getElementById('reviewModal').style.display = 'none';
+    };
+
+    document.getElementById('reviewForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const idx = +e.target.dataset.idx, o=ordersData[idx];
+      const staffReviews = o.staffList.map(nv=>({code:nv.code,shift:nv.shift,stars:nv.stars||0}));
+      const serviceStars = o.serviceStars||0;
+      const speed = document.querySelector('input[name="speed"]:checked').value;
+      const comment = document.getElementById('popupComment').value.trim();
+      if(!comment){ alert('Nhận xét không được để trống!'); return; }
+      try{
+        await fetch('/api/submitReview',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({order:o,staffReviews,serviceStars,speed,comment})
+        });
+        o.reviewed=true; o.point=10;
+        renderTable(); closePopup();
+        document.getElementById('thankModal').classList.add('show');
+        document.getElementById('thankModal').style.display = 'block';
+      }catch(err){
+        console.error(err);
+        alert('Gửi thất bại!');
+      }
+    });
+
+    window.closeThankPopup = ()=>{
+      document.getElementById('thankModal').classList.remove('show');
+      document.getElementById('thankModal').style.display = 'none';
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng nhập quản lý</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background:#f6f7fb; min-height:100vh; margin:0; }
+    .login-container {
+      max-width: 390px; margin: 110px auto; background: #fff;
+      border-radius: 15px; box-shadow: 0 2px 20px #0002; padding: 38px 30px;
+    }
+    h2 { text-align:center; color:#228B22; margin-bottom:24px; }
+    input { width:100%; margin-bottom:14px; padding:10px; font-size:16px; border-radius:5px; border:1px solid #bbb; }
+    button { width:100%; padding:10px; background:#228B22; color:#fff; font-weight:bold; border:none; border-radius:7px; font-size:17px; cursor:pointer; }
+    #loginError { color:#d32f2f; text-align:center; margin-bottom:10px; font-size:14px; display:none; }
+  </style>
+</head>
+<body>
+    <!-- Header/Navbar -->
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('navbar-container').innerHTML = html);
+  </script>
+
+  <div class="login-container">
+    <h2>Đăng nhập quản lý</h2>
+    <input id="loginUser" type="text" placeholder="Tên đăng nhập">
+    <input id="loginPass" type="password" placeholder="Mật khẩu">
+    <div id="loginError"></div>
+    <button onclick="doLogin()">Đăng nhập</button>
+  </div>
+  <script>
+  // Đường dẫn tới API backend vừa tạo (Vercel tự sinh /api/get-login)
+  const LOGIN_API_URL = '/api/get-login';
+
+  let validCredentials = null;
+
+  // Tải user/pass từ backend
+  async function loadCredentials() {
+    try {
+      const response = await fetch(LOGIN_API_URL);
+      const data = await response.json();
+      if (data.username && data.password) {
+        validCredentials = {
+          username: data.username,
+          password: data.password
+        };
+      } else {
+        throw new Error('Không nhận được user/pass');
+      }
+    } catch (error) {
+      validCredentials = { username: 'admin', password: '123456' }; // fallback
+      alert('Không thể tải thông tin đăng nhập từ Google Sheets.');
+    }
+  }
+
+  function checkLoginLock() {
+    var lockTime = localStorage.getItem('loginLockTime');
+    var now = Date.now();
+    if (lockTime && now < parseInt(lockTime)) {
+      var left = Math.ceil((parseInt(lockTime) - now) / 60000);
+      document.getElementById('loginError').innerText = 'Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau ' + left + ' phút!';
+      document.getElementById('loginError').style.display = 'block';
+      document.querySelector('button').disabled = true;
+      return true;
+    } else {
+      if (lockTime) {
+        localStorage.removeItem('loginFailCount');
+        localStorage.removeItem('loginLockTime');
+      }
+      document.querySelector('button').disabled = false;
+      return false;
+    }
+  }
+
+  async function doLogin() {
+    if (checkLoginLock()) return;
+
+    if (!validCredentials) {
+      document.getElementById('loginError').innerText = 'Đang tải thông tin đăng nhập...';
+      document.getElementById('loginError').style.display = 'block';
+      await loadCredentials();
+    }
+
+    var user = document.getElementById('loginUser').value.trim();
+    var pass = document.getElementById('loginPass').value.trim();
+
+    if(user === validCredentials.username && pass === validCredentials.password) {
+      localStorage.setItem('isAdmin', '1');
+      localStorage.removeItem('loginFailCount');
+      localStorage.removeItem('loginLockTime');
+      window.location = 'quanly.html';
+    } else {
+      var currentFailCount = parseInt(localStorage.getItem('loginFailCount') || '0');
+      currentFailCount = currentFailCount + 1;
+      localStorage.setItem('loginFailCount', currentFailCount.toString());
+
+      if (currentFailCount >= 5) {
+        var lockUntil = Date.now() + 10 * 60 * 1000;
+        localStorage.setItem('loginLockTime', lockUntil.toString());
+        document.getElementById('loginError').innerText = 'Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau 10 phút!';
+        document.getElementById('loginError').style.display = 'block';
+        document.querySelector('button').disabled = true;
+      } else {
+        document.getElementById('loginError').innerText = 'Sai tên đăng nhập hoặc mật khẩu! (' + currentFailCount + '/5)';
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+  }
+
+  window.onload = async function() {
+    await loadCredentials();
+    checkLoginLock();
+
+    var currentFailCount = parseInt(localStorage.getItem('loginFailCount') || '0');
+    if (currentFailCount > 0 && !localStorage.getItem('loginLockTime')) {
+      document.getElementById('loginError').innerText = 'Sai tên đăng nhập hoặc mật khẩu! (' + currentFailCount + '/5)';
+      document.getElementById('loginError').style.display = 'block';
+    }
+
+    setInterval(function() {
+      var wasLocked = checkLoginLock();
+      if (!wasLocked) {
+        var lockTime = localStorage.getItem('loginLockTime');
+        if (!lockTime) {
+          var currentFailCount = parseInt(localStorage.getItem('loginFailCount') || '0');
+          if (currentFailCount === 0) {
+            document.getElementById('loginError').style.display = 'none';
+          }
+        }
+      }
+    }, 5000);
+  };
+</script>
+</body>
+</html>

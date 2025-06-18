@@ -1,0 +1,109 @@
+require('dotenv').config();
+const { google } = require('googleapis');
+const nodemailer = require('nodemailer');
+
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  const { order, staffReviews, serviceStars, speed, comment } = req.body;
+  if (!order || !Array.isArray(staffReviews)) {
+    return res.status(400).json({ error: 'Missing payload' });
+  }
+
+  // 1. Auth Sheets
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      private_key:  process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
+    },
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  });
+  const sheets = google.sheets({ version: 'v4', auth });
+  const SHEET_ID = process.env.GOOGLE_SHEET_ID;
+
+  // 2. Ghi vào sheet "KHđánh giá"
+  // --- Format ngày giờ VN: DD/MM/YYYY HH:MM:SS ---
+  const d = new Date();
+  const two = v => v.toString().padStart(2, '0');
+  const now = [
+    two(d.getDate()),
+    two(d.getMonth()+1),
+    d.getFullYear()
+  ].join('/') + ' ' + [
+    two(d.getHours()),
+    two(d.getMinutes()),
+    two(d.getSeconds())
+  ].join(':');
+
+  const rows = staffReviews.map((nv, idx) => ([
+  now,                   // Thời gian
+  order.orderId,         // Mã đơn
+  order.name,            // Tên KH
+  order.phone,           // SĐT
+  order.email,           // Email
+  order.table,           // Số bàn (nếu cần)
+  nv.code,               // Mã NV
+  nv.shift,              // Ca LV
+  nv.stars,              // Đánh giá sao NV
+  serviceStars,          // Đánh giá sao quán
+  speed,                 // Tốc độ phục vụ
+  comment,               // Nhận xét chung
+  idx === 0 ? (order.point || 10) : '' // <-- CHỈ DÒNG ĐẦU ghi điểm thưởng
+]));
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: `'KHđánh giá'!A6`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: rows }
+  });
+
+  // 3. Cập nhật trạng thái và điểm đánh giá vào sheet "Orders"
+  // Đọc toàn bộ sheet Orders để xác định vị trí cần update
+  const ordersResult = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `'Orders'!A1:Q`
+  });
+  const orderRows = ordersResult.data.values || [];
+
+  if (orderRows.length < 2) {
+    return res.status(400).json({ error: 'Orders sheet empty' });
+  }
+
+  // Xác định vị trí cột: P (15) cho trạng thái đánh giá, Q (16) cho điểm thưởng
+  const colP = 'P'; // Trạng thái đánh giá
+  const colQ = 'Q'; // Điểm thưởng
+
+  // orderRows[0] là tiêu đề, dữ liệu bắt đầu từ orderRows[1] (dòng 2 trên Google Sheet)
+  let firstReviewRow = -1;
+  for (let i = 1; i < orderRows.length; i++) {
+    const row = orderRows[i];
+    // Cột B là index 1 (MÃ ĐH), đổi sang so sánh chuỗi
+    if (row[1] && row[1].toString().trim() === order.orderId.toString().trim()) {
+      // Cập nhật trạng thái đánh giá ở cột P (15)
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `'Orders'!${colP}${i + 1}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [['Đã đánh giá']] }
+      });
+      // Đánh dấu dòng đầu tiên để cập nhật điểm thưởng
+      if (firstReviewRow === -1) {
+        firstReviewRow = i;
+      }
+    }
+  }
+
+  // Chỉ cập nhật điểm thưởng ở dòng đầu tiên
+  if (firstReviewRow !== -1) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: `'Orders'!${colQ}${firstReviewRow + 1}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: [[order.point || 10]] }
+    });
+  }
+
+  return res.json({ ok: true });
+};

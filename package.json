@@ -1,0 +1,19 @@
+{
+  "name": "my-vercel-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "googleapis": "^115.0.0",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.10.1"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

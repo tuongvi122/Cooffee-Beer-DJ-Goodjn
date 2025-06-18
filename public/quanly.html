@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý đơn hàng – Coffee & Beer DJ GooDjn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #fafbfc;
+      color: #23272f;
+      min-height: 100vh;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #fafbfc;
+    }
+    #navbar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 10000;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+    }
+    .site-content {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding-top: 70px;
+      padding-bottom: 0;
+    }
+    #footer-container {
+      width: 100vw;
+      background: #fff;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+    @media (max-width: 600px) {
+      #footer-container { font-size: 14px; }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 22px auto 18px;
+      padding: 18px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin: 12px 0 18px;
+      font-size: 1.35em;
+      color: #157c07;
+      letter-spacing: 1px;
+    }
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .table-actions label {
+      font-weight: 500;
+      margin-right: 6px;
+    }
+    .table-actions .entries-select {
+      padding: 3px 7px;
+      border-radius: 5px;
+      border: 1px solid #888;
+      font-size: 15px;
+    }
+    .table-actions .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .table-actions input[type="text"] {
+      padding: 5px 10px;
+      border: 1.2px solid #888;
+      border-radius: 5px;
+      font-size: 15px;
+      width: 200px;
+      transition: border 0.2s;
+    }
+    .orders-table-wrap {
+      overflow-x: auto;
+      margin-bottom: 12px;
+    }
+    table.orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+      margin-bottom: 8px;
+    }
+    table.orders-table th, table.orders-table td {
+      padding: 8px 6px;
+      border: 1px solid #cfd8dc;
+      text-align: center;
+      font-size: 1em;
+    }
+    table.orders-table th {
+      background: #eafce4;
+      color: #20581f;
+      font-weight: 600;
+    }
+    table.orders-table td {
+      background: #fff;
+    }
+    .btn-confirm, .btn-huy, .btn-daxacnhan {
+      padding: 4px 15px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.18s;
+    }
+    .btn-confirm { background: #16c924; }
+    .btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-daxacnhan { background: #0b4fd7;}
+    .btn-huy { background: #e53935; cursor: not-allowed; }
+    .note-huy { color: #e53935; font-weight: 600; }
+    .note-da { color: #0b4fd7; font-weight: 600; }
+    .note-xacnhan { color: #16c924; font-weight: 600; }
+    .table-pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 2px;
+      margin: 8px 0 0 0;
+    }
+    .table-pagination button {
+      border: none;
+      background: #fff;
+      color: #1174e6;
+      padding: 3px 10px;
+      margin: 0 2px;
+      border-radius: 5px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 15px;
+      border: 1px solid #cfd8dc;
+    }
+    .table-pagination button.active,
+    .table-pagination button:disabled {
+      background: #0b8ffe;
+      color: #fff;
+      font-weight: bold;
+      cursor: default;
+    }
+    .table-pagination button:disabled {
+      opacity: 0.6;
+    }
+    .table-pagination span {
+      padding: 0 4px;
+      color: #444;
+    }
+    .orders-table th, .orders-table td { vertical-align: middle; }
+
+    .ql-ghichu-box {
+      min-width: 100px;
+      text-align: left;
+      font-size: 0.90em;
+      color: #0b4fd7;
+      word-break: break-word;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 12000 !important;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: rgba(0,0,0,0.2);
+    }
+    .modal.show { display: block; }
+    .modal-dialog {
+      position: relative;
+      margin: 5% auto;
+      max-width: 600px;
+      width: 100%;
+      min-width: 340px;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 0 0 15px 0;
+      box-shadow: 0 0 20px rgb(2, 163, 18);
+      border: 2px solid #14b55f;
+      max-width: 100%;
+    }
+    .modal-header {
+      padding: 15px 20px 0 20px;
+      border-bottom: 1px solid #eee;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      margin: 0;
+      font-size: 21px;
+      flex: 1;
+      text-align: center;
+      color: #05458b;
+      font-weight: bold;
+    }
+    .close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      color: #e53935;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .close:hover { color: #c62828; }
+    .modal-body { 
+      padding: 15px 16px;
+    }
+    .order-info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .order-info-row label {
+      min-width: 120px;
+      font-weight: 500;
+      color: #0b4fd7;
+    }
+    .order-info-row input {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 1em;
+      background: #f8f8ff;
+    }
+    .staff-list-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 0 0;
+      table-layout: fixed;
+      background: #fff;
+    }
+    .staff-list-table th, .staff-list-table td {
+      border: 1px solid #d7d7d7;
+      text-align: center;
+      font-size: 0.96em;
+      padding: 3px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: #fff;
+      max-width: 85px;
+    }
+    .staff-list-table th, .staff-list-table td { width: auto; }
+    .staff-list-table th:nth-child(1), .staff-list-table td:nth-child(1) { width: 60px; }
+    .staff-list-table th:nth-child(2), .staff-list-table td:nth-child(2) { width: 32px; }
+    .staff-list-table th:nth-child(3), .staff-list-table td:nth-child(3) { width: 55px; }
+    .staff-list-table th:nth-child(4), .staff-list-table td:nth-child(4) { width: 80px; }
+    .staff-list-table th:nth-child(5), .staff-list-table td:nth-child(5) { width: 55px; }
+    .btn-tatca, .btn-huydon, .btn-them-nv {
+      padding: 4px 13px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-tatca { background: #0b4fd7; color: #fff; }
+    .btn-huydon { background: #ff9800; color: #fff; }
+    .btn-them-nv { background: #10b314; color: #fff; }
+    .btn-them-nv:hover { background: #0e9e12; }
+    .staff-both-btns {
+      margin: 7px 0 10px 0;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .section-title { 
+      font-weight: 600; 
+      color: #1052e3; 
+      margin-bottom: 6px; 
+      margin-top: 8px;
+      display: block; 
+    }
+    .ql-ghichu-input {
+      width: 97.5%;
+      min-height: 50px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      font-size: 1.1em;
+      padding: 4px;
+      margin-bottom: 12px;
+      background: #f9f9fc;
+      line-height: 1.4;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .btn-popup-xacnhan, .btn-popup-close {
+      padding: 8px 20px;
+      border-radius: 5px;
+      font-weight: 600;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      min-width: 100px;
+      transition: background 0.2s;
+    }
+    .btn-popup-xacnhan { background: #10b314; color: #fff; }
+    .btn-popup-close { background: #e53935; color: #fff; }
+    .popup-thank {
+      padding: 22px;
+      text-align: center;
+      border: 1px solid #222;
+      background: #e1f1fb;
+      border-radius: 9px;
+    }
+    .popup-thank .title {
+      font-size: 1.18em;
+      font-weight: 600;
+      color: #0e3f8f;
+      margin-bottom: 8px;
+    }
+    .popup-thank .btn-back {
+      margin-top: 12px;
+      padding: 7px 20px;
+      background: #03a9f4;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+    .new-staff-row { background: #f0f8ff !important; }
+    .original-staff-label {
+      color: #999;
+      font-style: italic;
+      font-size: 12px;
+    }
+    /* Thu nhỏ nút Xóa */
+    .delete-staff-btn {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      min-width: 48px;
+      min-height: 26px;
+      padding: 4px 10px;
+      font-size: 0.96em;
+      border-radius: 4px;
+      font-weight: 600;
+      margin: 0 auto;
+      display: block;
+      transition: background 0.18s;
+    }
+    .delete-staff-btn:hover {
+      background: #c62828;
+    }
+    /* Thu nhỏ dropdown */
+    .staff-action-select {
+      width: 140px;
+      min-width: 75px;
+      height: 28px;
+      font-size: 0.9em;
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid #736c6c;
+      box-sizing: border-box;
+      text-align: center;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    @media (max-width: 600px) {
+      .modal-dialog { max-width: 99vw !important; min-width: 0; }
+      .staff-list-table th, .staff-list-table td { font-size: 0.92em; padding: 1px 0; }
+      .staff-action-select { width: 55px; font-size: 0.93em; height: 22px; }
+      .delete-staff-btn { min-width: 34px; min-height: 19px; font-size: 0.91em; }
+    }
+    </style>
+</head>
+<body>
+ <div id="navbar-container"></div>
+  <script>
+// Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
+if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
+
+fetch('navbar.html').then(r=>r.text()).then(html=>{
+  document.getElementById('navbar-container').innerHTML=html;
+  showLogoutTabIfLoggedIn();
+});
+
+// Hiện tab Đăng xuất nếu đã đăng nhập
+function showLogoutTabIfLoggedIn() {
+  var logoutTab = document.getElementById('logoutTab');
+  if(localStorage.getItem('isAdmin') === '1') {
+    if (logoutTab) logoutTab.style.display = '';
+  } else {
+    if (logoutTab) logoutTab.style.display = 'none';
+  }
+}
+
+// Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
+function logout() {
+  localStorage.removeItem('isAdmin');
+  window.location.replace('index.html'); // Dùng replace để không thể quay lại bằng Back
+}
+  
+  </script>
+  <div class="site-content">
+    <div class="container">
+      <h2>DANH SÁCH ĐƠN HÀNG TRONG 24H</h2>
+      <div class="table-actions">
+        <div>
+          <label for="entriesSelect">Show</label>
+          <select id="entriesSelect" class="entries-select">
+            <option>10</option><option>20</option><option>50</option><option>100</option>
+          </select>
+          entries
+        </div>
+        <div class="search-box">
+          <label for="filterInput">Tìm kiếm</label>
+          <input type="text" id="filterInput" placeholder="Nhập từ khóa...">
+        </div>
+      </div>
+      <div class="orders-table-wrap">
+        <table class="orders-table" id="ordersTable">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Mã đơn hàng</th>
+              <th>Tên khách hàng</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ email</th>
+              <th>Khách ghi chú</th>
+              <th>Số bàn</th>
+              <th>Mã NV</th>
+              <th>Tổng tiền</th>
+              <th>Xác nhận đơn hàng</th>
+              <th>Quản lý ghi chú</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+      <div class="table-pagination" id="tablePagination"></div>
+      <div id="showingInfo" style="margin:7px 0 0 0; color:#333; font-size:15px"></div>
+    </div>
+    <!-- Popup xác nhận/hủy -->
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+      <div class="modal-dialog mt-4">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="orderModalLabel">THÔNG TIN ĐƠN HÀNG</h5>
+            <button type="button" class="close" onclick="closeOrderModal()" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div style="text-align:center;color:#16a800;font-size:1.08em;margin-bottom:10px">
+              Mã đơn hàng: <span id="modalOrderId"></span>
+            </div>
+            <div class="order-info-row">
+              <label for="modalTenKH">Tên khách hàng:</label>
+              <input id="modalTenKH" readonly>
+            </div>
+            <div class="order-info-row">
+              <label for="modalSDT">Số điện thoại:</label>
+              <input id="modalSDT" readonly>
+            </div>
+            <div class="order-info-row">
+              <label for="modalEmail">Địa chỉ Email:</label>
+              <input id="modalEmail" readonly>
+            </div>
+            <div class="order-info-row">
+              <label for="modalTable">Số bàn:</label>
+              <input id="modalTable">
+            </div>
+            <label class="section-title">1. Nhân viên phục vụ</label>
+            <div class="staff-both-btns">
+              <button class="btn-tatca" onclick="modalTatCaDongY()">Tất cả đồng ý</button>
+              <button class="btn-huydon" onclick="modalHuyDon()">Hủy đơn</button>
+              <button class="btn-them-nv" onclick="modalThemNhanVien()">+ Thêm NV</button>
+            </div>
+            <table class="staff-list-table" id="modalStaffTable">
+              <thead>
+                <tr>
+                  <th>Mã NV</th>
+                  <th>Ca LV</th>
+                  <th>Đơn giá</th>
+                  <th>Thực hiện đơn hàng</th>
+                  <th>Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" style="text-align:right;font-weight:bold;color:#0b4fd7;">Tổng cộng</td>
+                  <td id="staffTotal" style="font-weight:bold;color:#e53935;text-align:center;"></td>
+                  <td colspan="2"></td>
+                </tr>
+              </tfoot>
+            </table>
+            <label for="modalGhiChu" class="section-title">2. Quản lý ghi chú</label>
+            <textarea class="ql-ghichu-input" id="modalGhiChu" placeholder="Nhập ghi chú quản lý..."></textarea>
+            <div class="modal-footer">
+              <button class="btn-popup-xacnhan" onclick="modalSubmitXacNhan()">Xác nhận</button>
+              <button class="btn-popup-close" onclick="closeOrderModal()">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Popup cảm ơn -->
+    <div class="modal fade" id="thankModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="popup-thank" role="alert">
+          <div class="title" id="thankMsg">Đơn hàng đã được xử lý!</div>
+          <div>Cảm ơn bạn đã sử dụng hệ thống quản lý.</div>
+          <button class="btn-back" onclick="closeThankPopup()">Quay lại</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="footer-container"></div>
+  <script>
+    fetch('footer.html').then(r=>r.text()).then(html=>document.getElementById('footer-container').innerHTML=html);
+  </script>
+  <script>
+    let PRODUCT_STAFFS = [];
+    const ENTRIES_OPTIONS = [10,20,50,100];
+    let ORDERS = [];
+    let FILTERED = [];
+    let page = 1, entries = 10, totalPages = 1;
+    let modalOrder = null, modalOrderIndex = -1, modalStaffs = [], modalStatus = '';
+    let modalHasNewStaff = false;
+
+    async function fetchProductStaffs() {
+      try {
+        const res = await fetch('/api/orderquanly?products=1');
+        const data = await res.json();
+        PRODUCT_STAFFS = data.products || [];
+      } catch (error) {
+        PRODUCT_STAFFS = [];
+      }
+    }
+    async function fetchOrders() {
+      try {
+        const res = await fetch('/api/orderquanly');
+        const data = await res.json();
+        ORDERS = data.orders || [];
+      } catch (error) {
+        ORDERS = [];
+      }
+    }
+    function renderTable() {
+      let html = "";
+      const start = (page-1)*entries, end = start+entries;
+      const paged = FILTERED.slice(start, end);
+      paged.forEach((o,i)=>{
+        let maNVs = o.staffList.map(s=>s.maNV).join(", ");
+        let btn = "";
+        let payStatus = o.payStatus || "";
+        if(o.confirmStatus==="chuaxacnhan") btn = `<button class="btn-confirm" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
+        else if(o.confirmStatus==="daxacnhan") btn = `<button class="btn-daxacnhan" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
+        else if(o.confirmStatus==="huydon") btn = `<button class="btn-huy" disabled>Hủy đơn</button>`;
+        html += `<tr>
+          <td>${o.time}</td>
+          <td>${o.orderId}</td>
+          <td>${o.name}</td>
+          <td>${o.phone}</td>
+          <td>${o.email}</td>
+          <td>${o.note}</td>
+          <td>${o.table}</td>
+          <td>${maNVs}</td>
+          <td>${o.total}</td>
+          <td>${btn}</td>
+          <td class="ql-ghichu-box">${o.qlNote||""}</td>
+        </tr>`;
+      });
+      document.getElementById("ordersTableBody").innerHTML = html;
+      document.getElementById("showingInfo").textContent = `Showing ${Math.min(FILTERED.length, start+1)} to ${Math.min(end,FILTERED.length)} of ${FILTERED.length} entries`;
+      renderPagination();
+    }
+    function renderPagination() {
+      if(FILTERED.length===0) { document.getElementById("tablePagination").innerHTML = ""; return; }
+      totalPages = Math.ceil(FILTERED.length/entries);
+      let html = "";
+      html += `<button ${page==1?"disabled":""} onclick="gotoPage(${Math.max(1,page-1)})">Previous</button>`;
+      let start = Math.max(1, page-2), end = Math.min(totalPages, page+2);
+      if(start>1) html += `<button onclick="gotoPage(1)">1</button><span>...</span>`;
+      for(let p=start;p<=end;p++) html += `<button ${p==page?"class='active' disabled":""} onclick="gotoPage(${p})">${p}</button>`;
+      if(end<totalPages) html += `<span>...</span><button onclick="gotoPage(${totalPages})">${totalPages}</button>`;
+      html += `<button ${page==totalPages?"disabled":""} onclick="gotoPage(${Math.min(totalPages,page+1)})">Next</button>`;
+      document.getElementById("tablePagination").innerHTML = html;
+    }
+    function gotoPage(p) { page=Math.max(1,Math.min(totalPages,p)); renderTable(); }
+    function filterTable() {
+      const kw = document.getElementById("filterInput").value.trim().toLowerCase();
+      FILTERED = ORDERS.filter(o =>
+        o.time.toLowerCase().includes(kw) ||
+        o.orderId.toLowerCase().includes(kw) ||
+        o.name.toLowerCase().includes(kw) ||
+        o.phone.toLowerCase().includes(kw) ||
+        o.email.toLowerCase().includes(kw) ||
+        o.note.toLowerCase().includes(kw) ||
+        o.table.toLowerCase().includes(kw) ||
+        o.staffList.map(s=>s.maNV).join(", ").toLowerCase().includes(kw) ||
+        o.total.toLowerCase().includes(kw) ||
+        (o.qlNote||"").toLowerCase().includes(kw)
+      );
+      FILTERED.forEach((o,i)=>o._index=ORDERS.findIndex(orig=>orig.orderId===o.orderId));
+      page=1; renderTable();
+    }
+    document.addEventListener("DOMContentLoaded", async ()=>{
+      await fetchProductStaffs();
+      await fetchOrders();
+      FILTERED = ORDERS.map((v,i)=>({...v,_index:i}));
+      document.getElementById("entriesSelect").addEventListener("change", function(){
+        entries = parseInt(this.value)||10;
+        page = 1;
+        renderTable();
+      });
+      document.getElementById("filterInput").addEventListener("input", filterTable);
+      renderTable();
+      setInterval(async ()=>{
+        await fetchOrders();
+        filterTable();
+      }, 30000);
+    });
+
+    // Popup & Staff Table
+    function openOrderModal(idx) {
+      modalOrderIndex = idx;
+      modalOrder = {...ORDERS[idx]};
+      // Đảm bảo trạng thái luôn là "Đồng ý" cho nhân viên gốc nếu thiếu
+      modalStaffs = modalOrder.staffList.map(s=>({
+        ...s,
+        isOriginal: true,
+        donGia: parseInt(s.donGia||0),
+        donGiaOrigin: parseInt(s.donGia||0),
+        trangThai: s.trangThai || "Đồng ý"
+      }));
+      modalStatus = "chuaxacnhan";
+      modalHasNewStaff = false;
+      document.getElementById("modalOrderId").textContent = modalOrder.orderId;
+      document.getElementById("modalTenKH").value = modalOrder.name;
+      document.getElementById("modalSDT").value = modalOrder.phone;
+      document.getElementById("modalEmail").value = modalOrder.email;
+      document.getElementById("modalTable").value = modalOrder.table;
+      document.getElementById("modalGhiChu").value = modalOrder.qlNote || "";
+      renderModalStaffTable();
+      document.body.style.overflow = "hidden";
+      document.getElementById("orderModal").classList.add("show");
+      document.getElementById("orderModal").style.display = "block";
+    }
+    function closeOrderModal() {
+      document.body.style.overflow = "";
+      document.getElementById("orderModal").classList.remove("show");
+      document.getElementById("orderModal").style.display = "none";
+    }
+    function renderModalStaffTable() {
+      let html = "";
+      let total = 0;
+      modalStaffs.forEach((s,i)=>{
+        let donGiaShow = (s.trangThai === "Hủy đơn" || s.trangThai === "Không tham gia") ? 0 : parseInt(s.donGia||0);
+        if (donGiaShow > 0) total += donGiaShow;
+        const deleteBtn = s.isOriginal ? 
+          `<span class="original-staff-label">Nhân viên gốc</span>` : 
+          `<button class="delete-staff-btn" onclick="modalXoaNhanVien(${i})">Xóa</button>`;
+        const rowClass = s.isOriginal ? '' : 'new-staff-row';
+        html += `<tr class="${rowClass}">
+          <td>
+            ${s.isOriginal
+              ? `<input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">`
+              : `<input type="text" value="${s.maNV||''}" style="width: 65px; text-align:center;font-size:0.96em;" list="availableNVs" onchange="modalChangeMaNV(${i},this.value)">`
+            }
+          </td>
+          <td>
+            ${s.isOriginal
+              ? `<input type="text" value="${s.caLV}" readonly style="width: 30px; border:none; background:transparent;text-align:center;font-size:0.96em;">`
+              : `<select onchange="modalChangeCaLV(${i},this.value)" style="width: 38px; text-align:center;font-size:0.96em;">${modalGetCaOptions(s.maNV,s.caLV)}</select>`
+            }
+          </td>
+          <td>
+            <input type="text" value="${donGiaShow.toLocaleString('vi-VN')}" readonly style="width:60px;border:none;text-align:right;background:transparent;font-weight:bold;color:#0b8e0b;font-size:0.96em;">
+          </td>
+          <td>
+            <select class="staff-action-select" onchange="modalStaffChange(${i},this)">
+              <option value="Đồng ý"${s.trangThai==="Đồng ý"?" selected":""}>Đồng ý</option>
+              <option value="Không tham gia"${s.trangThai==="Không tham gia"?" selected":""}>Không tham gia</option>
+              <option value="Hủy đơn"${s.trangThai==="Hủy đơn"?" selected":""}>Hủy đơn</option>
+            </select>
+          </td>
+          <td>${deleteBtn}</td>
+        </tr>`;
+      });
+      document.querySelector("#modalStaffTable tbody").innerHTML = html;
+      document.getElementById("staffTotal").innerText = total.toLocaleString('vi-VN');
+      renderDatalistMaNV();
+      setAllDropdownColors();
+    }
+    function modalGetCaOptions(maNV, caLV) {
+      const cas = PRODUCT_STAFFS.filter(x=>x.maNV===maNV).map(x=>x.caLV);
+      let uniqueCas = [...new Set(cas)];
+      return uniqueCas.map(ca=>
+        `<option value="${ca}"${ca==caLV?' selected':''}>${ca}</option>`
+      ).join('');
+    }
+    // Datalist cho input mã NV khi thêm mới
+    function renderDatalistMaNV() {
+      let html = '<datalist id="availableNVs">';
+      PRODUCT_STAFFS.forEach(p=>{
+        html += `<option value="${p.maNV}">${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ</option>`;
+      });
+      html += '</datalist>';
+      if (!document.getElementById('availableNVs')) {
+        let el = document.createElement('div');
+        el.innerHTML = html;
+        document.body.appendChild(el.firstChild);
+      } else {
+        document.getElementById('availableNVs').outerHTML = html;
+      }
+    }
+    // Khi đổi mã NV ở dòng mới
+    function modalChangeMaNV(i, val) {
+      let found = PRODUCT_STAFFS.filter(x=>x.maNV===val);
+      if (found.length) {
+        modalStaffs[i].maNV = val;
+        modalStaffs[i].caLV = found[0].caLV;
+        modalStaffs[i].donGia = parseInt(found[0].donGia||0);
+        modalStaffs[i].donGiaOrigin = parseInt(found[0].donGia||0);
+        modalStaffs[i].trangThai = "Đồng ý";
+        modalHasNewStaff = true;
+      }
+      renderModalStaffTable();
+    }
+    // Khi đổi ca LV ở dòng mới
+    function modalChangeCaLV(i, val) {
+      let found = PRODUCT_STAFFS.find(x=>x.maNV===modalStaffs[i].maNV && x.caLV==val);
+      if (found) {
+        modalStaffs[i].caLV = val;
+        modalStaffs[i].donGia = parseInt(found.donGia||0);
+        modalStaffs[i].donGiaOrigin = parseInt(found.donGia||0);
+        modalHasNewStaff = true;
+      }
+      renderModalStaffTable();
+    }
+
+    // === CẬP NHẬT ĐƠN GIÁ KHI ĐỔI TRẠNG THÁI NHÂN VIÊN ===
+  function modalStaffChange(i,sel) {
+  let staff = modalStaffs[i];
+  staff.trangThai = sel.value;
+  if (sel.value === "Hủy đơn" || sel.value === "Không tham gia") {
+    staff.donGia = 0;
+  } else if (sel.value === "Đồng ý") {
+    // Lấy lại đơn giá gốc từ PRODUCTS, loại bỏ dấu cách và so sánh kiểu chuỗi
+    let found = PRODUCT_STAFFS.find(x=>
+      String(x.maNV).trim() === String(staff.maNV).trim() &&
+      String(x.caLV).trim() === String(staff.caLV).trim()
+    );
+    staff.donGia = found ? parseInt(found.donGia||0) : (staff.donGiaOrigin||0);
+  }
+  renderModalStaffTable();
+}
+    function modalTatCaDongY() {
+      modalStaffs.forEach(s=>{
+        s.trangThai="Đồng ý";
+        let found = PRODUCT_STAFFS.find(x=>x.maNV===s.maNV && String(x.caLV)===String(s.caLV));
+        s.donGia = found ? parseInt(found.donGia||0) : (s.donGiaOrigin||0);
+      });
+      renderModalStaffTable();
+    }
+    function modalHuyDon() {
+      modalStatus = "huydon";
+      modalStaffs.forEach(s=>{
+        s.trangThai="Hủy đơn";
+        s.donGia=0;
+      });
+      renderModalStaffTable();
+    }
+    function modalThemNhanVien() {
+      let available = PRODUCT_STAFFS.filter(s =>
+        s.status === "Làm việc" && (!s.lockStatus || s.lockStatus.trim() === "")
+      );
+      if (!available.length) {
+        alert("Không có nhân viên khả dụng.");
+        return;
+      }
+      modalHasNewStaff = true;
+      modalStaffs.push({
+        maNV:"",
+        caLV:"",
+        donGia:0,
+        donGiaOrigin:0,
+        trangThai:"Đồng ý",
+        isOriginal: false
+      });
+      renderModalStaffTable();
+    }
+    function modalXoaNhanVien(index) {
+      if(modalStaffs[index].isOriginal) {
+        alert('Không thể xóa nhân viên gốc!');
+        return;
+      }
+      modalHasNewStaff = true;
+      if(confirm('Bạn có chắc muốn xóa nhân viên này?')) {
+        modalStaffs.splice(index, 1);
+        renderModalStaffTable();
+      }
+    }
+    async function modalSubmitXacNhan() {
+      if(modalOrderIndex<0) return;
+      try {
+        let tongcong = 0;
+        let staffListSend = [];
+        // Đảm bảo luôn có trạng thái cho tất cả nhân viên (nếu rỗng thì mặc định "Đồng ý")
+        modalStaffs.forEach(s=>{
+          let trangThai = s.trangThai || "Đồng ý";
+          let donGia = (trangThai==="Đồng ý") ? (parseInt(s.donGia)||0) : 0;
+          staffListSend.push({
+            maNV: s.maNV,
+            caLV: s.caLV,
+            donGia: donGia,
+            trangThai: trangThai,
+            isOriginal: s.isOriginal
+          });
+          if (donGia>0) tongcong += donGia;
+        });
+        let data = {
+          orderId: modalOrder.orderId,
+          staffList: staffListSend,
+          ghiChu: document.getElementById("modalGhiChu").value.trim(),
+          huydon: modalStatus==="huydon",
+          tongcong: tongcong,
+          name: modalOrder.name,
+          phone: modalOrder.phone,
+          email: modalOrder.email,
+          table: document.getElementById("modalTable").value,
+          note: modalOrder.note
+        };
+        const response = await fetch('/api/orderquanly', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('API call failed');
+        closeOrderModal();
+        await fetchOrders();
+        FILTERED = ORDERS.map((v,i)=>({...v,_index:i}));
+        renderTable();
+        openThankPopup(modalStatus==="huydon"?"Hủy đơn thành công!":"Xác nhận đơn hàng thành công!");
+      } catch (error) {
+        alert('Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.');
+      }
+    }
+    function openThankPopup(msg) {
+      document.getElementById("thankMsg").textContent = msg;
+      document.getElementById("thankModal").classList.add("show");
+      document.getElementById("thankModal").style.display = "block";
+    }
+    function closeThankPopup() {
+      document.getElementById("thankModal").classList.remove("show");
+      document.getElementById("thankModal").style.display = "none";
+    }
+    // ĐỔI MÀU CHỮ DROPDOWN THEO GIÁ TRỊ
+    function updateDropdownColor(sel) {
+      if (!sel) return;
+      let val = sel.value;
+      sel.style.color =
+        val === "Đồng ý" ? "#16c924"
+        : val === "Không tham gia" ? "#0074d9"
+        : val === "Hủy đơn" ? "#e53935"
+        : "#23272f";
+    }
+    function setAllDropdownColors() {
+      document.querySelectorAll('.staff-action-select').forEach(updateDropdownColor);
+    }
+    document.addEventListener("DOMContentLoaded", setAllDropdownColors);
+    document.addEventListener("change", function(e){
+      if(e.target.classList.contains("staff-action-select")) {
+        updateDropdownColor(e.target);
+      }
+    });
+  </script>
+</body>
+</html>

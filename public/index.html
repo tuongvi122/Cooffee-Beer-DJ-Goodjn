@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Coffee & Beer GooDjn</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      padding: 0;
+      margin: 0;
+      background-color: #f9f9f9;
+    }
+    #navbar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 10000;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+    }
+    .site-content {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding-top: 64px;  /* Điều chỉnh nếu navbar cao/thấp hơn */
+      padding-bottom: 0;
+    }
+    #footer-container {
+      width: 100vw;
+      background: #fff;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+      /* KHÔNG dùng position: fixed */
+    }
+
+    h2 { text-align: center; }
+    #products { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+    .product-card { background: #fff; border: 1px solid #ccc; border-radius: 10px; padding: 10px; width: 100%; max-width: 260px; text-align: center; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 12px; display: flex; flex-direction: column; align-items: stretch; position: relative;}
+    .product-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
+    .product-card .full-note { color: #d32f2f; font-weight: bold; font-size: 15px; margin-top: 5px; }
+    .product-card.disabled { opacity: 0.65; pointer-events: none; }
+    .ca-list { margin: 12px 0 0 0; padding: 0; list-style: none; }
+    .ca-item-row { display: flex; align-items: center; gap: 0; margin-bottom: 5px; font-size: 15px; line-height: 1.4; width: 100%; box-sizing: border-box; }
+    .ca-label { flex: 0 0 52px; text-align: left; font-weight: 500; color: #333; font-size: 15px; margin-right: 2px; white-space: nowrap; }
+    .ca-price { flex: 1 1 70px; text-align: left; color: #086824; font-weight: 600; font-size: 15px; margin-right: 3px; min-width: 65px; max-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ca-checkbox { flex: 0 0 22px; margin-left: 0; margin-right: 0; align-self: center; transform: scale(1.1); display: inline-block; accent-color: #219a50; }
+    .ca-remove-btn2 {
+      flex: 0 0 auto;
+      border: 2px solid #d32f2f;
+      background: #d32f2f;
+      color: #fff;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 2px 13px 2px 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      margin-left: 9px;
+      white-space: nowrap;
+      min-width: 0;
+      width: auto;
+      height: 28px;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+    .ca-remove-btn2:disabled { opacity: 0.45; cursor: not-allowed; background: #f8bbbc; border-color: #e57373; color: #fff; }
+    .ca-remove-btn2:hover:not(:disabled) { background: #b71c1c; border-color: #b71c1c; }
+    .note-already-added { color: red; font-size: 13px; margin-left: 8px; min-width: 120px; display:inline-block; }
+    .ca-busy-note { color: #d32f2f; font-size: 13px; font-weight: bold; margin-left: 7px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100vw; height: 100vh; overflow: auto; background: rgba(0,0,0,0.2);}
+    .modal.show { display: block; }
+    #modalOrder { z-index: 1100 !important; }
+    .modal-dialog { position: relative; margin: 5% auto; max-width: 500px; width: 95%; }
+    .modal-content { background: #fff; border-radius: 10px; padding: 0 0 15px 0; box-shadow: 0 0 20px rgba(0,0,0,0.3);}
+    .modal-header { padding: 15px 20px 0 20px; border-bottom: 1px solid #eee; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;}
+    .modal-title { margin: 0; font-size: 21px;}
+    .close { background: none; border: none; font-size: 28px; font-weight: bold; color: #888; cursor: pointer; line-height: 1;}
+    .modal-body { padding: 15px 20px; }
+    .alert { padding: 8px 12px; margin-bottom: 12px; border-radius: 5px; font-size: 14px; display: none;}
+    .alert-danger { background: #ffd9d9; color: #a94442; border: 1px solid #f5c6cb;}
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+    #order-thankyou { background: #daf7e1; color: #1e7e34; border: 1px solid #b7e4c7; padding: 12px; border-radius: 7px; text-align: center; font-weight: bold; font-size: 17px; margin-bottom: 10px; display: none;}
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px;}
+    th, td { padding: 8px; border: 1px solid #ddd; text-align: center;}
+    .remove-btn, .remove-cart-btn { cursor: pointer; color: red; font-weight: bold; background: none; border: none; font-size: 18px;}
+    input, textarea { width: 100%; margin: 5px 0; padding: 8px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;}
+    .form-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 20px;}
+    .confirm-btn { background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 15px; cursor: pointer; transition: background-color 0.3s;}
+    .confirm-btn:hover { background-color: #218838;}
+    .close-btn { background-color: #999; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 15px; cursor: pointer; transition: background-color 0.3s;}
+    .close-btn:hover { background-color: #777;}
+    @media screen and (max-width: 600px) {
+      .product-card { max-width: 100%; }
+      .form-buttons { flex-direction: column; }
+      .modal-dialog { max-width: 350px !important; width: 95vw !important; }
+      .ca-item-row { flex-wrap: wrap; }
+      .ca-remove-btn2 { margin-top: 4px; }
+      #navbar-container { padding-top: 0; }
+    }
+    #scrollToTopBtn { position: fixed; bottom: 20px; right: 10px; background-color: red; color: white; border: none; width: 30px; height: 30px; border-radius: 6px; font-size: 18px; line-height: 30px; text-align: center; cursor: pointer; display: none; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+    #floating-cart { position: fixed; top: 140px; right: 2px; background-color: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; z-index: 9999; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);}
+    #tbl_carts th, #tbl_carts td { padding-top: 3px; padding-bottom: 3px; font-size: 15px; }
+    #tbl_carts tr { height: 15px; }
+    .product-card input[type="checkbox"]:disabled { filter: grayscale(80%); cursor: not-allowed;}
+    #search-bar-area {
+      position: fixed;
+      right: 2px;
+      top: 90px;
+      z-index: 10002;
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      gap: 0;
+    }
+    #search-bar-area.hide { display: none !important; }
+    #search-fab {
+      width: 28px;
+      height: 28px;
+      background: #fff;
+      color: #219a50;
+      border: 2px solid #219a50;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.13);
+      transition: background 0.2s, color 0.2s;
+      margin-bottom: 0;
+      margin-right: 3px;
+    }
+    #search-fab:hover {
+      background: #219a50;
+      color: #fff;
+    }
+    #search-bar-wrapper {
+      display: none;
+      align-items: center;
+      flex-direction: row;
+      gap: 0;
+      position: relative;
+      z-index: 10003;
+    }
+    #search-bar {
+      width: 175px;
+      background: #fff;
+      border: 1.8px solid #28a745;
+      border-radius: 7px 0 0 7px;
+      padding: 6px 10px;
+      outline: none;
+      font-size: 15px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.09);
+      border-right: none;
+    }
+    #search-close {
+      border: 1.8px solid #28a745;
+      border-radius: 0 7px 7px 0;
+      background: #f8d7da;
+      color: #c82333;
+      font-weight: bold;
+      font-size: 15px;
+      margin: 0;
+      padding: 7px 13px 7px 9px;
+      cursor: pointer;
+      vertical-align: middle;
+      border-left: none;
+      transition: background 0.2s, color 0.2s;
+      position: relative;
+      left: -4px;
+    }
+    #search-close:hover { background: #c82333; color: #fff; }
+    @media (max-width: 600px) {
+      #search-bar-area { right: 2px; top: 75px; }
+      #search-bar { width: 90px; font-size: 14px; }
+    }
+    .marquee-flex-wrap {
+      width: 100%;
+      overflow: hidden;
+      background: transparent;
+      margin: 10px 0 15px 0;
+      height: 2.2em;
+      position: relative;
+    }
+    .marquee-flex-text {
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 1.3em;
+      color: #08810a;
+      font-weight: bold;
+      animation: slide-right 15s linear infinite;
+    }
+    @keyframes slide-right {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100vw);
+      }
+    }
+    @media (max-width: 600px) {
+      #footer-container { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <script>
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(html => { document.getElementById('navbar-container').innerHTML = html });
+  </script>
+  <div class="site-content">
+    <div class="marquee-flex-wrap">
+      <div class="marquee-flex-text">
+        Chào mừng đến với Coffee & Beer DJ GooDjn!
+      </div>
+    </div>
+
+    <div id="products"></div>
+    <!-- Modal đặt hàng - POPUP GIỎ HÀNG -->
+    <div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-labelledby="modalOrderLabel" aria-hidden="true">
+      <div class="modal-dialog mt-4">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalOrderLabel">ĐẶT DỊCH VỤ</h5>
+            <button type="button" class="close" onclick="closeCartModal()" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="order-thankyou"></div>
+            <div class="alert alert-danger" role="alert" id="alert_order"></div>
+            <div class="alert alert-success" role="alert" id="alert_order_sucess"></div>
+            <table id="tbl_carts" style="table-layout: fixed; width: 100%;">
+            <thead>
+              <tr>
+              <th style="width: 20%;">Mã NV</th>
+              <th style="width: 25%;">Đơn giá</th>
+              <th style="width: 15%;">Ca LV</th>
+              <th style="width: 25%;">Tổng</th>
+              <th style="width: 15%;">Xóa</th>
+              </tr>
+            </thead>
+              <tbody>
+              </tbody>
+            </table>
+            <div id="order-total" style="text-align:right; font-weight:bold; margin-bottom:10px;"></div>
+            <input placeholder="Họ và tên" id="name"><br>
+            <input placeholder="Số điện thoại" id="phone" maxlength="10" pattern="[0-9]{10}" oninput="validatePhoneInput(this)"><br>
+            <input placeholder="Email" id="contact"><br>
+            <input placeholder="Bàn số 1-50" id="table-number" type="number" min="1" max="50"><br>
+            <textarea placeholder="Ghi chú" id="address"></textarea><br><br>
+            <div class="form-buttons">
+              <button class="confirm-btn" onclick="submitOrder()">Đặt dịch vụ</button>
+              <button class="close-btn" onclick="closeCartModal()">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button id="floating-cart" onclick="showCartModal()">Cart <span id="cart-count-floating">0</span> 🛒</button>
+    <button id="scrollToTopBtn" onclick="scrollToTop()">⬆</button>
+    <!-- Search Bar UI -->
+    <div id="search-bar-area">
+      <div id="search-fab" title="Tìm kiếm" onclick="showSearchBar()">
+        <svg width="15" height="15" style="vertical-align:middle" viewBox="0 0 20 20">
+          <circle cx="9" cy="9" r="6.5" stroke="#219a50" stroke-width="2" fill="none"/>
+          <line x1="14" y1="14" x2="19" y2="19" stroke="#219a50" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div id="search-bar-wrapper">
+        <input id="search-bar" type="text" placeholder="Tìm Mã NV hoặc Ca LV..." autocomplete="off"
+          oninput="searchProductHandler(this.value)">
+        <button id="search-close" onclick="closeSearchBar()" title="Xóa tìm kiếm">✕</button>
+      </div>
+    </div>
+    <!-- Modal chi tiết sản phẩm - POPUP SẢN PHẨM -->
+    <div class="modal fade" id="modalProductDetail" tabindex="-1" style="display:none;">
+      <div class="modal-dialog mt-4">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Chi tiết sản phẩm</h5>
+            <button type="button" class="close" onclick="closeProductDetailModal()" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modalProductDetailBody"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let cart = [];
+    let productsList = [];
+    let employeeMap = {};
+    let currentEmployeeMap = {};
+    let lastSearchKey = "";
+    let searchInputActive = false;
+    let currentProductDetail = null;
+
+    function formatCurrency(num) {
+      return Number(num).toLocaleString('vi-VN') + "₫";
+    }
+
+    // --- Tự động reload sản phẩm sau mỗi 70s (để luôn cập nhật trạng thái mới nhất) ---
+    let reloadProductsInterval = null;
+    function startAutoReloadProducts() {
+      if (reloadProductsInterval) clearInterval(reloadProductsInterval);
+      reloadProductsInterval = setInterval(loadProducts, 70000);
+    }
+
+    async function loadProducts() {
+      try {
+        productsList = await fetch('/api/getProducts').then(r=>r.json());
+        // Xử lý trường hợp API trả về lỗi
+        if (!Array.isArray(productsList) || productsList.length === 0) {
+          document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Không lấy được dữ liệu sản phẩm! Hãy kiểm tra API hoặc dữ liệu Google Sheets!</div>';
+          return;
+        }
+        employeeMap = groupByEmployee(productsList);
+        currentEmployeeMap = employeeMap;
+        renderProducts(currentEmployeeMap);
+      } catch (e) {
+        document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Lỗi lấy dữ liệu sản phẩm: ' + e + '</div>';
+      }
+    }
+
+    // Gom nhóm sản phẩm theo mã NV
+    function groupByEmployee(products) {
+      const map = {};
+      products.forEach(prod => {
+        map[prod.maNV] = {
+          linkAnhNV: prod.linkAnhNV || "",
+          caList: prod.caList || [],
+          isFull: prod.allCaFull || false
+        };
+      });
+      return map;
+    }
+
+    // Hiển thị danh sách thẻ sản phẩm
+    function renderProducts(empMap) {
+  const container = document.getElementById('products');
+  let html = '';
+  Object.entries(empMap).forEach(([maNV, emp]) => {
+    // Nếu BẤT KỲ ca nào của mã NV này có daFull = "Đã full" thì disable toàn bộ thẻ
+    let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
+    let cardClass = isFull ? "product-card disabled" : "product-card";
+    html += `
+      <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
+        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
+        <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
+        ${isFull ? `<div class="full-note">Đã full</div>` : ""}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+    function isCaInCart(maNV, caLV) {
+      return cart.some(item => item.maNV === maNV && item.caLV === caLV);
+    }
+
+    // Hiển thị popup chi tiết sản phẩm
+    function showProductDetail(maNV) {
+      currentProductDetail = maNV;
+      const emp = currentEmployeeMap[maNV];
+      if (!emp) return;
+      window._popupTempChecked = {};
+
+      let html = `
+        <div style="text-align:center;">
+          <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/180x140?text=' + maNV}" alt="Ảnh sản phẩm" style="width:180px;height:140px;object-fit:cover;border-radius:8px;">
+          <div style="font-weight:bold; font-size:22px; margin-top:12px;">${maNV}</div>
+        </div>
+        <ul class="ca-list" style="margin-top:18px;">
+      `;
+      emp.caList.forEach((ca, idx) => {
+        // Ẩn ca nếu nghỉ phép/nghỉ việc
+        if (ca.trangThai !== "Làm việc") return;
+        const idCheckbox = `modal_ck_${maNV}_${ca.caLV}`;
+        const isLocked = isCaInCart(maNV, ca.caLV);
+        const isBusy = ca.dangBan === "Đang bận";
+        html += `
+          <li class="ca-item-row" data-ma-nv="${maNV}" data-ca-lv="${ca.caLV}">
+            <span class="ca-label">Ca ${ca.caLV}:</span>
+            <span class="ca-price">${formatCurrency(ca.donGia)}</span>
+            <input type="checkbox" class="ca-checkbox" id="${idCheckbox}" 
+              data-ma-nv="${maNV}" data-ca-lv="${ca.caLV}" data-don-gia="${ca.donGia}"
+              ${isLocked ? "checked disabled" : ""}
+              ${isBusy ? "disabled" : ""}
+              onchange="popupCaCheckboxChange(this)">
+            ${isBusy ? `<span class="ca-busy-note">Đang bận việc</span>` : ""}
+            <button class="ca-remove-btn2" onclick="removeCaFromCartModal('${maNV}','${ca.caLV}')" style="${isLocked ? '' : 'display:none'};margin-left:7px;">Xóa</button>
+            ${isLocked ? `<span class="note-already-added" style="margin-left:7px;">Ca ${ca.caLV} đã có trong giỏ hàng</span>` : ""}
+          </li>
+        `;
+      });
+
+      html += `</ul>
+        <div class="form-buttons" style="margin-top:24px;">
+          <button class="confirm-btn" onclick="addModalCheckedItems('${maNV}')">Thêm vào giỏ</button>
+          <button class="close-btn" onclick="closeProductDetailModal()">Đóng</button>
+        </div>
+      `;
+
+      document.getElementById('modalProductDetailBody').innerHTML = html;
+      document.getElementById('modalProductDetail').classList.add('show');
+      document.getElementById('modalProductDetail').style.display = 'block';
+      window._popupTempChecked = {};
+    }
+
+    function popupCaCheckboxChange(cb) {
+      const maNV = cb.getAttribute('data-ma-nv');
+      const caLV = cb.getAttribute('data-ca-lv');
+      if (cb.disabled) return;
+      window._popupTempChecked = window._popupTempChecked || {};
+      window._popupTempChecked[caLV] = cb.checked;
+    }
+
+    function addModalCheckedItems(maNV) {
+      window._popupTempChecked = window._popupTempChecked || {};
+      const emp = currentEmployeeMap[maNV];
+      if (!emp) return;
+      let isAdded = false;
+      emp.caList.forEach((ca) => {
+        if (ca.trangThai !== "Làm việc") return;
+        if (window._popupTempChecked[ca.caLV] && !isCaInCart(maNV, ca.caLV)) {
+          cart.push({ maNV, caLV: ca.caLV, donGia: ca.donGia });
+          isAdded = true;
+        }
+      });
+      showProductDetail(maNV);
+      updateCartCount();
+    }
+
+    function removeCaFromCartModal(maNV, caLV) {
+      const idx = cart.findIndex(item => item.maNV === maNV && item.caLV === caLV);
+      if (idx !== -1) cart.splice(idx, 1);
+      showProductDetail(maNV);
+      updateCartCount();
+    }
+
+    function closeProductDetailModal() {
+      document.getElementById('modalProductDetail').classList.remove('show');
+      document.getElementById('modalProductDetail').style.display = 'none';
+      currentProductDetail = null;
+    }
+
+    function refreshProductDetailIfOpen() {
+      if (currentProductDetail && document.getElementById('modalProductDetail').style.display === 'block') {
+        showProductDetail(currentProductDetail);
+      }
+    }
+
+    function updateCartCount() {
+      document.getElementById('cart-count-floating').innerText = cart.length;
+    }
+
+    function removeFromCart(index) {
+      if (index >= 0 && index < cart.length) {
+        cart.splice(index, 1);
+        renderCartTable();
+        updateCartCount();
+        refreshProductDetailIfOpen();
+      }
+    }
+
+    function renderCartTable() {
+      const tbody = document.querySelector('#tbl_carts tbody');
+      tbody.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, index) => {
+        const sub = item.donGia;
+        total += sub;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.maNV}</td>
+          <td>${formatCurrency(item.donGia)}</td>
+          <td>${item.caLV}</td>
+          <td>${formatCurrency(sub)}</td>
+          <td><button class="remove-cart-btn" title="Remove" onclick="removeFromCart(${index})">🗑️</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+      document.getElementById('order-total').innerHTML = "Tổng cộng: " + formatCurrency(total);
+    }
+
+    function showCartModal() {
+      renderCartTable();
+      document.getElementById('alert_order').style.display = 'none';
+      document.getElementById('alert_order_sucess').style.display = 'none';
+      document.getElementById('order-thankyou').style.display = 'none';
+      document.getElementById('modalOrder').classList.add('show');
+      document.getElementById('modalOrder').style.display = 'block';
+      document.getElementById('floating-cart').style.display = 'none';
+      document.getElementById('scrollToTopBtn').style.display = 'none';
+      document.getElementById('search-bar-area').classList.add('hide');
+      closeSearchBar();
+    }
+
+    function closeCartModal() {
+      document.getElementById('modalOrder').classList.remove('show');
+      document.getElementById('modalOrder').style.display = 'none';
+      document.getElementById('floating-cart').style.display = '';
+      document.getElementById('search-bar-area').classList.remove('hide');
+      if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+        document.getElementById('scrollToTopBtn').style.display = 'block';
+      } else {
+        document.getElementById('scrollToTopBtn').style.display = 'none';
+      }
+    }
+
+    function validatePhoneInput(input) {
+      input.value = input.value.replace(/[^0-9]/g, '').slice(0, 10);
+    }
+
+    async function submitOrder() {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const contact = document.getElementById('contact').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const tableNum = document.getElementById('table-number').value.trim();
+      const alertOrder = document.getElementById('alert_order');
+      const alertSuccess = document.getElementById('alert_order_sucess');
+      const orderThankyou = document.getElementById('order-thankyou');
+
+      alertOrder.style.display = 'none';
+      alertSuccess.style.display = 'none';
+      orderThankyou.style.display = 'none';
+
+      if (!name || !phone || !contact || !tableNum || !address) {
+        alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số bàn, Ghi chú";
+        alertOrder.style.display = 'block';
+        return;
+      }
+      if (!/^[0-9]{10}$/.test(phone)) {
+        alertOrder.innerText = "Số điện thoại phải gồm đúng 10 số.";
+        alertOrder.style.display = 'block';
+        return;
+      }
+      if (cart.length === 0) {
+        alertOrder.innerText = "Giỏ hàng trống chưa có sản phẩm!";
+        alertOrder.style.display = 'block';
+        return;
+      }
+
+      const order = { name, phone, contact, address, tableNum, items: cart };
+
+      try {
+        const result = await fetch('/api/submitOrder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(order)
+        }).then(r => r.json());
+
+        if (result && result.success) {
+          alertOrder.style.display = 'none';
+          alertSuccess.style.display = 'none';
+          orderThankyou.innerText = `Đơn hàng ${result.orderCode} của bạn đã gửi đến GooDjn DJ Coffee & Beer, cảm ơn bạn!`;
+          orderThankyou.style.display = 'block';
+          cart = [];
+          document.getElementById('cart-count-floating').innerText = '0';
+          setTimeout(() => {
+            closeCartModal();
+            renderProducts(currentEmployeeMap);
+            orderThankyou.style.display = 'none';
+            refreshProductDetailIfOpen();
+          }, 2000);
+        } else {
+          alertOrder.innerText = "Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại.";
+          alertOrder.style.display = 'block';
+        }
+      } catch (e) {
+        alertOrder.innerText = "Lỗi kết nối: " + e;
+        alertOrder.style.display = 'block';
+      }
+    }
+
+    window.onscroll = function () {
+      const btn = document.getElementById("scrollToTopBtn");
+      if (btn) {
+        btn.style.display = (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "block" : "none";
+      }
+    };
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showSearchBar() {
+      document.getElementById('search-bar-wrapper').style.display = 'flex';
+      document.getElementById('search-bar').focus();
+    }
+
+    function closeSearchBar() {
+      document.getElementById('search-bar-wrapper').style.display = 'none';
+      document.getElementById('search-bar').value = '';
+      searchInputActive = false;
+      applyProductSearchFilter('');
+    }
+
+    function searchProductHandler(val) {
+      val = val || "";
+      searchInputActive = val.trim().length > 0;
+      applyProductSearchFilter(val);
+    }
+
+    function applyProductSearchFilter(keyword) {
+      lastSearchKey = keyword = (keyword || "").trim().toLowerCase();
+      if (!keyword) {
+        currentEmployeeMap = employeeMap;
+      } else {
+        let filteredEmployeeMap = {};
+        let caMatchList = [];
+        const caRegex = /ca\s*([0-9]+)/g;
+        let m;
+        while ((m = caRegex.exec(keyword)) !== null) {
+          caMatchList.push(m[1].replace(/^0+/,''));
+        }
+        keyword = keyword.replace(/ca\s*[0-9]+/g, "");
+        keyword = keyword.trim();
+
+        Object.entries(employeeMap).forEach(([maNV, emp]) => {
+          const matchNV = keyword && maNV.toLowerCase().includes(keyword);
+          let caList = emp.caList;
+          if (caMatchList.length > 0) {
+            caList = caList.filter(
+              ca => caMatchList.includes(ca.caLV.replace(/^0+/, ""))
+            );
+          }
+          if (keyword) {
+            caList = caList.filter(
+              ca =>
+                matchNV ||
+                maNV.toLowerCase().includes(keyword) ||
+                ca.caLV.toLowerCase().includes(keyword)
+            );
+          }
+          if (matchNV || caList.length) {
+            filteredEmployeeMap[maNV] = {
+              linkAnhNV: emp.linkAnhNV,
+              caList,
+              isFull: emp.isFull
+            };
+          }
+        });
+        currentEmployeeMap = filteredEmployeeMap;
+      }
+      renderProducts(currentEmployeeMap);
+    }
+
+    window.applyProductSearchFilter = applyProductSearchFilter;
+    window.popupCaCheckboxChange = popupCaCheckboxChange;
+    window.removeCaFromCartModal = removeCaFromCartModal;
+    window.addModalCheckedItems = addModalCheckedItems;
+    window.showProductDetail = showProductDetail;
+    window.closeProductDetailModal = closeProductDetailModal;
+    window.removeFromCart = removeFromCart;
+    window.showCartModal = showCartModal;
+    window.closeCartModal = closeCartModal;
+    window.submitOrder = submitOrder;
+    window.scrollToTop = scrollToTop;
+    window.validatePhoneInput = validatePhoneInput;
+    window.showSearchBar = showSearchBar;
+    window.closeSearchBar = closeSearchBar;
+    window.searchProductHandler = searchProductHandler;
+    window.refreshProductDetailIfOpen = refreshProductDetailIfOpen;
+
+    window.onload = () => {
+      loadProducts();
+      startAutoReloadProducts();
+    };
+
+    document.addEventListener('click', function(e){
+      const fab = document.getElementById('search-fab');
+      const wrapper = document.getElementById('search-bar-wrapper');
+      if (wrapper && wrapper.style.display === 'flex' && !wrapper.contains(e.target) && !fab.contains(e.target)) {
+        if (!document.getElementById('search-bar').value.trim()) {
+          closeSearchBar();
+        }
+      }
+    });
+  </script>
+ <div id="footer-container"></div>
+  <script>
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(html => { document.getElementById('footer-container').innerHTML = html });
+  </script>
+</body>
+</html>
