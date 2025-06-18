@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Coffee & Beer GooDjn</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Font Awesome cho hamburger icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     html, body {
@@ -28,6 +29,7 @@
       z-index: 10000;
       background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+      /* Thêm chiều cao cố định trên mobile cho navbar custom */
     }
     .site-content {
       flex: 1 0 auto;
@@ -41,67 +43,36 @@
       background: #fff;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
       flex-shrink: 0;
-      /* KHÔNG dùng position: fixed */
     }
 
     h2 { text-align: center; }
-    #products { 
-      display: flex; 
-      flex-wrap: wrap; 
-      justify-content: center; 
-      gap: 15px; 
-      margin-top: 20px; 
+    #products {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
     }
-    .product-card { 
-      background: #fff; 
-      border: 1px solid #ccc; 
-      border-radius: 10px; 
-      padding: 10px; 
-      width: 100%; 
-      max-width: 260px; 
-      text-align: center; 
-      box-sizing: border-box; 
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-      margin-bottom: 12px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: stretch; 
+    .product-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      width: 100%;
+      max-width: 260px;
+      text-align: center;
+      box-sizing: border-box;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
       position: relative;
+      transition: box-shadow 0.2s;
     }
     .product-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
     .product-card .full-note { color: #d32f2f; font-weight: bold; font-size: 15px; margin-top: 5px; }
     .product-card.disabled { opacity: 0.65; pointer-events: none; }
-
-    /* MOBILE: 2 cột sản phẩm */
-    @media screen and (max-width: 600px) {
-      #products {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 9px 9px;
-        margin-top: 12px;
-        padding: 0 3px;
-      }
-      .product-card {
-        max-width: 100%;
-        margin-bottom: 7px;
-        padding: 8px 6px;
-      }
-    }
-    /* MOBILE: Nếu chỉ 1 sản phẩm thì vẫn căn giữa */
-    @media screen and (max-width: 600px) {
-      #products:only-child {
-        justify-content: center;
-      }
-    }
-    /* MOBILE: Modal nhỏ lại */
-    @media screen and (max-width: 600px) {
-      .form-buttons { flex-direction: column; }
-      .modal-dialog { max-width: 350px !important; width: 95vw !important; }
-      .ca-item-row { flex-wrap: wrap; }
-      .ca-remove-btn2 { margin-top: 4px; }
-      #navbar-container { padding-top: 0; }
-    }
-
     .ca-list { margin: 12px 0 0 0; padding: 0; list-style: none; }
     .ca-item-row { display: flex; align-items: center; gap: 0; margin-bottom: 5px; font-size: 15px; line-height: 1.4; width: 100%; box-sizing: border-box; }
     .ca-label { flex: 0 0 52px; text-align: left; font-weight: 500; color: #333; font-size: 15px; margin-right: 2px; white-space: nowrap; }
@@ -153,6 +124,44 @@
     .confirm-btn:hover { background-color: #218838;}
     .close-btn { background-color: #999; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 15px; cursor: pointer; transition: background-color 0.3s;}
     .close-btn:hover { background-color: #777;}
+    @media screen and (max-width: 600px) {
+      /* 2 cột sản phẩm trên mobile */
+      #products {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 10px;
+        margin-top: 13px;
+        padding: 0 4px;
+        justify-items: stretch;
+        align-items: stretch;
+      }
+      .product-card {
+        max-width: 100vw;
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 5px;
+        box-sizing: border-box;
+        /* Tạo card cao đều, hình ảnh căn chỉnh đẹp */
+      }
+      .product-card img {
+        height: 95px;
+        border-radius: 5px;
+      }
+      .form-buttons { flex-direction: column; }
+      .modal-dialog { max-width: 350px !important; width: 95vw !important; }
+      .ca-item-row { flex-wrap: wrap; }
+      .ca-remove-btn2 { margin-top: 4px; }
+      #navbar-container { padding-top: 0; }
+    }
+    @media (max-width: 400px) {
+      #products {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px 5px;
+      }
+      .product-card { padding: 7px 3px; }
+    }
+    #scrollToTopBtn { position: fixed; bottom: 20px; right: 10px; background-color: red; color: white; border: none; width: 30px; height: 30px; border-radius: 6px; font-size: 18px; line-height: 30px; text-align: center; cursor: pointer; display: none; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+    #floating-cart { position: fixed; top: 140px; right: 2px; background-color: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; z-index: 9999; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);}
     #tbl_carts th, #tbl_carts td { padding-top: 3px; padding-bottom: 3px; font-size: 15px; }
     #tbl_carts tr { height: 15px; }
     .product-card input[type="checkbox"]:disabled { filter: grayscale(80%); cursor: not-allowed;}
@@ -256,220 +265,205 @@
       #footer-container { font-size: 14px; }
     }
 
-    /* === Navbar Responsive & Hamburger Menu === */
-    .navbar-hamburger {
+    /* ======= Navbar Responsive Mobile Hamburger ======= */
+    .mobile-navbar {
       display: none;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 2.1em;
-      margin-right: 12px;
-      margin-left: 2px;
-      cursor: pointer;
-      z-index: 99999;
-      align-items: center;
     }
-    @media (max-width: 600px) {
-      .navbar-hamburger {
-        display: flex;
+    @media (max-width: 768px) {
+      #navbar-container {
+        padding: 0;
+        min-height: 54px;
+        height: 54px;
+      }
+      .mobile-navbar {
+        display: flex !important;
+        align-items: center;
+        width: 100vw;
+        background: #228B22;
+        min-height: 54px;
+        height: 54px;
+        padding: 0 8px 0 0;
         position: relative;
+        z-index: 10001;
       }
-      #navbar-main-container {
-        flex-direction: row !important;
-        min-height: 54px !important;
-        padding: 0 10px !important;
+      .mobile-navbar .hamburger {
+        padding: 12px 12px 12px 7px;
+        font-size: 27px;
+        color: #fff;
+        background: none;
+        border: none;
+        outline: none;
+        margin-right: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
       }
-      .navbar-logo-title {
-        flex-direction: row !important;
-        align-items: center !important;
-      }
-      .navbar-logo-title img {
-        height: 40px !important;
-        margin-right: 9px !important;
-        margin-left: 2px !important;
-      }
-      .navbar-title-area {
+      .mobile-navbar .navbar-title {
+        flex: 1 1 70%;
         display: flex;
         flex-direction: column;
         line-height: 1.1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
       }
-      .navbar-title-main {
-        font-size: 1.18em !important;
+      .mobile-navbar .navbar-title .brand-main {
+        color: #e1ba0a;
+        font-weight: bold;
+        font-size: 1.13em;
+        line-height: 1.1;
+        margin-bottom: 0;
       }
-      .navbar-title-sub {
-        font-size: 1em !important;
+      .mobile-navbar .navbar-title .brand-sub {
+        color: #e1ba0a;
+        font-weight: bold;
+        font-size: 0.99em;
+        line-height: 1;
+        margin-top: 0;
       }
-      .navbar-hotline-area {
-        margin-left: auto !important;
-        margin-right: 2px !important;
-        padding: 4px 7px !important;
-        border-radius: 18px !important;
-        font-size: 1em !important;
+      .mobile-navbar .mobile-hotline {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 30px;
+        padding: 3px 10px 3px 10px;
+        margin-left: 4px;
+        box-shadow: 0 0 5px #1113;
+        height: 28px;
+        font-size: 0.98em;
       }
-      .navbar-tabs {
+      .mobile-navbar .mobile-hotline i {
+        color: #e53935;
+        margin-right: 5px;
+        font-size: 1.1em;
+      }
+      .mobile-navbar .mobile-hotline .hotline-label {
+        color: #d52724;
+        font-weight: bold;
+        font-size: 1em;
+        letter-spacing: .5px;
+        margin-right: 2px;
+        margin-left: 0;
+        display: none;
+      }
+      .mobile-navbar .mobile-hotline .hotline-number {
+        color: #0011ff;
+        font-weight: bold;
+        font-size: 1.07em;
+        margin-left: 0;
+      }
+      /* Hamburger menu overlay */
+      .mobile-navbar-menu {
+        display: none;
+        position: fixed;
+        top: 54px;
+        left: 0;
+        width: 77vw;
+        max-width: 275px;
+        background: #228B22;
+        color: #fff;
+        z-index: 12000;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+        border-radius: 0 0 10px 0;
+        padding: 0 0 20px 0;
+        animation: slideInMenu 0.18s;
+      }
+      .mobile-navbar-menu.open {
+        display: block;
+      }
+      @keyframes slideInMenu {
+        from { transform: translateX(-90%); opacity: 0.5; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      .mobile-navbar-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 14px 0 0 0;
+      }
+      .mobile-navbar-menu li {
+        padding: 16px 0 10px 34px;
+        font-size: 1.15em;
+        cursor: pointer;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        transition: background 0.1s;
+      }
+      .mobile-navbar-menu li:active,
+      .mobile-navbar-menu li:hover {
+        background: #1c6e1b;
+      }
+      .mobile-navbar-menu li:last-child { border-bottom: none; }
+      .mobile-navbar-menu .logout-li { color: #fff; }
+    }
+    /* Ẩn Nav desktop ở mobile */
+    @media (max-width: 768px) {
+      #navbar-container .desktop-navbar {
         display: none !important;
       }
     }
-    /* Hamburger menu drawer */
-    .navbar-mobile-menu-backdrop {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.16);
-      z-index: 10020;
-      transition: background 0.2s;
-    }
-    .navbar-mobile-menu {
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      left: 0; top: 0;
-      width: 210px;
-      height: 100vh;
-      background: #228B22;
-      box-shadow: 2px 0 16px rgba(0,0,0,0.15);
-      z-index: 10021;
-      padding-top: 62px;
-      transform: translateX(-100%);
-      transition: transform 0.22s cubic-bezier(0.82,0,0.18,1);
-    }
-    .navbar-mobile-menu.show { transform: translateX(0); }
-    .navbar-mobile-menu .menu-link {
-      padding: 14px 24px;
-      color: #fff;
-      font-weight: bold;
-      font-size: 1.14em;
-      text-decoration: none;
-      border-bottom: 1px solid #2ea054;
-      letter-spacing: 0.01em;
-      transition: background 0.18s;
-    }
-    .navbar-mobile-menu .menu-link:hover {
-      background: #20a24f;
-      color: #fff;
-    }
-    .navbar-mobile-menu .menu-link:last-child {
-      border-bottom: none;
-    }
-    .navbar-mobile-menu-close {
-      display: block;
-      position: absolute;
-      top: 15px;
-      right: 10px;
-      font-size: 2em;
-      color: #fff;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 10022;
-    }
-    .navbar-mobile-menu-logo {
-      position: absolute;
-      top: 10px;
-      left: 18px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-    .navbar-mobile-menu-logo img {
-      height: 36px;
-      border-radius: 8px;
-    }
-    .navbar-mobile-menu-logo-title {
-      color: #e1ba0a;
-      font-weight: bold;
-      font-size: 1.1em;
-      letter-spacing: 0.01em;
-    }
-    @media (min-width: 601px) {
-      .navbar-mobile-menu, .navbar-mobile-menu-backdrop, .navbar-hamburger { display: none !important; }
-      .navbar-tabs { display: flex !important; }
+    /* Ẩn mobile navbar ở desktop */
+    @media (min-width: 769px) {
+      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
   </style>
 </head>
 <body>
-  <!-- Navbar cấu hình lại cho mobile/desktop -->
+  <!-- NAVBAR: Desktop & Mobile (bổ sung mobile-navbar) -->
   <div id="navbar-container">
-    <nav id="navbar-main-container" style="background:#228B22; display:flex; align-items:center; min-height:70px; padding:0 20px; position:relative;">
-      <!-- Hamburger (mobile only) -->
-      <button class="navbar-hamburger" id="navbarHamburgerBtn" aria-label="Open menu">
+    <!-- Mobile Navbar (Ẩn trên desktop) -->
+    <div class="mobile-navbar" style="display:none;">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
       </button>
-      <!-- Logo + tên quán -->
-      <div class="navbar-logo-title" style="display:flex; align-items:center;">
-        <img src="https://tse4.mm.bing.net/th?id=OIP.retlmg0icVWKULyKF3ng8AHaEr&pid=Api&P=0" alt="Logo quán" style="height:48px; margin-right:14px;">
-        <div class="navbar-title-area">
-          <div class="navbar-title-main" style="color:#e1ba0a; font-weight:bold; font-size:1.6em; line-height:1;">Coffee & Beer</div>
-          <div class="navbar-title-sub" style="color:#e1ba0a; font-weight:bold; font-size:1.4em; line-height:1;">DJ GooDjn</div>
-        </div>
+      <div class="navbar-title">
+        <span class="brand-main">Coffee & Beer</span>
+        <span class="brand-sub">DJ GooDjn</span>
       </div>
-      <!-- Hotline (mobile: dịch phải) -->
-      <div class="navbar-hotline-area" style="display:flex; align-items:center; background: #fff; border-radius: 30px; padding: 8px 22px; box-shadow:0 0 8px #1113; text-decoration:none; margin-left:24px;">
-        <i class="fa-solid fa-phone fa-lg" style="color: #e53935; margin-right:7px;"></i>
-        <span style="color:#d52724; font-weight:bold; font-size: 1.16em; letter-spacing:1px;">Hotline:</span>
-        <span style="color:#0011ff; font-weight:bold; font-size:1.18em; margin-left:7px;">0902 926 636</span>
-      </div>
-      <div style="flex:1"></div>
-      <!-- Desktop Tabs -->
-      <div class="navbar-tabs" style="display:flex; align-items:center;">
-        <a href="index.html" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none;">Đặt dịch vụ</a>
-        <a href="danhgiakh.html" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none;">Đánh giá dịch vụ</a>
-        <a href="login.html" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none;">Login</a>
-        <a href="#" id="logoutTab" style="color:#FFF; font-weight:bold; font-size:1.2em; margin:0 24px; text-decoration:none; display:none;" onclick="logout()">Đăng xuất</a>
-      </div>
-    </nav>
-    <!-- Hamburger Drawer Menu (mobile only) -->
-    <div class="navbar-mobile-menu-backdrop" id="navbarMobileMenuBackdrop"></div>
-    <div class="navbar-mobile-menu" id="navbarMobileMenu">
-      <button class="navbar-mobile-menu-close" id="navbarMobileMenuCloseBtn" aria-label="Đóng menu">
-        &times;
-      </button>
-      <div class="navbar-mobile-menu-logo">
-        <img src="https://tse4.mm.bing.net/th?id=OIP.retlmg0icVWKULyKF3ng8AHaEr&pid=Api&P=0" alt="Logo" />
-        <span class="navbar-mobile-menu-logo-title">DJ GooDjn</span>
-      </div>
-      <a class="menu-link" href="index.html">Đặt dịch vụ</a>
-      <a class="menu-link" href="danhgiakh.html">Đánh giá dịch vụ</a>
-      <a class="menu-link" href="login.html">Login</a>
-      <a class="menu-link" id="logoutTabMobile" href="#" style="display:none;" onclick="logout()">Đăng xuất</a>
+      <a class="mobile-hotline" href="tel:0902926636" style="margin-left:auto;">
+        <i class="fa-solid fa-phone"></i>
+        <span class="hotline-number">0902 926 636</span>
+      </a>
     </div>
+    <!-- Mobile Hamburger menu overlay -->
+    <nav class="mobile-navbar-menu" id="mobileMenu">
+      <ul>
+        <li data-href="index.html">Đặt dịch vụ</li>
+        <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
+        <li data-href="login.html">Login</li>
+      </ul>
+    </nav>
+    <!-- Desktop Navbar (giữ nguyên load từ navbar.html) -->
+    <div class="desktop-navbar"></div>
   </div>
   <script>
-    // Hamburger menu logic
-    const navbarHamburgerBtn = document.getElementById('navbarHamburgerBtn');
-    const navbarMobileMenu = document.getElementById('navbarMobileMenu');
-    const navbarMobileMenuBackdrop = document.getElementById('navbarMobileMenuBackdrop');
-    const navbarMobileMenuCloseBtn = document.getElementById('navbarMobileMenuCloseBtn');
-    function openMobileMenu() {
-      navbarMobileMenu.classList.add('show');
-      navbarMobileMenuBackdrop.style.display = 'block';
-      document.body.style.overflow = 'hidden';
-    }
-    function closeMobileMenu() {
-      navbarMobileMenu.classList.remove('show');
-      navbarMobileMenuBackdrop.style.display = 'none';
-      document.body.style.overflow = '';
-    }
-    navbarHamburgerBtn && navbarHamburgerBtn.addEventListener('click', openMobileMenu);
-    navbarMobileMenuBackdrop && navbarMobileMenuBackdrop.addEventListener('click', closeMobileMenu);
-    navbarMobileMenuCloseBtn && navbarMobileMenuCloseBtn.addEventListener('click', closeMobileMenu);
-    // Đóng menu khi chọn một tab (menu-link)
-    navbarMobileMenu && Array.from(navbarMobileMenu.getElementsByClassName('menu-link')).forEach(link => {
-      link.addEventListener('click', function(e){
-        closeMobileMenu();
-        // Nếu là # thì không chuyển trang
-        if (link.getAttribute('href') === '#') e.preventDefault();
+    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
+
+    // Mobile Hamburger menu JS
+    document.addEventListener('DOMContentLoaded', function(){
+      var hamburger = document.getElementById('hamburgerBtn');
+      var menu = document.getElementById('mobileMenu');
+      // Đóng menu khi click ngoài menu
+      document.addEventListener('click', function(e){
+        if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
+          menu.classList.remove('open');
+        }
+      });
+      // Mở menu khi click hamburger
+      hamburger.onclick = function(e){
+        e.stopPropagation();
+        menu.classList.toggle('open');
+      };
+      // Đóng menu + điều hướng khi chọn tab
+      menu.querySelectorAll('li').forEach(function(tab){
+        tab.onclick = function(){
+          menu.classList.remove('open');
+          window.location.href = tab.getAttribute('data-href');
+        };
       });
     });
-    // Đồng bộ logic logout tab (nếu có)
-    function logout() {
-      // Thực hiện logic đăng xuất ở đây
-      alert('Bạn đã đăng xuất!');
-      document.getElementById('logoutTab').style.display = 'none';
-      document.getElementById('logoutTabMobile').style.display = 'none';
-      // ... Xử lý session nếu có ...
-    }
-    window.logout = logout;
   </script>
   <div class="site-content">
     <div class="marquee-flex-wrap">
@@ -477,7 +471,6 @@
         Chào mừng đến với Coffee & Beer DJ GooDjn!
       </div>
     </div>
-
     <div id="products"></div>
     <!-- Modal đặt hàng - POPUP GIỎ HÀNG -->
     <div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-labelledby="modalOrderLabel" aria-hidden="true">
@@ -552,7 +545,8 @@
     </div>
   </div>
   <script>
-    let cart = [];
+    // ...GIỮ NGUYÊN TOÀN BỘ JS PHÍA DƯỚI (loadProducts, renderProducts, các hàm FE khác)...
+     let cart = [];
     let productsList = [];
     let employeeMap = {};
     let currentEmployeeMap = {};
@@ -602,22 +596,22 @@
 
     // Hiển thị danh sách thẻ sản phẩm
     function renderProducts(empMap) {
-      const container = document.getElementById('products');
-      let html = '';
-      Object.entries(empMap).forEach(([maNV, emp]) => {
-        // Nếu BẤT KỲ ca nào của mã NV này có daFull = "Đã full" thì disable toàn bộ thẻ
-        let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
-        let cardClass = isFull ? "product-card disabled" : "product-card";
-        html += `
-          <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
-            <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
-            <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
-            ${isFull ? `<div class="full-note">Đã full</div>` : ""}
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
+  const container = document.getElementById('products');
+  let html = '';
+  Object.entries(empMap).forEach(([maNV, emp]) => {
+    // Nếu BẤT KỲ ca nào của mã NV này có daFull = "Đã full" thì disable toàn bộ thẻ
+    let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
+    let cardClass = isFull ? "product-card disabled" : "product-card";
+    html += `
+      <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
+        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
+        <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
+        ${isFull ? `<div class="full-note">Đã full</div>` : ""}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
 
     function isCaInCart(maNV, caLV) {
       return cart.some(item => item.maNV === maNV && item.caLV === caLV);
