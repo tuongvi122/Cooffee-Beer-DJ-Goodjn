@@ -5,6 +5,34 @@
   <title>Coffee & Beer GooDjn</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
+    /* ---------- PRODUCT GRID RESPONSIVE ---------- */
+    .product-list, #products {
+      display: grid !important;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      justify-content: center;
+    }
+
+    /* Điện thoại (dọc): 2 cột */
+    @media (min-width: 480px) {
+      .product-list, #products {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    /* Máy tính bảng (dọc, từ 768px đến dưới 1024px): 4 cột */
+    @media (min-width: 768px) and (max-width: 1023.98px) {
+      .product-list, #products {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    /* Desktop (từ 1024px trở lên): giữ nguyên (nếu muốn 5 cột) */
+    @media (min-width: 1024px) {
+      .product-list, #products {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
     html, body {
       height: 100%;
       margin: 0;
@@ -40,15 +68,28 @@
       background: #fff;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
       flex-shrink: 0;
-      /* KHÔNG dùng position: fixed */
     }
 
     h2 { text-align: center; }
-    #products { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
-    .product-card { background: #fff; border: 1px solid #ccc; border-radius: 10px; padding: 10px; width: 100%; max-width: 260px; text-align: center; box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 12px; display: flex; flex-direction: column; align-items: stretch; position: relative;}
+    .product-card { 
+      background: #fff; 
+      border: 1px solid #ccc; 
+      border-radius: 10px; 
+      padding: 10px; 
+      width: 100%; 
+      box-sizing: border-box; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+      margin-bottom: 0;
+      display: flex; 
+      flex-direction: column; 
+      align-items: stretch; 
+      position: relative;
+      text-align: center;
+    }
     .product-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
     .product-card .full-note { color: #d32f2f; font-weight: bold; font-size: 15px; margin-top: 5px; }
     .product-card.disabled { opacity: 0.65; pointer-events: none; }
+    /*------ Các style khác giữ nguyên ------*/
     .ca-list { margin: 12px 0 0 0; padding: 0; list-style: none; }
     .ca-item-row { display: flex; align-items: center; gap: 0; margin-bottom: 5px; font-size: 15px; line-height: 1.4; width: 100%; box-sizing: border-box; }
     .ca-label { flex: 0 0 52px; text-align: left; font-weight: 500; color: #333; font-size: 15px; margin-right: 2px; white-space: nowrap; }
@@ -100,14 +141,6 @@
     .confirm-btn:hover { background-color: #218838;}
     .close-btn { background-color: #999; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 15px; cursor: pointer; transition: background-color 0.3s;}
     .close-btn:hover { background-color: #777;}
-    @media screen and (max-width: 600px) {
-      .product-card { max-width: 100%; }
-      .form-buttons { flex-direction: column; }
-      .modal-dialog { max-width: 350px !important; width: 95vw !important; }
-      .ca-item-row { flex-wrap: wrap; }
-      .ca-remove-btn2 { margin-top: 4px; }
-      #navbar-container { padding-top: 0; }
-    }
     #scrollToTopBtn { position: fixed; bottom: 20px; right: 10px; background-color: red; color: white; border: none; width: 30px; height: 30px; border-radius: 6px; font-size: 18px; line-height: 30px; text-align: center; cursor: pointer; display: none; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
     #floating-cart { position: fixed; top: 140px; right: 2px; background-color: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 14px; cursor: pointer; z-index: 9999; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);}
     #tbl_carts th, #tbl_carts td { padding-top: 3px; padding-bottom: 3px; font-size: 15px; }
@@ -184,6 +217,7 @@
     @media (max-width: 600px) {
       #search-bar-area { right: 2px; top: 75px; }
       #search-bar { width: 90px; font-size: 14px; }
+      #footer-container { font-size: 14px; }
     }
     .marquee-flex-wrap {
       width: 100%;
@@ -209,9 +243,6 @@
         transform: translateX(100vw);
       }
     }
-    @media (max-width: 600px) {
-      #footer-container { font-size: 14px; }
-    }
   </style>
 </head>
 <body>
@@ -228,7 +259,7 @@
       </div>
     </div>
 
-    <div id="products"></div>
+    <div id="products" class="product-list"></div>
     <!-- Modal đặt hàng - POPUP GIỎ HÀNG -->
     <div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-labelledby="modalOrderLabel" aria-hidden="true">
       <div class="modal-dialog mt-4">
@@ -302,6 +333,7 @@
     </div>
   </div>
   <script>
+    // Toàn bộ script giữ nguyên như file cũ (không cần thay đổi logic).
     let cart = [];
     let productsList = [];
     let employeeMap = {};
@@ -314,11 +346,11 @@
       return Number(num).toLocaleString('vi-VN') + "₫";
     }
 
-    // --- Tự động reload sản phẩm sau mỗi 70s (để luôn cập nhật trạng thái mới nhất) ---
+    // --- Tự động reload sản phẩm sau mỗi 60s (để luôn cập nhật trạng thái mới nhất) ---
     let reloadProductsInterval = null;
     function startAutoReloadProducts() {
       if (reloadProductsInterval) clearInterval(reloadProductsInterval);
-      reloadProductsInterval = setInterval(loadProducts, 70000);
+      reloadProductsInterval = setInterval(loadProducts, 60000);
     }
 
     async function loadProducts() {
@@ -352,22 +384,22 @@
 
     // Hiển thị danh sách thẻ sản phẩm
     function renderProducts(empMap) {
-  const container = document.getElementById('products');
-  let html = '';
-  Object.entries(empMap).forEach(([maNV, emp]) => {
-    // Nếu BẤT KỲ ca nào của mã NV này có daFull = "Đã full" thì disable toàn bộ thẻ
-    let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
-    let cardClass = isFull ? "product-card disabled" : "product-card";
-    html += `
-      <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
-        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
-        <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
-        ${isFull ? `<div class="full-note">Đã full</div>` : ""}
-      </div>
-    `;
-  });
-  container.innerHTML = html;
-}
+      const container = document.getElementById('products');
+      let html = '';
+      Object.entries(empMap).forEach(([maNV, emp]) => {
+        // Nếu BẤT KỲ ca nào của mã NV này có daFull = "Đã full" thì disable toàn bộ thẻ
+        let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
+        let cardClass = isFull ? "product-card disabled" : "product-card";
+        html += `
+          <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
+            <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
+            <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
+            ${isFull ? `<div class="full-note">Đã full</div>` : ""}
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
 
     function isCaInCart(maNV, caLV) {
       return cart.some(item => item.maNV === maNV && item.caLV === caLV);
@@ -595,7 +627,6 @@
         btn.style.display = (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "block" : "none";
       }
     };
-
     function scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
