@@ -136,6 +136,7 @@
       max-width: 430px;
       margin: 24px 0;
       position: relative;
+      /* Không có overflow-y: auto, không có max-height */
     }
     .modal-header {
       padding: 15px 20px 0 20px;
@@ -357,26 +358,23 @@
         line-height: 1;
         margin-top: 0;
       }
-      /* Hotline box fix: always fit content, not overflow, and not stuck to right edge */
-      .mobile-navbar .mobile-hotline {
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border-radius: 30px;
-        padding: 3px 22px 3px 14px;
-        margin-right: 10px;
-        margin-left: 0 !important;
-        box-shadow: 0 0 5px #1113;
-        height: 28px;
-        font-size: 0.98em;
-        white-space: nowrap;
-        min-width: 0;
-        max-width: none;
-        width: auto;
-        overflow: visible;
-        text-overflow: unset;
-        text-decoration: none !important;
-      }
+  .mobile-navbar .mobile-hotline {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 30px;
+  padding: 3px 20px 3px 14px;   /* tăng padding phải */
+  margin-left: 12px;            /* đẩy hotline cách xa logo/tên, KHÔNG dùng margin-right lớn! */
+  overflow: hidden;             /* tránh tràn số điện thoại */
+  white-space: nowrap;          /* không xuống dòng */
+  box-shadow: 0 0 5px #1113;
+  height: 28px;
+  font-size: 0.98em;
+  min-width: 0;
+  width: auto;
+  max-width: none;
+  text-decoration: none !important;
+}
       .mobile-navbar .mobile-hotline .hotline-number {
         font-size: 1.07em;
         margin-left: 3px;
@@ -441,9 +439,6 @@
     }
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
-      #navbar-container .desktop-navbar {
-        display: block !important;
-      }
     }
   </style>
 </head>
@@ -451,7 +446,7 @@
   <!-- NAVBAR: Desktop & Mobile (bổ sung mobile-navbar) -->
   <div id="navbar-container">
     <!-- Mobile Navbar (Ẩn trên desktop) -->
-    <div class="mobile-navbar">
+    <div class="mobile-navbar" style="display:none;">
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
       </button>
@@ -605,8 +600,6 @@
       unlockBodyScroll();
     }
     // ...GIỮ NGUYÊN TOÀN BỘ JS PHÍA DƯỚI (loadProducts, renderProducts, các hàm FE khác)...
-    // (KHÔNG thay đổi logic này ở bản hoàn chỉnh!)
-    // (Đoạn script phía dưới giữ nguyên như của bạn)
     let cart = [];
     let productsList = [];
     let employeeMap = {};
@@ -619,6 +612,7 @@
       return Number(num).toLocaleString('vi-VN') + "₫";
     }
 
+    // --- Tự động reload sản phẩm sau mỗi 60s (để luôn cập nhật trạng thái mới nhất) ---
     let reloadProductsInterval = null;
     function startAutoReloadProducts() {
       if (reloadProductsInterval) clearInterval(reloadProductsInterval);
@@ -628,6 +622,7 @@
     async function loadProducts() {
       try {
         productsList = await fetch('/api/getProducts').then(r=>r.json());
+        // Xử lý trường hợp API trả về lỗi
         if (!Array.isArray(productsList) || productsList.length === 0) {
           document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Không lấy được dữ liệu sản phẩm! Hãy kiểm tra API hoặc dữ liệu Google Sheets!</div>';
           return;
@@ -640,6 +635,7 @@
       }
     }
 
+    // Gom nhóm sản phẩm theo mã NV
     function groupByEmployee(products) {
       const map = {};
       products.forEach(prod => {
@@ -652,27 +648,30 @@
       return map;
     }
 
+    // Hiển thị danh sách thẻ sản phẩm
     function renderProducts(empMap) {
-      const container = document.getElementById('products');
-      let html = '';
-      Object.entries(empMap).forEach(([maNV, emp]) => {
-        let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
-        let cardClass = isFull ? "product-card disabled" : "product-card";
-        html += `
-          <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
-            <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
-            <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
-            ${isFull ? `<div class="full-note">Đã full</div>` : ""}
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
+  const container = document.getElementById('products');
+  let html = '';
+  Object.entries(empMap).forEach(([maNV, emp]) => {
+    // Nếu BẤT KỲ ca nào của mã NV này có daFull = "Đã full" thì disable toàn bộ thẻ
+    let isFull = emp.caList.some(ca => ca.daFull === "Đã full");
+    let cardClass = isFull ? "product-card disabled" : "product-card";
+    html += `
+      <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
+        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
+        <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
+        ${isFull ? `<div class="full-note">Đã full</div>` : ""}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
 
     function isCaInCart(maNV, caLV) {
       return cart.some(item => item.maNV === maNV && item.caLV === caLV);
     }
 
+    // Hiển thị popup chi tiết sản phẩm
     function showProductDetail(maNV) {
       currentProductDetail = maNV;
       const emp = currentEmployeeMap[maNV];
@@ -687,6 +686,7 @@
         <ul class="ca-list" style="margin-top:18px;">
       `;
       emp.caList.forEach((ca, idx) => {
+        // Ẩn ca nếu nghỉ phép/nghỉ việc
         if (ca.trangThai !== "Làm việc") return;
         const idCheckbox = `modal_ck_${maNV}_${ca.caLV}`;
         const isLocked = isCaInCart(maNV, ca.caLV);
