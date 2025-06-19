@@ -102,11 +102,44 @@
     .note-already-added { color: red; font-size: 13px; margin-left: 8px; min-width: 120px; display:inline-block; }
     .ca-busy-note { color: #d32f2f; font-size: 13px; font-weight: bold; margin-left: 7px; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100vw; height: 100vh; overflow: auto; background: rgba(0,0,0,0.2);}
+    .modal {
+    z-index: 20000 !important;           /* Cao hơn cả navbar/menu */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
     .modal.show { display: block; }
     #modalOrder { z-index: 1100 !important; }
-    .modal-dialog { position: relative; margin: 5% auto; max-width: 500px; width: 95%; }
-    .modal-content { background: #fff; border-radius: 10px; padding: 0 0 15px 0; box-shadow: 0 0 20px rgba(0,0,0,0.3);}
+    .modal-dialog {
+    margin: 0 auto !important;
+    top: 0 !important;
+    left: 0;
+    right: 0;
+    transform: none !important;
+    max-width: 96vw !important;
+    width: 99vw !important;
+    min-width: 0 !important;
+    position: relative;
+    z-index: 20001 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-content {
+    margin: 0 auto;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-radius: 14px;
+    box-shadow: 0 3px 20px rgba(0,0,0,0.25);
+    max-height: 92vh;
+    overflow-y: auto;
+    width: 100%;
+  }
     .modal-header { padding: 15px 20px 0 20px; border-bottom: 1px solid #eee; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;}
     .modal-title { margin: 0; font-size: 21px;}
     .close { background: none; border: none; font-size: 28px; font-weight: bold; color: #888; cursor: pointer; line-height: 1;}
@@ -240,14 +273,14 @@
       width: 100%;
       overflow: hidden;
       background: transparent;
-      margin: 10px 0 15px 0;
-      height: 2.2em;
+      margin: 5px 0 7px 0;
+      height: 1.5em;
       position: relative;
     }
     .marquee-flex-text {
       display: inline-block;
       white-space: nowrap;
-      font-size: 1.3em;
+      font-size: 1.2em;
       color: #08810a;
       font-weight: bold;
       animation: slide-right 15s linear infinite;
@@ -332,12 +365,12 @@
   font-size: 0.98em;
   white-space: nowrap;   /* <-- Luôn giữ hotline 1 dòng */
   min-width: 0;
-  max-width: 150px;      /* Giới hạn chiều rộng, giúp không chiếm quá nhiều chỗ */
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
+  text-decoration: none !important;
 }
       .mobile-navbar .mobile-hotline i {
-        color: #e53935;
+        color: #1b28df;
         margin-right: 5px;
         font-size: 1.1em;
       }
@@ -354,8 +387,9 @@
   font-size: 1.07em;
   margin-left: 3px;
   font-weight: bold;
-  color: #0011ff;
+  color: #d80707;
   letter-spacing: 0.5px;
+  text-decoration: none !important;
 }
       /* Hamburger menu overlay */
   .mobile-navbar-menu {
@@ -364,8 +398,8 @@
   top: 54px;
   left: 0;
   width: 60vw;         /* ----> Thay vì 77vw/max-width... */
-  min-width: 150px;           /* ----> Đủ cho 3 tab, không cần quá rộng */
-  max-width: 85vw;
+  min-width: 140px;           /* ----> Đủ cho 3 tab, không cần quá rộng */
+  max-width: 70vw;
   background: #228B22;
   color: #fff;
   z-index: 12000;
