@@ -288,13 +288,178 @@
       border-radius: 7px;
       cursor: pointer;
     }
+
+    /* ----------------- MOBILE DESIGN CUSTOM ----------------- */
     @media (max-width: 700px) {
-      .container { padding: 12px; }
-      table { font-size: 0.9em; }
-      .input-row { flex-direction: column; align-items: flex-start; }
-      .search-row { flex-direction: column; align-items: flex-start; }
-      .modal-dialog { max-width: 350px !important; width: 95vw !important; }
-      .popup-btns { flex-direction: column; }
+      .container {
+        padding: 8px 4px 12px 4px !important;
+        border-radius: 0;
+        max-width: 98vw;
+        margin: 12px auto 0;
+        box-shadow: none;
+      }
+      .search-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .search-row label {
+        font-size: 1em;
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+      .search-row input[type="text"] {
+        width: 100%;
+        border: 2px solid #388e3c;
+        border-radius: 5px;
+        height: 38px;
+        font-size: 1.03em;
+        margin-bottom: 0;
+        padding: 7px 10px;
+      }
+      .search-row button {
+        width: 100%;
+        border-radius: 6px;
+        font-size: 1.1em;
+        background: #007b38;
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        margin-top: 5px;
+        margin-bottom: 6px;
+      }
+      .search-row .label-point,
+      .search-row .point-box {
+        display: none !important;
+      }
+      h2 {
+        font-size: 1.09em;
+        text-align: left;
+        margin: 10px 0 9px 2px;
+        color: #2e7d32;
+        font-weight: 700;
+      }
+      .table-wrap {
+        overflow-x: auto;
+        margin-bottom: 12px;
+        margin-top: 0;
+      }
+      table {
+        font-size: 1em;
+        min-width: unset !important;
+        width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      th, td {
+        padding: 9px 5px;
+        font-size: 1em;
+        border: 1px solid #dbe9c1;
+      }
+      th {
+        background: #5dbb36;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1em;
+      }
+      .sum-row td {
+        background: #f0f6f9;
+        color: #234d20;
+        font-weight: 600;
+        font-size: 1em;
+        border-top: 2px solid #bcd898;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+      .btn-eval {
+        min-width: 90px;
+        padding: 5px 0 !important;
+        font-size: 1em;
+        border-radius: 5px !important;
+        margin: 0 auto;
+        display: block;
+      }
+      .btn-eval.green {
+        background: #25b324;
+        font-weight: bold;
+        color: #fff;
+        border: 2px solid #217c1a;
+      }
+      .btn-eval.red {
+        background: #e53935;
+        font-weight: bold;
+        color: #fff;
+        border: 2px solid #b71c1c;
+      }
+      /* Chỉ hiển thị các cột: Số bàn, NV phụ trách, Tổng tiền, Đánh giá */
+      #ordersTable thead tr th:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
+      #ordersTable tbody tr td:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
+      #ordersTable tfoot tr td:not(:nth-child(4)):not(:nth-child(6)) {
+        display: none !important;
+      }
+      /* Căn trái cho NV phụ trách */
+      #ordersTable tbody tr td:nth-child(5) {
+        text-align: left;
+      }
+      /* Đổi màu nền cho tổng cộng */
+      #ordersTable tfoot tr.sum-row td:nth-child(4) {
+        background: #e3f1e6 !important;
+        font-weight: bold;
+        color: #41501b;
+        font-size: 1em;
+      }
+      /* Đặt lại chiều cao modal dialog trên mobile */
+      .modal-dialog {
+        max-width: 99vw !important;
+        width: 99vw !important;
+        margin: 12vw auto !important;
+      }
+      .popup-btns {
+        flex-direction: column;
+        gap: 7px;
+      }
+    }
+
+    /* Footer màu xanh đậm, fix sát đáy mobile */
+    @media (max-width: 700px) {
+      #footer-container {
+        background: #27923b !important;
+        color: #fff !important;
+        font-size: 0.97em !important;
+        padding: 6px 0 2px 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        text-align: center;
+      }
+    }
+    /* Căn giữa logo, nút gọi trong navbar trên mobile */
+    @media (max-width: 700px) {
+      #navbar-container {
+        background: #27923b !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+        height: 54px !important;
+      }
+      .navbar-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 54px !important;
+        padding: 0 6px;
+      }
+      .navbar-mobile .logo {
+        height: 35px;
+      }
+      .navbar-mobile .call-btn {
+        background: #fff;
+        color: #114b0d;
+        border-radius: 18px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        font-weight: bold;
+        font-size: 1.08em;
+        padding: 4px 13px;
+        border: 2px solid #388e3c;
+      }
     }
   </style>
 </head>
@@ -310,7 +475,7 @@
   <div class="site-content">
     <div class="container">
       <div class="search-row">
-        <label for="phoneInput">Số ĐT đặt dịch vụ:</label>
+        <label for="phoneInput">Số điện thoại đặt dịch vụ:</label>
         <input type="text" id="phoneInput" maxlength="15" placeholder="Nhập SĐT…" />
         <button id="searchBtn">Tìm kiếm</button>
         <span class="label-point">Tổng điểm tích lũy trong 24h <span id="currentMonth"></span>:</span>
