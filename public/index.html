@@ -100,13 +100,7 @@
     .note-already-added { color: red; font-size: 13px; margin-left: 8px; min-width: 120px; display:inline-block; }
     .ca-busy-note { color: #d32f2f; font-size: 13px; font-weight: bold; margin-left: 7px; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
-    /* Modal Popup - giống đánh giá khách hàng */
-    body.modal-open {
-      overflow: hidden !important;
-      position: fixed !important;
-      width: 100vw !important;
-      height: 100vh;
-    }
+    /* Popup toàn trang - cuộn như trang chính */
     .modal {
       display: none;
       position: fixed;
@@ -115,29 +109,28 @@
       top: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.25);
-      overflow-y: auto;
+      background: rgba(0,0,0,0.3);
+      overflow-y: auto; /* Cuộn toàn trang khi popup dài */
     }
     .modal.show { display: block; }
     .modal-dialog {
-      position: fixed !important;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 430px;
-      width: 98vw;
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
       margin: 0;
-      z-index: 100000;
-      pointer-events: all;
     }
     .modal-content {
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0,0,0,0.20);
-      max-height: 95vh;
-      overflow-y: auto;
+      width: 98vw;
+      max-width: 430px;
+      margin: 24px 0;
       position: relative;
-      padding: 0 0 15px 0;
+      /* KHÔNG đặt max-height hay overflow-y ở đây để cuộn toàn trang */
     }
     .modal-header {
       padding: 15px 20px 0 20px;
@@ -146,10 +139,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
       background: #fff;
-      z-index: 10;
+      /* Không cần sticky, để cuộn toàn trang */
     }
     .modal-title { margin: 0; font-size: 21px;}
     .close { background: none; border: none; font-size: 28px; font-weight: bold; color: #888; cursor: pointer; line-height: 1;}
@@ -287,7 +278,7 @@
       }
       .form-buttons { flex-direction: column; }
       .modal-dialog { max-width: 99vw !important; width: 99vw !important; }
-      .modal-content { max-height: 95vh; padding: 0 0 12px 0; }
+      .modal-content { width: 99vw; max-width: 99vw; }
       .ca-item-row { flex-wrap: wrap; }
       .ca-remove-btn2 { margin-top: 4px; }
       #navbar-container { padding-top: 0; }
@@ -581,22 +572,14 @@
     </div>
   </div>
   <script>
-    // Khóa cuộn trang chính khi mở popup
-    function lockBodyScroll() {
-      document.body.classList.add('modal-open');
-    }
-    function unlockBodyScroll() {
-      document.body.classList.remove('modal-open');
-    }
+    // Không khóa cuộn body, cuộn toàn trang khi popup mở
     function openModalFix(modalid) {
       document.getElementById(modalid).classList.add('show');
       document.getElementById(modalid).style.display = 'block';
-      lockBodyScroll();
     }
     function closeModalFix(modalid) {
       document.getElementById(modalid).classList.remove('show');
       document.getElementById(modalid).style.display = 'none';
-      unlockBodyScroll();
     }
     // ...GIỮ NGUYÊN TOÀN BỘ JS PHÍA DƯỚI (loadProducts, renderProducts, các hàm FE khác)...
     let cart = [];
