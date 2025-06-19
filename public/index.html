@@ -34,7 +34,7 @@
       flex: 1 0 auto;
       display: flex;
       flex-direction: column;
-      padding-top: 64px;  /* Điều chỉnh nếu navbar cao/thấp hơn */
+      padding-top: 64px;
       padding-bottom: 0;
     }
     #footer-container {
@@ -43,7 +43,6 @@
       box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
       flex-shrink: 0;
     }
-
     h2 { text-align: center; }
     #products {
       display: flex;
@@ -105,8 +104,7 @@
       display: none;
       position: fixed;
       z-index: 99999 !important;
-      left: 0;
-      top: 0;
+      left: 0; top: 0;
       width: 100vw;
       height: 100vh;
       overflow: auto;
@@ -114,21 +112,21 @@
     }
     .modal.show { display: block; }
     .modal-dialog {
-      position: absolute;
-      left: 50%;
-      top: 50%;
+      position: fixed !important;
+      left: 50%; top: 50%;
       transform: translate(-50%, -50%);
-      width: 95vw;
-      max-width: 400px;
+      width: 98vw;
+      max-width: 430px;
       margin: 0;
       z-index: 100000;
+      pointer-events: all;
     }
     .modal-content {
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0,0,0,0.20);
       padding: 0 0 15px 0;
-      max-height: 88vh;
+      max-height: 95vh;
       overflow-y: auto;
       position: relative;
     }
@@ -246,6 +244,12 @@
         transform: translateX(100vw);
       }
     }
+    body.modal-open {
+      overflow: hidden !important;
+      position: fixed !important;
+      width: 100vw !important;
+      height: 100vh;
+    }
     /* ======= Navbar Responsive Mobile Hamburger ======= */
     .mobile-navbar {
       display: none;
@@ -272,8 +276,8 @@
         border-radius: 5px;
       }
       .form-buttons { flex-direction: column; }
-      .modal-dialog { max-width: 98vw !important; width: 97vw !important; }
-      .modal-content { max-height: 89vh; padding: 0 0 12px 0; }
+      .modal-dialog { max-width: 99vw !important; width: 99vw !important; }
+      .modal-content { max-height: 95vh; padding: 0 0 12px 0; }
       .ca-item-row { flex-wrap: wrap; }
       .ca-remove-btn2 { margin-top: 4px; }
       #navbar-container { padding-top: 0; }
@@ -356,15 +360,14 @@
         align-items: center;
         background: #fff;
         border-radius: 30px;
-        padding: 3px 10px 3px 8px;
+        padding: 3px 14px 3px 10px;
         margin-left: 4px;
         box-shadow: 0 0 5px #1113;
         height: 28px;
         font-size: 0.98em;
         white-space: nowrap;
         min-width: 0;
-        /* max-width: 138px; */ /* Bỏ dòng này hoặc tăng lên nếu cần */
-        max-width: 190px;
+        max-width: 240px;
         overflow: visible;
         text-overflow: unset;
         text-decoration: none !important;
@@ -573,29 +576,23 @@
   <script>
     // Lock scroll on body when modal is open (mobile UX enhancement)
     function lockBodyScroll() {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100vw';
+      document.body.classList.add('modal-open');
     }
     function unlockBodyScroll() {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      document.body.classList.remove('modal-open');
     }
-    // Khi show modal
     function openModalFix(modalid) {
       document.getElementById(modalid).classList.add('show');
       document.getElementById(modalid).style.display = 'block';
       lockBodyScroll();
     }
-    // Khi đóng modal
     function closeModalFix(modalid) {
       document.getElementById(modalid).classList.remove('show');
       document.getElementById(modalid).style.display = 'none';
       unlockBodyScroll();
     }
     // ...GIỮ NGUYÊN TOÀN BỘ JS PHÍA DƯỚI (loadProducts, renderProducts, các hàm FE khác)...
-     let cart = [];
+    let cart = [];
     let productsList = [];
     let employeeMap = {};
     let currentEmployeeMap = {};
