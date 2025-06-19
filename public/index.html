@@ -100,23 +100,32 @@
     .note-already-added { color: red; font-size: 13px; margin-left: 8px; min-width: 120px; display:inline-block; }
     .ca-busy-note { color: #d32f2f; font-size: 13px; font-weight: bold; margin-left: 7px; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Modal Popup - giống đánh giá khách hàng */
+    body.modal-open {
+      overflow: hidden !important;
+      position: fixed !important;
+      width: 100vw !important;
+      height: 100vh;
+    }
     .modal {
       display: none;
       position: fixed;
       z-index: 99999 !important;
-      left: 0; top: 0;
+      left: 0;
+      top: 0;
       width: 100vw;
       height: 100vh;
-      overflow: auto;
       background: rgba(0,0,0,0.25);
+      overflow-y: auto;
     }
     .modal.show { display: block; }
     .modal-dialog {
       position: fixed !important;
-      left: 50%; top: 50%;
+      left: 50%;
+      top: 50%;
       transform: translate(-50%, -50%);
-      width: 98vw;
       max-width: 430px;
+      width: 98vw;
       margin: 0;
       z-index: 100000;
       pointer-events: all;
@@ -125,12 +134,23 @@
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0,0,0,0.20);
-      padding: 0 0 15px 0;
       max-height: 95vh;
       overflow-y: auto;
       position: relative;
+      padding: 0 0 15px 0;
     }
-    .modal-header { padding: 15px 20px 0 20px; border-bottom: 1px solid #eee; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;}
+    .modal-header {
+      padding: 15px 20px 0 20px;
+      border-bottom: 1px solid #eee;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 10;
+    }
     .modal-title { margin: 0; font-size: 21px;}
     .close { background: none; border: none; font-size: 28px; font-weight: bold; color: #888; cursor: pointer; line-height: 1;}
     .modal-body { padding: 15px 20px; }
@@ -244,16 +264,6 @@
         transform: translateX(100vw);
       }
     }
-    body.modal-open {
-      overflow: hidden !important;
-      position: fixed !important;
-      width: 100vw !important;
-      height: 100vh;
-    }
-    /* ======= Navbar Responsive Mobile Hamburger ======= */
-    .mobile-navbar {
-      display: none;
-    }
     @media (max-width: 600px) {
       #products {
         display: grid !important;
@@ -299,9 +309,6 @@
         gap: 9px 5px;
       }
       .product-card { padding: 7px 3px; }
-    }
-    .mobile-navbar {
-      display: none;
     }
     @media (max-width: 768px) {
       #navbar-container {
@@ -574,7 +581,7 @@
     </div>
   </div>
   <script>
-    // Lock scroll on body when modal is open (mobile UX enhancement)
+    // Khóa cuộn trang chính khi mở popup
     function lockBodyScroll() {
       document.body.classList.add('modal-open');
     }
