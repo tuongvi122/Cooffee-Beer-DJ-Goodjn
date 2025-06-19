@@ -24,7 +24,7 @@
       background: #fafbfc;
     }
     #navbar-container {
-      position: fixed;
+      position: sticky;
       top: 0;
       left: 0;
       width: 100vw;
@@ -38,6 +38,8 @@
       flex-direction: column;
       padding-top: 64px;
       padding-bottom: 0;
+      min-height: 100vh;
+      background: #fafbfc;
     }
     #footer-container {
       background: #228B22;
@@ -52,14 +54,10 @@
       box-sizing: border-box;
       text-align: center;
       padding: 0 10px;
-      position: fixed;
-      left: 0;
+      position: sticky;
       bottom: 0;
+      left: 0;
       z-index: 10000;
-      transition: transform 0.3s;
-    }
-    #footer-container.hide-footer {
-      transform: translateY(100%);
     }
     #footer-container div {
       width: 100%;
@@ -100,6 +98,7 @@
       margin: 0;
       box-sizing: border-box;
       outline: none;
+      background: #fff;
     }
     .search-row button {
       padding: 8px 22px;
@@ -164,28 +163,32 @@
     .modal.show { display: block; }
     .modal-dialog {
       position: relative;
-      margin: 5% auto;
-      max-width: 460px;
-      width: 95%;
+      margin: 8vw auto;
+      max-width: 380px;
+      width: 95vw;
       min-height: auto;
+      padding: 0;
+      box-sizing: border-box;
     }
     .modal-content {
       background: #fff;
-      border-radius: 10px;
+      border-radius: 13px;
       padding: 0 0 15px 0;
       box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      margin: 0;
+      box-sizing: border-box;
     }
     .modal-header {
-      padding: 15px 20px 0 20px;
+      padding: 13px 16px 0 16px;
       border-bottom: 1px solid #eee;
-      border-radius: 10px 10px 0 0;
+      border-radius: 13px 13px 0 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .modal-title {
       margin: 0;
-      font-size: 21px;
+      font-size: 19px;
       flex: 1;
       text-align: center;
       color: #0007da;
@@ -204,7 +207,9 @@
     .close:hover {
       color: #c62828;
     }
-    .modal-body { padding: 15px 20px; }
+    .modal-body {
+      padding: 13px 10px 10px 10px;
+    }
     form { display: flex; flex-direction: column; gap: 8px; }
     .input-row {
       display: flex;
@@ -227,14 +232,14 @@
     fieldset {
       border: 1px solid #ccc;
       border-radius: 6px;
-      padding: 10px;
+      padding: 8px;
       margin-top: 8px;
     }
     legend { font-weight: 600; color: #1052e3; }
     .staff-label, .service-review-row {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       margin-bottom: 6px;
     }
     .staff-name { min-width: 60px; font-weight: 500; color: #183d1a; }
@@ -248,7 +253,7 @@
     .star.gray { color: #ccc; }
     .service-review-row.speed-row { flex-wrap: nowrap; }
     .service-review-row.speed-row label { white-space: nowrap; margin-right: 12px; }
-    .speed-options { display: flex; gap: 16px; }
+    .speed-options { display: flex; gap: 10px; }
     .speed-options label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
     .speed-quick { color: #15b316; font-weight: 600; }
     .speed-normal { color: #120be8; font-weight: 600; }
@@ -267,24 +272,25 @@
       border: 1px solid #aaa;
       border-radius: 4px;
       background: #f9f9fc;
-      font-size: 1.2em;
+      font-size: 1.1em;
       line-height: 1.4;
     }
     .popup-btns {
       text-align: center;
-      margin-top: 14px;
+      margin: 10px 0 0 0;
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
+      flex-direction: row;
     }
     .popup-btns button {
-      padding: 8px 20px;
+      padding: 8px 16px;
       border-radius: 5px;
       border: none;
       font-weight: 600;
       cursor: pointer;
       font-size: 15px;
-      min-width: 100px;
+      min-width: 90px;
     }
     .popup-btns .send  { background: #10b314; color: #fff; }
     .popup-btns .close { background: #e53935; color: #fff; }
@@ -313,9 +319,9 @@
     /* --- NAVBAR & FOOTER MOBILE --- */
     @media (max-width: 700px) {
       .container {
-        padding: 8px 4px 12px 4px !important;
+        padding: 10px 4px 10px 4px !important;
         border-radius: 0;
-        max-width: 98vw;
+        max-width: 100vw;
         margin: 12px auto 0;
         box-shadow: none;
       }
@@ -323,33 +329,30 @@
         flex-wrap: nowrap !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 10px !important;
+        gap: 7px !important;
         margin-bottom: 10px;
         justify-content: center !important;
         width: 100%;
       }
       .search-row input[type="tel"] {
-        width: 70vw;
-        min-width: 110px;
+        width: 67vw;
+        min-width: 95px;
         max-width: 195px;
         flex: 1 1 auto;
-        font-size: 1.06em;
-        padding: 7px 12px;
+        font-size: 1.08em;
+        padding: 7px 10px;
+        margin: 0 !important;
       }
       .search-row button {
         flex: 0 0 auto;
-        font-size: 1.09em;
+        font-size: 1.08em;
         height: 38px;
-        min-width: 100px;
-        padding: 0 13px;
+        min-width: 85px;
+        padding: 0 11px;
         margin-left: 0;
       }
-      .search-row .label-point,
-      .search-row .point-box {
-        display: none !important;
-      }
       h2 {
-        font-size: 1.09em;
+        font-size: 1.07em;
         text-align: center !important;
         margin: 10px 0 9px 2px;
         color: #2e7d32;
@@ -388,9 +391,9 @@
         border-bottom-right-radius: 3px;
       }
       .btn-eval {
-        min-width: 90px;
+        min-width: 80px;
         padding: 5px 0 !important;
-        font-size: 1em;
+        font-size: 0.99em;
         border-radius: 5px !important;
         margin: 0 auto;
         display: block;
@@ -424,18 +427,32 @@
       .modal-dialog {
         max-width: 99vw !important;
         width: 99vw !important;
-        margin: 12vw auto !important;
+        margin: 10vw auto 0 auto !important;
+        padding: 0 3vw;
+      }
+      .modal-content {
+        padding-left: 3vw;
+        padding-right: 3vw;
+        /* border-radius đã có ở trên */
       }
       .popup-btns {
-        flex-direction: column;
-        gap: 7px;
+        flex-direction: row !important;
+        gap: 10px !important;
+        margin: 8px 0 0 0 !important;
+        justify-content: center !important;
+        align-items: center !important;
+      }
+      .popup-btns button {
+        min-width: 90px !important;
+        font-size: 0.99em !important;
+        padding: 9px 13px !important;
       }
       #footer-container {
         min-height: 54px;
         height: 54px;
         font-size: 0.98em;
         padding: 0 7px;
-        position: fixed;
+        position: sticky;
         left: 0;
         bottom: 0;
         z-index: 10000;
@@ -458,6 +475,8 @@
         padding: 0;
         min-height: 54px;
         height: 54px;
+        position: sticky !important;
+        top: 0;
       }
       .mobile-navbar {
         position: relative;
@@ -642,20 +661,6 @@
         };
       });
     });
-
-    // Footer auto-hide when input is focused on mobile (bàn phím bật)
-    function checkFooterInputFocus() {
-      const footer = document.getElementById('footer-container');
-      if (!footer) return;
-      const active = document.activeElement;
-      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
-        footer.classList.add('hide-footer');
-      } else {
-        footer.classList.remove('hide-footer');
-      }
-    }
-    window.addEventListener('focusin', checkFooterInputFocus);
-    window.addEventListener('focusout', checkFooterInputFocus);
   </script>
   <!-- Main content -->
   <div class="site-content">
