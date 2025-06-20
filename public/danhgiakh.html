@@ -12,6 +12,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
       font-family: 'Roboto', Arial, sans-serif;
       background: #fafbfc;
       color: #23272f;
@@ -24,15 +25,17 @@
       flex-direction: column;
       background: #fafbfc;
       box-sizing: border-box;
+      overflow-x: hidden;
     }
     #navbar-container {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
+      width: 100%;
       z-index: 10000;
       background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+      box-sizing: border-box;
     }
     .site-content {
       flex: 1 0 auto;
@@ -42,25 +45,37 @@
       padding-bottom: 0;
       min-height: 100vh;
       box-sizing: border-box;
+      width: 100%;
     }
     #footer-container {
       background: #228B22;
       color: #fff;
-      width: 100vw;
-      font-size: 1em;
+      width: 100%;
       box-sizing: border-box;
       text-align: center;
-      padding: 0 10px;
+      padding: 5px 8px 3px 8px;
+      font-family: Arial, 'Roboto', sans-serif;
+      font-size: 14px;
+      line-height: 1.17;
+      font-weight: 400;
+      letter-spacing: 0;
+      word-break: break-word;
       margin-top: 36px;
+      border: none;
+      overflow-x: hidden;
     }
     #footer-container div {
       width: 100%;
       text-align: center;
-      line-height: 1.15;
-      word-break: break-word;
+      white-space: normal;
+      overflow-wrap: break-word;
+      -webkit-hyphens: auto;
+      hyphens: auto;
     }
     .container {
       max-width: 870px;
+      width: 100%;
+      box-sizing: border-box;
       margin: 22px auto 18px;
       padding: 18px;
       background: #fff;
@@ -124,13 +139,14 @@
     .search-row .point-box {
       display: none !important;
     }
-    .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+    .table-wrap { overflow-x: auto; margin-bottom: 20px; width: 100%; box-sizing: border-box;}
     table {
       width: 100%;
-      min-width: 700px;
+      min-width: unset;
       border-collapse: collapse;
       box-shadow: 0 2px 12px rgba(0,0,0,0.1);
       background: #fff;
+      box-sizing: border-box;
     }
     th, td {
       padding: 8px;
@@ -166,18 +182,20 @@
     .modal-dialog {
       position: relative;
       margin: 5% auto;
-      max-width: 410px;
-      width: 96vw;
-      min-height: auto;
+      max-width: 420px;
+      width: 98vw;
+      padding: 0;
       background: transparent;
       border-radius: 0;
+      box-sizing: border-box;
     }
     .modal-content {
       background: #fff;
       border-radius: 13px;
       padding: 8px 0 10px 0;
       box-shadow: 0 0 20px rgba(0,0,0,0.17);
-      margin: 0 9px;
+      margin: 0 18px;
+      box-sizing: border-box;
     }
     .modal-header {
       padding: 13px 15px 0 15px;
@@ -186,6 +204,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #fff;
+      box-sizing: border-box;
     }
     .modal-title {
       margin: 0;
@@ -208,7 +228,10 @@
     .close:hover {
       color: #c62828;
     }
-    .modal-body { padding: 10px 14px 10px 14px; }
+    .modal-body {
+      padding: 12px 30px 15px 30px;
+      box-sizing: border-box;
+    }
     form { display: flex; flex-direction: column; gap: 8px; }
     .input-row {
       display: flex;
@@ -232,9 +255,11 @@
     .input-row input[readonly] { background: #eee; }
     fieldset {
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 7px 8px 4px 8px;
-      margin-top: 8px;
+      margin-top: 7px;
+      font-size: 0.97em;
+      box-sizing: border-box;
     }
     legend { font-weight: 600; color: #1052e3; font-size: 1em; }
     .staff-label, .service-review-row {
@@ -269,30 +294,34 @@
     #popupComment {
       width: 100%;
       min-height: 44px;
-      padding: 6px;
-      border: 1px solid #aaa;
-      border-radius: 4px;
+      max-width: 100%;
+      font-size: 0.98em;
+      line-height: 1.3;
+      margin-bottom: 0;
+      box-sizing: border-box;
+      border: 2px solid #e0b43c;
+      border-radius: 6px;
+      padding: 5px 8px;
       background: #f9f9fc;
-      font-size: 1em;
-      line-height: 1.4;
       resize: vertical;
+      margin-top: 0;
     }
     .popup-btns {
       text-align: center;
-      margin-top: 10px;
+      margin-top: 10px !important;
       display: flex;
-      justify-content: center;
-      gap: 10px;
       flex-direction: row;
+      gap: 10px;
+      justify-content: center;
     }
     .popup-btns button {
-      padding: 7px 14px;
+      min-width: 95px !important;
+      font-size: 0.98em !important;
+      padding: 8px 11px !important;
       border-radius: 5px;
       border: none;
       font-weight: 600;
       cursor: pointer;
-      font-size: 15px;
-      min-width: 90px;
     }
     .popup-btns .send  { background: #10b314; color: #fff; }
     .popup-btns .close { background: #e53935; color: #fff; }
@@ -324,8 +353,10 @@
         padding: 7px 2vw 10px 2vw !important;
         border-radius: 0;
         max-width: 100vw;
+        width: 100%;
         margin: 12px auto 0;
         box-shadow: none;
+        box-sizing: border-box;
       }
       .search-row {
         flex-wrap: nowrap !important;
@@ -362,6 +393,7 @@
         overflow-x: auto;
         margin-bottom: 12px;
         margin-top: 0;
+        width: 100%;
       }
       table {
         font-size: 1em;
@@ -369,6 +401,7 @@
         width: 100%;
         box-shadow: none;
         border-radius: 0;
+        box-sizing: border-box;
       }
       th, td {
         padding: 9px 5px;
@@ -425,160 +458,72 @@
         font-size: 1em;
       }
       .modal-dialog {
-        max-width: 94vw !important;
-        width: 94vw !important;
-        margin: 4vw auto !important;
+        max-width: 98vw !important;
+        width: 98vw !important;
+        margin: 6vw auto !important;
+        padding: 0;
       }
       .modal-content {
         border-radius: 13px !important;
-        margin: 0 2vw !important;
+        margin: 0 1vw !important;
         padding: 8px 0 10px 0 !important;
+        box-sizing: border-box;
       }
       .modal-header {
-        padding: 12px 10px 0 10px !important;
+        padding: 11px 10px 0 10px !important;
+      }
+      .modal-title {
+        font-size: 1.09em !important;
       }
       .modal-body {
-        padding: 9px 8px 10px 8px !important;
-      }
-      form {
-        gap: 6px;
+        padding: 10px 6vw 10px 6vw !important; /* Lề trái/phải vừa phải */
+        box-sizing: border-box;
       }
       .input-row label {
-        width: 95px !important;
-        font-size: 0.99em;
+        width: 88px !important;
+        font-size: 0.97em;
       }
       .input-row input {
-        font-size: 0.99em !important;
+        font-size: 1em !important;
       }
       fieldset {
-        padding: 6px 6px 3px 6px;
+        padding: 7px 8px 4px 8px;
         margin-top: 7px;
+        border-radius: 8px;
+        font-size: 0.97em;
+        box-sizing: border-box;
       }
-      .popup-btns {
-        margin-top: 8px !important;
-        flex-direction: row !important;
-        gap: 8px !important;
-      }
-      .popup-btns button {
-        min-width: 88px !important;
-        font-size: 0.97em !important;
-        padding: 7px 10px !important;
-      }
-      /* NAVBAR FIXED */
-      .mobile-navbar {
-        position: relative;
-        display: flex !important;
-        align-items: center;
-        width: 100vw;
-        background: #228B22;
-        min-height: 54px;
-        height: 54px;
-        z-index: 10001;
-      }
-      .mobile-navbar .hamburger {
-        padding: 12px 12px 12px 7px;
-        font-size: 27px;
-        color: #fff;
-        background: none;
-        border: none;
-        outline: none;
-        margin-right: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .navbar-title {
-        flex: 1 1 70%;
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .mobile-navbar .navbar-title .brand-main {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 1.13em;
-        line-height: 1.1;
+      #popupComment {
+        width: 100%;
+        min-height: 44px;
+        max-width: 100%;
+        font-size: 0.98em;
+        line-height: 1.3;
         margin-bottom: 0;
-      }
-      .mobile-navbar .navbar-title .brand-sub {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 0.99em;
-        line-height: 1;
+        box-sizing: border-box;
+        border: 2px solid #e0b43c;
+        border-radius: 6px;
+        padding: 5px 8px;
+        background: #f9f9fc;
+        resize: vertical;
         margin-top: 0;
       }
-      .mobile-navbar .mobile-hotline {
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border-radius: 30px;
-        padding: 3px 16px 3px 11px;
-        box-shadow: 0 0 5px #1113;
-        height: 28px;
-        font-size: 0.98em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-decoration: none !important;
+      .popup-btns {
+        margin-top: 10px !important;
+        flex-direction: row !important;
+        gap: 10px !important;
+        justify-content: center !important;
       }
-      .mobile-navbar .mobile-hotline .hotline-number {
-        font-size: 1.07em;
-        margin-left: 3px;
-        font-weight: bold;
-        color: #0011ff;
-        letter-spacing: 0.5px;
-        text-decoration: none !important;
+      .popup-btns button {
+        min-width: 95px !important;
+        font-size: 0.98em !important;
+        padding: 8px 11px !important;
       }
-      .mobile-navbar .mobile-hotline:link,
-      .mobile-navbar .mobile-hotline:visited,
-      .mobile-navbar .mobile-hotline:hover,
-      .mobile-navbar .mobile-hotline:active {
-        text-decoration: none !important;
+      #footer-container {
+        font-size: 13px;
+        padding: 5px 6px 3px 6px;
+        line-height: 1.15;
       }
-      .mobile-navbar-menu {
-        display: none;
-        position: fixed;
-        top: 54px;
-        left: 0;
-        width: 75vw;
-        max-width: 320px;
-        background: #228B22;
-        color: #fff;
-        z-index: 12000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
-        border-radius: 0 0 10px 0;
-        padding: 0 0 16px 0;
-        animation: slideInMenu 0.18s;
-      }
-      .mobile-navbar-menu.open { display: block; }
-      @keyframes slideInMenu {
-        from { transform: translateX(-90%); opacity: 0.5; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      .mobile-navbar-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 10px 0 0 0;
-      }
-      .mobile-navbar-menu li {
-        padding: 13px 0 9px 18px;
-        font-size: 1.12em;
-        cursor: pointer;
-        font-weight: bold;
-        border-bottom: 1px solid rgba(255,255,255,0.10);
-        transition: background 0.1s;
-      }
-      .mobile-navbar-menu li:active,
-      .mobile-navbar-menu li:hover {
-        background: #1c6e1b;
-      }
-      .mobile-navbar-menu li:last-child { border-bottom: none; }
     }
     @media (max-width: 768px) {
       #navbar-container .desktop-navbar {
@@ -654,7 +599,6 @@
           list="phone-history" />
         <datalist id="phone-history"></datalist>
         <button id="searchBtn" type="button">Tìm kiếm</button>
-        <!-- Ẩn điểm tích lũy trên mobile, chỉ hiển thị trên desktop nếu muốn -->
         <span class="label-point">Tổng điểm tích lũy trong 24h <span id="currentMonth"></span>:</span>
         <span class="point-box" id="totalPointBox">0</span>
       </div>
