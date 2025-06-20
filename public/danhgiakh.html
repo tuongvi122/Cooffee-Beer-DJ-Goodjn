@@ -4,27 +4,29 @@
   <meta charset="UTF-8">
   <title>Đánh giá dịch vụ – Coffee & Beer DJ GooDjn</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
       font-family: 'Roboto', Arial, sans-serif;
       background: #fafbfc;
       color: #23272f;
-      height: 100%;
       min-height: 100vh;
+      box-sizing: border-box;
     }
     body {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       background: #fafbfc;
-      padding: 0;
+      box-sizing: border-box;
     }
     #navbar-container {
-      position: sticky;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
@@ -38,27 +40,18 @@
       flex-direction: column;
       padding-top: 64px;
       padding-bottom: 0;
-      min-height: calc(100vh - 54px - 54px); /* header + footer */
+      min-height: 100vh;
       box-sizing: border-box;
     }
     #footer-container {
       background: #228B22;
       color: #fff;
       width: 100vw;
-      min-height: 54px;
-      height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 1em;
       box-sizing: border-box;
       text-align: center;
       padding: 0 10px;
-      position: static;
-      left: 0;
-      bottom: 0;
-      z-index: 10000;
-      margin-top: auto;
+      margin-top: 36px;
     }
     #footer-container div {
       width: 100%;
@@ -66,7 +59,6 @@
       line-height: 1.15;
       word-break: break-word;
     }
-    /* ... giữ nguyên style khác ... */
     .container {
       max-width: 870px;
       margin: 22px auto 18px;
@@ -80,6 +72,7 @@
       margin: 12px 0 18px;
       font-size: 1.21em;
       color: #145a32;
+      font-weight: bold;
     }
     .search-row {
       display: flex;
@@ -88,6 +81,7 @@
       gap: 10px;
       margin-bottom: 20px;
       justify-content: center;
+      width: 100%;
     }
     .search-row input[type="tel"] {
       padding: 7px 12px;
@@ -101,6 +95,11 @@
       box-sizing: border-box;
       outline: none;
       background: #fff;
+      transition: border-color 0.2s;
+    }
+    .search-row input[type="tel"]:focus {
+      border-color: #1976d2;
+      background: #f4fafb;
     }
     .search-row button {
       padding: 8px 22px;
@@ -131,6 +130,7 @@
       min-width: 700px;
       border-collapse: collapse;
       box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      background: #fff;
     }
     th, td {
       padding: 8px;
@@ -138,7 +138,7 @@
       text-align: center;
       font-size: 0.95em;
     }
-    th { background: #eafce4; color: #20581f; font-weight: 600; }
+    th { background: #5dbb36; color: #fff; font-weight: 600; }
     .sum-row td { background: #e2f0f6; font-weight: 600; }
     .btn-eval {
       padding: 4px 12px;
@@ -151,10 +151,177 @@
     .btn-eval.green { background: #15b316; }
     .btn-eval.red   { background: #e53935; }
     .btn-eval:disabled { opacity: 0.7; cursor: not-allowed; }
-    /* ... giữ nguyên style popup ... */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 12000 !important;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.2);
+    }
+    .modal.show { display: block; }
+    .modal-dialog {
+      position: relative;
+      margin: 5% auto;
+      max-width: 410px;
+      width: 96vw;
+      min-height: auto;
+      background: transparent;
+      border-radius: 0;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 13px;
+      padding: 8px 0 10px 0;
+      box-shadow: 0 0 20px rgba(0,0,0,0.17);
+      margin: 0 9px;
+    }
+    .modal-header {
+      padding: 13px 15px 0 15px;
+      border-bottom: 1px solid #eee;
+      border-radius: 13px 13px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      margin: 0;
+      font-size: 19px;
+      flex: 1;
+      text-align: center;
+      color: #0007da;
+      font-weight: bold;
+    }
+    .close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      color: #e53935;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .close:hover {
+      color: #c62828;
+    }
+    .modal-body { padding: 10px 14px 10px 14px; }
+    form { display: flex; flex-direction: column; gap: 8px; }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+    .input-row label {
+      width: 110px;
+      font-weight: 500;
+      font-size: 1em;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      background: #f8f8ff;
+      font-size: 1em;
+    }
+    .input-row input[readonly] { background: #eee; }
+    fieldset {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 7px 8px 4px 8px;
+      margin-top: 8px;
+    }
+    legend { font-weight: 600; color: #1052e3; font-size: 1em; }
+    .staff-label, .service-review-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .staff-name { min-width: 60px; font-weight: 500; color: #183d1a; }
+    .staff-shift { min-width: 40px; color: #666; }
+    .staff-stars .star,
+    .service-stars .star {
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    .star { color: #FFD600; }
+    .star.gray { color: #ccc; }
+    .service-review-row.speed-row { flex-wrap: nowrap; }
+    .service-review-row.speed-row label { white-space: nowrap; margin-right: 12px; }
+    .speed-options { display: flex; gap: 16px; }
+    .speed-options label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .speed-quick { color: #15b316; font-weight: 600; }
+    .speed-normal { color: #120be8; font-weight: 600; }
+    .speed-slow  { color: #e53935; font-weight: 600; }
+    .section-title {
+      display: block;
+      font-weight: 600;
+      color: #1052e3;
+      margin-bottom: 6px;
+      margin-top: 8px;
+    }
+    #popupComment {
+      width: 100%;
+      min-height: 44px;
+      padding: 6px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      background: #f9f9fc;
+      font-size: 1em;
+      line-height: 1.4;
+      resize: vertical;
+    }
+    .popup-btns {
+      text-align: center;
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-direction: row;
+    }
+    .popup-btns button {
+      padding: 7px 14px;
+      border-radius: 5px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 15px;
+      min-width: 90px;
+    }
+    .popup-btns .send  { background: #10b314; color: #fff; }
+    .popup-btns .close { background: #e53935; color: #fff; }
+    .popup-thank {
+      padding: 18px;
+      text-align: center;
+      border: 1px solid #222;
+      background: #e1f1fb;
+      border-radius: 9px;
+    }
+    .popup-thank .title {
+      font-size: 1.13em;
+      font-weight: 600;
+      color: #0e3f8f;
+      margin-bottom: 8px;
+    }
+    .popup-thank .btn-back {
+      margin-top: 10px;
+      padding: 7px 20px;
+      background: #03a9f4;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+    /* --- NAVBAR & FOOTER MOBILE --- */
     @media (max-width: 700px) {
       .container {
-        padding: 10px 4px 10px 4px !important;
+        padding: 7px 2vw 10px 2vw !important;
         border-radius: 0;
         max-width: 100vw;
         margin: 12px auto 0;
@@ -164,56 +331,154 @@
         flex-wrap: nowrap !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 7px !important;
+        gap: 9px !important;
         margin-bottom: 10px;
         justify-content: center !important;
         width: 100%;
       }
       .search-row input[type="tel"] {
-        width: 67vw;
-        min-width: 95px;
-        max-width: 195px;
-        flex: 1 1 auto;
+        width: 60vw;
+        min-width: 90px;
+        max-width: 170px;
         font-size: 1.08em;
-        padding: 7px 10px;
-        margin: 0 !important;
+        padding: 7px 12px;
       }
       .search-row button {
         flex: 0 0 auto;
-        font-size: 1.08em;
+        font-size: 1.09em;
         height: 38px;
-        min-width: 85px;
-        padding: 0 11px;
+        min-width: 90px;
+        padding: 0 10px;
         margin-left: 0;
       }
       h2 {
-        font-size: 1.07em;
+        font-size: 1.09em;
         text-align: center !important;
         margin: 10px 0 9px 2px;
         color: #2e7d32;
         font-weight: 700;
       }
-      .site-content {
-        min-height: calc(100vh - 54px - 54px);
-        box-sizing: border-box;
-        padding-bottom: 12px;
+      .table-wrap {
+        overflow-x: auto;
+        margin-bottom: 12px;
+        margin-top: 0;
       }
-      #footer-container {
-        position: static !important;
-        left: 0;
-        bottom: 0;
-        width: 100vw; 
-        margin-top: auto;
+      table {
+        font-size: 1em;
+        min-width: unset !important;
+        width: 100%;
+        box-shadow: none;
+        border-radius: 0;
       }
-      body {
-        padding-bottom: 0 !important;
+      th, td {
+        padding: 9px 5px;
+        font-size: 1em;
+        border: 1px solid #dbe9c1;
       }
+      th {
+        background: #5dbb36;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1em;
+      }
+      .sum-row td {
+        background: #f0f6f9;
+        color: #234d20;
+        font-weight: 600;
+        font-size: 1em;
+        border-top: 2px solid #bcd898;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
+      .btn-eval {
+        min-width: 90px;
+        padding: 5px 0 !important;
+        font-size: 1em;
+        border-radius: 5px !important;
+        margin: 0 auto;
+        display: block;
+      }
+      .btn-eval.green {
+        background: #25b324;
+        font-weight: bold;
+        color: #fff;
+        border: 2px solid #217c1a;
+      }
+      .btn-eval.red {
+        background: #e53935;
+        font-weight: bold;
+        color: #fff;
+        border: 2px solid #b71c1c;
+      }
+      #ordersTable thead tr th:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
+      #ordersTable tbody tr td:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
+      #ordersTable tfoot tr td:not(:nth-child(4)):not(:nth-child(6)) {
+        display: none !important;
+      }
+      #ordersTable tbody tr td:nth-child(5) {
+        text-align: left;
+      }
+      #ordersTable tfoot tr.sum-row td:nth-child(4) {
+        background: #e3f1e6 !important;
+        font-weight: bold;
+        color: #41501b;
+        font-size: 1em;
+      }
+      .modal-dialog {
+        max-width: 94vw !important;
+        width: 94vw !important;
+        margin: 4vw auto !important;
+      }
+      .modal-content {
+        border-radius: 13px !important;
+        margin: 0 2vw !important;
+        padding: 8px 0 10px 0 !important;
+      }
+      .modal-header {
+        padding: 12px 10px 0 10px !important;
+      }
+      .modal-body {
+        padding: 9px 8px 10px 8px !important;
+      }
+      form {
+        gap: 6px;
+      }
+      .input-row label {
+        width: 95px !important;
+        font-size: 0.99em;
+      }
+      .input-row input {
+        font-size: 0.99em !important;
+      }
+      fieldset {
+        padding: 6px 6px 3px 6px;
+        margin-top: 7px;
+      }
+      .popup-btns {
+        margin-top: 8px !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+      }
+      .popup-btns button {
+        min-width: 88px !important;
+        font-size: 0.97em !important;
+        padding: 7px 10px !important;
+      }
+    }
+    @media (max-width: 768px) {
+      #navbar-container .desktop-navbar {
+        display: none !important;
+      }
+    }
+    @media (min-width: 769px) {
+      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
   </style>
 </head>
 <body>
-  <!-- NAVBAR ĐỒNG BỘ -->
+  <!-- NAVBAR: Desktop & Mobile (copy đồng bộ từ index.html) -->
   <div id="navbar-container">
+    <!-- Mobile Navbar (Ẩn trên desktop) -->
     <div class="mobile-navbar" style="display:none;">
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
@@ -227,6 +492,7 @@
         <span class="hotline-number">0902 926 636</span>
       </a>
     </div>
+    <!-- Mobile Hamburger menu overlay -->
     <nav class="mobile-navbar-menu" id="mobileMenu">
       <ul>
         <li data-href="index.html">Đặt dịch vụ</li>
@@ -234,13 +500,16 @@
         <li data-href="login.html">Login</li>
       </ul>
     </nav>
+    <!-- Desktop Navbar (giữ nguyên load từ navbar.html) -->
     <div class="desktop-navbar"></div>
   </div>
   <script>
+    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
     fetch('navbar.html')
       .then(response => response.text())
       .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
 
+    // Mobile Hamburger menu JS
     document.addEventListener('DOMContentLoaded', function(){
       var hamburger = document.getElementById('hamburgerBtn');
       var menu = document.getElementById('mobileMenu');
@@ -261,6 +530,7 @@
       });
     });
   </script>
+  <!-- Main content -->
   <div class="site-content">
     <div class="container">
       <div class="search-row">
@@ -270,6 +540,7 @@
           list="phone-history" />
         <datalist id="phone-history"></datalist>
         <button id="searchBtn" type="button">Tìm kiếm</button>
+        <!-- Ẩn điểm tích lũy trên mobile, chỉ hiển thị trên desktop nếu muốn -->
         <span class="label-point">Tổng điểm tích lũy trong 24h <span id="currentMonth"></span>:</span>
         <span class="point-box" id="totalPointBox">0</span>
       </div>
@@ -305,7 +576,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <div id="popupOrderId" style="text-align: center; color: #18b318; margin-bottom: 10px; font-size: 1em; font-weight: 500;"></div>
+            <div id="popupOrderId" style="text-align: center; color: #18b318; margin-bottom: 7px; font-size: 1em; font-weight: 500;"></div>
             <form id="reviewForm" autocomplete="off" novalidate>
               <div class="input-row">
                 <label for="popupName">Khách hàng:</label>
@@ -316,7 +587,7 @@
                 <input type="text" id="popupPhone" name="phone" readonly />
               </div>
               <div class="input-row">
-                <label for="popupEmail">Địa chỉ Email:</label>
+                <label for="popupEmail">Email:</label>
                 <input type="email" id="popupEmail" name="email" readonly />
               </div>
               <div class="input-row">
@@ -370,7 +641,7 @@
       </div>
     </div>
   </div>
-  <!-- FOOTER: Copy đồng bộ từ index.html -->
+  <!-- FOOTER: Copy đồng bộ từ index.html, KHÔNG dùng fixed/sticky trên mobile -->
   <div id="footer-container">
     <div>
       © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
