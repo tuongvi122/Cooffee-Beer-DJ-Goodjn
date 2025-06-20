@@ -464,6 +464,121 @@
         font-size: 0.97em !important;
         padding: 7px 10px !important;
       }
+      /* NAVBAR FIXED */
+      .mobile-navbar {
+        position: relative;
+        display: flex !important;
+        align-items: center;
+        width: 100vw;
+        background: #228B22;
+        min-height: 54px;
+        height: 54px;
+        z-index: 10001;
+      }
+      .mobile-navbar .hamburger {
+        padding: 12px 12px 12px 7px;
+        font-size: 27px;
+        color: #fff;
+        background: none;
+        border: none;
+        outline: none;
+        margin-right: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+      .mobile-navbar .navbar-title {
+        flex: 1 1 70%;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .mobile-navbar .navbar-title .brand-main {
+        color: #e1ba0a;
+        font-weight: bold;
+        font-size: 1.13em;
+        line-height: 1.1;
+        margin-bottom: 0;
+      }
+      .mobile-navbar .navbar-title .brand-sub {
+        color: #e1ba0a;
+        font-weight: bold;
+        font-size: 0.99em;
+        line-height: 1;
+        margin-top: 0;
+      }
+      .mobile-navbar .mobile-hotline {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 30px;
+        padding: 3px 16px 3px 11px;
+        box-shadow: 0 0 5px #1113;
+        height: 28px;
+        font-size: 0.98em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-decoration: none !important;
+      }
+      .mobile-navbar .mobile-hotline .hotline-number {
+        font-size: 1.07em;
+        margin-left: 3px;
+        font-weight: bold;
+        color: #0011ff;
+        letter-spacing: 0.5px;
+        text-decoration: none !important;
+      }
+      .mobile-navbar .mobile-hotline:link,
+      .mobile-navbar .mobile-hotline:visited,
+      .mobile-navbar .mobile-hotline:hover,
+      .mobile-navbar .mobile-hotline:active {
+        text-decoration: none !important;
+      }
+      .mobile-navbar-menu {
+        display: none;
+        position: fixed;
+        top: 54px;
+        left: 0;
+        width: 75vw;
+        max-width: 320px;
+        background: #228B22;
+        color: #fff;
+        z-index: 12000;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+        border-radius: 0 0 10px 0;
+        padding: 0 0 16px 0;
+        animation: slideInMenu 0.18s;
+      }
+      .mobile-navbar-menu.open { display: block; }
+      @keyframes slideInMenu {
+        from { transform: translateX(-90%); opacity: 0.5; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      .mobile-navbar-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 10px 0 0 0;
+      }
+      .mobile-navbar-menu li {
+        padding: 13px 0 9px 18px;
+        font-size: 1.12em;
+        cursor: pointer;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        transition: background 0.1s;
+      }
+      .mobile-navbar-menu li:active,
+      .mobile-navbar-menu li:hover {
+        background: #1c6e1b;
+      }
+      .mobile-navbar-menu li:last-child { border-bottom: none; }
     }
     @media (max-width: 768px) {
       #navbar-container .desktop-navbar {
@@ -476,10 +591,9 @@
   </style>
 </head>
 <body>
-  <!-- NAVBAR: Desktop & Mobile (copy đồng bộ từ index.html) -->
+  <!-- NAVBAR: Sửa triệt để mobile -->
   <div id="navbar-container">
-    <!-- Mobile Navbar (Ẩn trên desktop) -->
-    <div class="mobile-navbar" style="display:none;">
+    <div class="mobile-navbar">
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
       </button>
@@ -500,7 +614,7 @@
         <li data-href="login.html">Login</li>
       </ul>
     </nav>
-    <!-- Desktop Navbar (giữ nguyên load từ navbar.html) -->
+    <!-- Desktop Navbar (nếu dùng) -->
     <div class="desktop-navbar"></div>
   </div>
   <script>
@@ -641,7 +755,7 @@
       </div>
     </div>
   </div>
-  <!-- FOOTER: Copy đồng bộ từ index.html, KHÔNG dùng fixed/sticky trên mobile -->
+  <!-- FOOTER -->
   <div id="footer-container">
     <div>
       © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
