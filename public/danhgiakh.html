@@ -429,9 +429,24 @@
       }
       #ordersTable thead tr th:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
       #ordersTable tbody tr td:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
-      #ordersTable tfoot tr td:not(:nth-child(4)):not(:nth-child(6)) {
-        display: none !important;
-      }
+      #ordersTable tfoot tr td {
+  display: none !important;
+}
+#ordersTable tfoot tr td:nth-child(4),
+#ordersTable tfoot tr td:nth-child(5) {
+  display: table-cell !important;
+  background: #e3f1e6 !important;
+  color: #234d20;
+  font-size: 1em;
+  font-weight: bold;
+  border-top: 2px solid #bcd898;
+}
+#ordersTable tfoot tr td:nth-child(4) {
+  text-align: right;
+}
+#ordersTable tfoot tr td:nth-child(5) {
+  text-align: left;
+}
       #ordersTable tbody tr td:nth-child(5) {
         text-align: left;
       }
@@ -617,16 +632,6 @@
         background: #1c6e1b;
       }
       .mobile-navbar-menu li:last-child { border-bottom: none; }
-/* Luôn hiện dòng tổng cộng dưới Table trên mobile */
-#ordersTable tfoot tr .cell-tongcong,
-#ordersTable tfoot tr #sumTotal {
-  display: table-cell !important;
-  font-weight: bold;
-  background: #e3f1e6 !important;
-  color: #234d20;
-  font-size: 1em;
-  border-top: 2px solid #bcd898;
-}
     }
     @media (max-width: 768px) {
       #navbar-container .desktop-navbar {
@@ -722,10 +727,14 @@
           </thead>
           <tbody id="ordersTableBody"></tbody>
           <tfoot>
-        <tr class="sum-row">
-         <td class="cell-tongcong" colspan="5" style="text-align:right;">Tổng cộng</td>
-         <td id="sumTotal" colspan="4"></td>
-       </tr>
+    <tr class="sum-row">
+    <td></td>
+    <td></td>
+    <td></td>
+    <td style="text-align:right; font-weight:bold;">Tổng tiền</td>
+    <td id="sumTotal" style="font-weight:bold; color:#234d20;">0</td>
+    <td colspan="4"></td>
+  </tr>
           </tfoot>
         </table>
       </div>
