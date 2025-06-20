@@ -617,6 +617,16 @@
         background: #1c6e1b;
       }
       .mobile-navbar-menu li:last-child { border-bottom: none; }
+/* Luôn hiện dòng tổng cộng dưới Table trên mobile */
+#ordersTable tfoot tr .cell-tongcong,
+#ordersTable tfoot tr #sumTotal {
+  display: table-cell !important;
+  font-weight: bold;
+  background: #e3f1e6 !important;
+  color: #234d20;
+  font-size: 1em;
+  border-top: 2px solid #bcd898;
+}
     }
     @media (max-width: 768px) {
       #navbar-container .desktop-navbar {
@@ -712,11 +722,10 @@
           </thead>
           <tbody id="ordersTableBody"></tbody>
           <tfoot>
-            <tr class="sum-row">
-              <td colspan="5" style="text-align:right;">Tổng cộng</td>
-              <td id="sumTotal">0</td>
-              <td colspan="3" id="sumPoint"></td>
-            </tr>
+        <tr class="sum-row">
+         <td class="cell-tongcong" colspan="5" style="text-align:right;">Tổng cộng</td>
+         <td id="sumTotal" colspan="4"></td>
+       </tr>
           </tfoot>
         </table>
       </div>
