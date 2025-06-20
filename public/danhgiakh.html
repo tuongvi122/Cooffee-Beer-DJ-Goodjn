@@ -432,8 +432,8 @@
       #ordersTable tfoot tr td {
   display: none !important;
 }
-#ordersTable tfoot tr td:nth-child(4),
-#ordersTable tfoot tr td:nth-child(5) {
+#ordersTable tfoot tr td:nth-child(5),
+#ordersTable tfoot tr td:nth-child(6) {
   display: table-cell !important;
   background: #e3f1e6 !important;
   color: #234d20;
@@ -441,16 +441,16 @@
   font-weight: bold;
   border-top: 2px solid #bcd898;
 }
-#ordersTable tfoot tr td:nth-child(4) {
+#ordersTable tfoot tr td:nth-child(5) {
   text-align: right;
 }
-#ordersTable tfoot tr td:nth-child(5) {
+#ordersTable tfoot tr td:nth-child(6) {
   text-align: left;
 }
-      #ordersTable tbody tr td:nth-child(5) {
+      #ordersTable tbody tr td:nth-child(6) {
         text-align: left;
       }
-      #ordersTable tfoot tr.sum-row td:nth-child(4) {
+      #ordersTable tfoot tr.sum-row td:nth-child(5) {
         background: #e3f1e6 !important;
         font-weight: bold;
         color: #41501b;
@@ -731,9 +731,12 @@
     <td></td>
     <td></td>
     <td></td>
-    <td style="text-align:right; font-weight:bold;">Tổng tiền</td>
-    <td id="sumTotal" style="font-weight:bold; color:#234d20;">0</td>
-    <td colspan="4"></td>
+    <td></td>
+    <td style="text-align:right; font-weight:bold; background:#e3f1e6;">Tổng tiền</td>
+    <td id="sumTotal" style="font-weight:bold; color:#234d20; background:#e3f1e6;">0</td>
+    <td></td>
+    <td></td>
+    <td></td>
   </tr>
           </tfoot>
         </table>
