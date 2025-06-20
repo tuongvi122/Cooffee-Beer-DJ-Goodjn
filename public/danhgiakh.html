@@ -805,6 +805,35 @@
     </div>
   </div>
   <script>
+    // Tự động ẩn Footer khi bàn phím mở trên mobile
+  function checkFooterInputFocus() {
+    const footer = document.getElementById('footer-container');
+    if (!footer) return;
+    // Chỉ áp dụng trên mobile
+    if (window.innerWidth > 800) {
+      footer.classList.remove('hide-footer');
+      return;
+    }
+    // Kiểm tra nếu có input/textarea focus thì ẩn footer
+    const active = document.activeElement;
+    if (
+      active &&
+      (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') &&
+      (active.type === 'text' || active.type === 'tel' || active.type === 'email' || active.type === 'search' || active.type === 'number')
+    ) {
+      footer.classList.add('hide-footer');
+    } else {
+      footer.classList.remove('hide-footer');
+    }
+  }
+  window.addEventListener('focusin', checkFooterInputFocus);
+  window.addEventListener('focusout', function() {
+    // Delay để bàn phím chắc chắn đã tắt
+    setTimeout(checkFooterInputFocus, 300);
+  });
+  // Đảm bảo kiểm tra lại khi resize cửa sổ
+  window.addEventListener('resize', checkFooterInputFocus);
+  
     document.getElementById('currentMonth').innerText =
       new Date().toLocaleString('vi-VN',{month:'numeric',year:'numeric'});
 
