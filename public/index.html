@@ -1058,5 +1058,38 @@
       .then(response => response.text())
       .then(html => { document.getElementById('footer-container').innerHTML = html });
   </script>
+  <script>
+(function(){
+  // Chỉ thực hiện trên thiết bị di động
+  function isMobile() {
+    return window.innerWidth <= 768;
+  }
+  function hideFooter() {
+    var f = document.getElementById('footer-container');
+    if(f) f.style.display = 'none';
+  }
+  function showFooter() {
+    var f = document.getElementById('footer-container');
+    if(f) f.style.display = '';
+  }
+  // Tìm tất cả input, textarea để gán sự kiện focus/blur
+  document.addEventListener('DOMContentLoaded', function() {
+    if(!isMobile()) return;
+    var inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(function(el) {
+      el.addEventListener('focus', hideFooter);
+      el.addEventListener('blur', showFooter);
+    });
+    // Nếu dùng thêm bàn phím ảo ngoài, có thể check thêm event resize
+    var oldHeight = window.innerHeight;
+    window.addEventListener('resize', function() {
+      if(!isMobile()) return;
+      if(window.innerHeight < oldHeight - 80) hideFooter();
+      else showFooter();
+      oldHeight = window.innerHeight;
+    });
+  });
+})();
+</script>
 </body>
 </html>
