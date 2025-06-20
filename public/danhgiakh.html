@@ -47,26 +47,22 @@
   background: #228B22;
   color: #fff;
   width: 100vw;
+  min-height: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
   box-sizing: border-box;
   text-align: center;
-  padding: 2px 8px 2px 8px;
-  font-family: Arial, 'Roboto', sans-serif;
-  font-size: 14px;
-  line-height: 1.17;
-  font-weight: 400;
-  letter-spacing: 0;
-  word-break: break-word;
-  margin-top: 36px;
+  padding: 0 10px;
 }
-
-#footer-container div {
-  width: 100%;
-  text-align: center;
-  white-space: normal;      /* Cho phép xuống dòng nhưng không tràn ngoài */
-  overflow-wrap: break-word;
-  -webkit-hyphens: auto;
-  hyphens: auto;
-}
+    #footer-container div {
+      width: 100%;
+      text-align: center;
+      line-height: 1.15;
+      word-break: break-word;
+    }
     .container {
       max-width: 870px;
       margin: 22px auto 18px;
@@ -336,10 +332,18 @@
         box-shadow: none;
       }
     #footer-container {
-    font-size: 13px;
-    padding: 5px 6px 3px 6px;
+    min-height: 54px;
+    height: 54px;
+    font-size: 0.98em;
+    padding: 0 7px;
     line-height: 1.15;
   }
+  #footer-container div {
+    width: 100%;
+    text-align: center;
+    line-height: 1.15;
+    word-break: break-word;
+}
       .search-row {
         flex-wrap: nowrap !important;
         flex-direction: row !important;
