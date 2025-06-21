@@ -554,6 +554,13 @@
       #navbar-container .desktop-navbar {
         display: none !important;
       }
+    .desktop-navbar, .desktop-navbar *, .desktop-navbar * * {
+    display: none !important;
+    height: 0 !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
     }
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
