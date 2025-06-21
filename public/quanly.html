@@ -549,11 +549,6 @@
         line-height: 1.15;
         word-break: break-word;
       }
-    }
-    @media (max-width: 768px) {
-      #navbar-container .desktop-navbar {
-        display: none !important;
-      }
     .desktop-navbar, .desktop-navbar *, .desktop-navbar * * {
     display: none !important;
     height: 0 !important;
@@ -561,6 +556,11 @@
     opacity: 0 !important;
     pointer-events: none !important;
   }
+    }
+    @media (max-width: 768px) {
+      #navbar-container .desktop-navbar {
+        display: none !important;
+      }
     }
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
