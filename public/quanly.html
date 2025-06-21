@@ -110,6 +110,139 @@
       width: 200px;
       transition: border 0.2s;
     }
+
+    /* MOBILE TABLE CUSTOM - ONLY FOR MOBILE */
+    @media (max-width: 600px) {
+      .container {
+        padding: 7px 2vw 10px 2vw !important;
+        border-radius: 0;
+        max-width: 100vw;
+        margin: 12px auto 0;
+        box-shadow: none;
+      }
+      .orders-table-wrap {
+        overflow-x: unset;
+        margin-bottom: 12px;
+      }
+      /* Hide original table */
+      table.orders-table {
+        display: none;
+      }
+      /* Show new mobile order table */
+      .mobile-orders-table {
+        display: block;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 7px;
+        margin-bottom: 8px;
+      }
+      .mobile-orders-table-row {
+        border-radius: 9px;
+        background: #fff;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+        margin-bottom: 10px;
+        overflow: hidden;
+        border: 1px solid #e4e4e4;
+        display: flex;
+        flex-direction: row;
+        min-height: 44px;
+      }
+      .mobile-orders-table-row .col {
+        flex: 1 1 0;
+        padding: 8px 3px 7px 5px;
+        font-size: 0.99em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .mobile-orders-table-row .col.col-khach {
+        min-width: 90px;
+        font-weight: 600;
+        color: #20581f;
+        justify-content: flex-start;
+        text-align: left;
+        padding-left: 7px;
+      }
+      .mobile-orders-table-row .col.col-ban {
+        min-width: 34px;
+        color: #1a237e;
+        font-weight: 500;
+        text-align: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .mobile-orders-table-row .col.col-mnv {
+        min-width: 54px;
+        color: #20581f;
+        font-size: 0.97em;
+        word-break: break-all;
+        font-weight: 500;
+        text-align: left;
+        padding-left: 3px;
+      }
+      .mobile-orders-table-row .col.col-tong {
+        min-width: 54px;
+        color: #e53935;
+        font-weight: 600;
+        font-size: 1.02em;
+        text-align: right;
+        padding-right: 7px;
+      }
+      .mobile-orders-table-row .col.col-xacnhan {
+        min-width: 80px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+      .mobile-orders-table-row .col.col-ghichu {
+        min-width: 70px;
+        color: #0b4fd7;
+        font-size: 0.97em;
+        font-weight: 400;
+        padding-right: 4px;
+        text-align: left;
+      }
+      .mobile-orders-table-row .btn-confirm,
+      .mobile-orders-table-row .btn-daxacnhan,
+      .mobile-orders-table-row .btn-huy {
+        width: 86px;
+        min-width: 72px;
+        margin: 2px 0;
+        font-size: 0.98em;
+        padding: 4px 0;
+      }
+      .mobile-orders-table-head {
+        display: flex;
+        flex-direction: row;
+        background: #eafce4;
+        color: #20581f;
+        font-weight: 600;
+        font-size: 1.04em;
+        border-radius: 8px 8px 0 0;
+        border-bottom: 1.5px solid #cfd8dc;
+        margin-bottom: 4px;
+      }
+      .mobile-orders-table-head .col {
+        flex: 1 1 0;
+        padding: 8px 3px 7px 5px;
+        text-align: center;
+        font-size: 0.98em;
+        font-weight: 600;
+        color: #20581f;
+      }
+      .mobile-orders-table-head .col.col-khach { text-align: left; }
+      .mobile-orders-table-head .col.col-ban { text-align: center; }
+      .mobile-orders-table-head .col.col-mnv { text-align: left;}
+      .mobile-orders-table-head .col.col-tong { text-align: right;}
+      .mobile-orders-table-head .col.col-xacnhan { text-align: center;}
+      .mobile-orders-table-head .col.col-ghichu { text-align: left;}
+    }
+    /* END MOBILE TABLE */
+
     .orders-table-wrap {
       overflow-x: auto;
       margin-bottom: 12px;
@@ -192,7 +325,6 @@
       color: #0b4fd7;
       word-break: break-word;
     }
-
     .modal {
       display: none;
       position: fixed;
@@ -561,7 +693,7 @@
     </style>
 </head>
 <body>
-  <!-- NAVBAR -->
+<!-- NAVBAR -->
   <div id="navbar-container">
     <!-- Mobile Navbar -->
     <div class="mobile-navbar">
@@ -605,6 +737,7 @@
         </div>
       </div>
       <div class="orders-table-wrap">
+        <!-- TABLE DESKTOP -->
         <table class="orders-table" id="ordersTable">
           <thead>
             <tr>
@@ -623,36 +756,38 @@
           </thead>
           <tbody id="ordersTableBody"></tbody>
         </table>
+        <!-- TABLE MOBILE DYNAMIC -->
+        <div id="mobileOrdersTableWrap" style="display:none;"></div>
       </div>
       <div class="table-pagination" id="tablePagination"></div>
       <div id="showingInfo" style="margin:7px 0 0 0; color:#333; font-size:15px"></div>
     </div>
   <script>
-// Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
-if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
+    // Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
+    if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
 
-fetch('navbar.html')
-  .then(response => response.text())
-  .then(html => { 
-    document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; 
-  showLogoutTabIfLoggedIn();
-});
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(html => { 
+        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; 
+        showLogoutTabIfLoggedIn();
+      });
 
-// Hiện tab Đăng xuất nếu đã đăng nhập
-function showLogoutTabIfLoggedIn() {
-  var logoutTab = document.getElementById('logoutTab');
-  if(localStorage.getItem('isAdmin') === '1') {
-    if (logoutTab) logoutTab.style.display = '';
-  } else {
-    if (logoutTab) logoutTab.style.display = 'none';
-  }
-}
+    // Hiện tab Đăng xuất nếu đã đăng nhập
+    function showLogoutTabIfLoggedIn() {
+      var logoutTab = document.getElementById('logoutTab');
+      if(localStorage.getItem('isAdmin') === '1') {
+        if (logoutTab) logoutTab.style.display = '';
+      } else {
+        if (logoutTab) logoutTab.style.display = 'none';
+      }
+    }
 
-// Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
-function logout() {
-  localStorage.removeItem('isAdmin');
-  window.location.replace('index.html'); // Dùng replace để không thể quay lại bằng Back
-}
+    // Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      window.location.replace('index.html'); // Dùng replace để không thể quay lại bằng Back
+    }
   
   </script>
     <!-- Popup xác nhận/hủy -->
@@ -820,6 +955,8 @@ function logout() {
         ORDERS = [];
       }
     }
+
+    // --- RENDER TABLES ---
     function renderTable() {
       let html = "";
       const start = (page-1)*entries, end = start+entries;
@@ -848,7 +985,49 @@ function logout() {
       document.getElementById("ordersTableBody").innerHTML = html;
       document.getElementById("showingInfo").textContent = `Showing ${Math.min(FILTERED.length, start+1)} to ${Math.min(end,FILTERED.length)} of ${FILTERED.length} entries`;
       renderPagination();
+      renderMobileOrdersTable(); // update mobile view always!
     }
+
+    // --- RENDER MOBILE TABLE ONLY (when mobile) ---
+    function renderMobileOrdersTable() {
+      if(window.innerWidth > 600) {
+        document.getElementById("mobileOrdersTableWrap").style.display = "none";
+        return;
+      }
+      // Show table head
+      let head = `<div class="mobile-orders-table-head">
+        <div class="col col-khach">Tên khách hàng</div>
+        <div class="col col-ban">Số bàn</div>
+        <div class="col col-mnv">Mã NV</div>
+        <div class="col col-tong">Tổng tiền</div>
+        <div class="col col-xacnhan">Xác nhận<br>đơn hàng</div>
+        <div class="col col-ghichu">Quản lý ghi chú</div>
+      </div>`;
+      // Show rows
+      const start = (page-1)*entries, end = start+entries;
+      const paged = FILTERED.slice(start, end);
+      let rows = paged.map((o,i)=>{
+        let maNVs = o.staffList.map(s=>s.maNV).join(", ");
+        let btn = '';
+        if(o.confirmStatus==="chuaxacnhan")
+          btn = `<button class="btn-confirm" style="width:86px;min-width:72px;" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
+        else if(o.confirmStatus==="daxacnhan")
+          btn = `<button class="btn-daxacnhan" style="width:86px;min-width:72px;" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
+        else if(o.confirmStatus==="huydon")
+          btn = `<button class="btn-huy" style="width:86px;min-width:72px;" disabled>Hủy đơn</button>`;
+        return `<div class="mobile-orders-table-row">
+          <div class="col col-khach">${o.name}</div>
+          <div class="col col-ban">${o.table}</div>
+          <div class="col col-mnv">${maNVs}</div>
+          <div class="col col-tong">${parseInt(o.total||0).toLocaleString('vi-VN')}</div>
+          <div class="col col-xacnhan">${btn}</div>
+          <div class="col col-ghichu">${o.qlNote||""}</div>
+        </div>`;
+      }).join('');
+      document.getElementById("mobileOrdersTableWrap").innerHTML = `<div class="mobile-orders-table">${head}${rows}</div>`;
+      document.getElementById("mobileOrdersTableWrap").style.display = "";
+    }
+
     function renderPagination() {
       if(FILTERED.length===0) { document.getElementById("tablePagination").innerHTML = ""; return; }
       totalPages = Math.ceil(FILTERED.length/entries);
@@ -894,6 +1073,9 @@ function logout() {
         await fetchOrders();
         filterTable();
       }, 30000);
+
+      // Listen to resize for mobile table
+      window.addEventListener('resize', renderMobileOrdersTable);
     });
 
     // Popup & Staff Table
