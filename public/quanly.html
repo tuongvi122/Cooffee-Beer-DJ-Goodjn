@@ -4,9 +4,179 @@
   <meta charset="UTF-8">
   <title>Quản lý đơn hàng – Coffee & Beer DJ GooDjn</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome & Google Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    /* ========== NAVBAR & FOOTER MOBILE BEGIN (copy from danhgiakh.html) ========== */
+    #navbar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 10000;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+    }
+    .mobile-navbar {
+      position: relative;
+      display: flex !important;
+      align-items: center;
+      width: 100vw;
+      background: #228B22;
+      min-height: 54px;
+      height: 54px;
+      z-index: 10001;
+    }
+    .mobile-navbar .hamburger {
+      padding: 12px 12px 12px 7px;
+      font-size: 27px;
+      color: #fff;
+      background: none;
+      border: none;
+      outline: none;
+      margin-right: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .mobile-navbar .navbar-title {
+      flex: 1 1 70%;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .mobile-navbar .navbar-title .brand-main {
+      color: #e1ba0a;
+      font-weight: bold;
+      font-size: 1.13em;
+      line-height: 1.1;
+      margin-bottom: 0;
+    }
+    .mobile-navbar .navbar-title .brand-sub {
+      color: #e1ba0a;
+      font-weight: bold;
+      font-size: 0.99em;
+      line-height: 1;
+      margin-top: 0;
+    }
+    .mobile-navbar .mobile-hotline {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-radius: 30px;
+      padding: 3px 16px 3px 11px;
+      box-shadow: 0 0 5px #1113;
+      height: 28px;
+      font-size: 0.98em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-decoration: none !important;
+    }
+    .mobile-navbar .mobile-hotline .hotline-number {
+      font-size: 1.07em;
+      margin-left: 3px;
+      font-weight: bold;
+      color: #0011ff;
+      letter-spacing: 0.5px;
+      text-decoration: none !important;
+    }
+    .mobile-navbar .mobile-hotline:link,
+    .mobile-navbar .mobile-hotline:visited,
+    .mobile-navbar .mobile-hotline:hover,
+    .mobile-navbar .mobile-hotline:active {
+      text-decoration: none !important;
+    }
+    .mobile-navbar-menu {
+      display: none;
+      position: fixed;
+      top: 54px;
+      left: 0;
+      width: 75vw;
+      max-width: 320px;
+      background: #228B22;
+      color: #fff;
+      z-index: 12000;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+      border-radius: 0 0 10px 0;
+      padding: 0 0 16px 0;
+      animation: slideInMenu 0.18s;
+    }
+    .mobile-navbar-menu.open { display: block; }
+    @keyframes slideInMenu {
+      from { transform: translateX(-90%); opacity: 0.5; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .mobile-navbar-menu ul {
+      list-style: none;
+      margin: 0;
+      padding: 10px 0 0 0;
+    }
+    .mobile-navbar-menu li {
+      padding: 13px 0 9px 18px;
+      font-size: 1.12em;
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      transition: background 0.1s;
+    }
+    .mobile-navbar-menu li:active,
+    .mobile-navbar-menu li:hover {
+      background: #1c6e1b;
+    }
+    .mobile-navbar-menu li:last-child { border-bottom: none; }
+    @media (max-width: 768px) {
+      #navbar-container .desktop-navbar {
+        display: none !important;
+      }
+    }
+    @media (min-width: 769px) {
+      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
+    }
+    /* FOOTER MOBILE */
+    #footer-container {
+      background: #228B22;
+      color: #fff;
+      width: 100vw;
+      min-height: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 0 10px;
+    }
+    #footer-container div {
+      width: 100%;
+      text-align: center;
+      line-height: 1.15;
+      word-break: break-word;
+    }
+    @media (max-width: 700px) {
+      #footer-container {
+        min-height: 54px;
+        height: 54px;
+        font-size: 0.98em;
+        padding: 0 7px;
+        line-height: 1.15;
+      }
+      #footer-container div {
+        width: 100%;
+        text-align: center;
+        line-height: 1.15;
+        word-break: break-word;
+      }
+    }
+    /* ========== NAVBAR & FOOTER MOBILE END ========== */
     html, body {
       height: 100%;
       margin: 0;
@@ -404,6 +574,79 @@
     </style>
 </head>
 <body>
+ <!-- ========== NAVBAR MOBILE ========= -->
+  <div id="navbar-container">
+    <div class="mobile-navbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
+        <i class="fa fa-bars"></i>
+      </button>
+      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
+        <span class="brand-main">Coffee & Beer</span>
+        <span class="brand-sub">DJ GooDjn</span>
+      </a>
+      <a class="mobile-hotline" href="tel:0902926636">
+        <i class="fa-solid fa-phone" style="color:#e53935"></i>
+        <span class="hotline-number">0902 926 636</span>
+      </a>
+    </div>
+    <!-- Mobile Hamburger menu overlay -->
+    <nav class="mobile-navbar-menu" id="mobileMenu">
+      <ul>
+        <li data-href="index.html">Đặt dịch vụ</li>
+        <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
+        <li data-href="login.html">Login</li>
+      </ul>
+    </nav>
+    <!-- Desktop Navbar (chỉ hiện trên PC) -->
+    <div class="desktop-navbar"></div>
+  </div>
+  <script>
+    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
+
+    // Mobile Hamburger menu JS
+    document.addEventListener('DOMContentLoaded', function(){
+      var hamburger = document.getElementById('hamburgerBtn');
+      var menu = document.getElementById('mobileMenu');
+      document.addEventListener('click', function(e){
+        if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
+          menu.classList.remove('open');
+        }
+      });
+      hamburger.onclick = function(e){
+        e.stopPropagation();
+        menu.classList.toggle('open');
+      };
+      menu.querySelectorAll('li').forEach(function(tab){
+        tab.onclick = function(){
+          menu.classList.remove('open');
+          window.location.href = tab.getAttribute('data-href');
+        };
+      });
+    });
+  </script>
+  <!-- ========== END NAVBAR MOBILE ========== -->
+  <script>
+    // Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
+    if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
+
+    // Lưu lại chức năng logout tab cho desktop navbar nếu có
+    function showLogoutTabIfLoggedIn() {
+      var logoutTab = document.getElementById('logoutTab');
+      if(localStorage.getItem('isAdmin') === '1') {
+        if (logoutTab) logoutTab.style.display = '';
+      } else {
+        if (logoutTab) logoutTab.style.display = 'none';
+      }
+    }
+    // Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      window.location.replace('index.html');
+    }
+  </script>
  <div id="navbar-container"></div>
   <script>
 // Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
@@ -546,9 +789,44 @@ function logout() {
       </div>
     </div>
   </div>
-  <div id="footer-container"></div>
+  <!-- ========== FOOTER MOBILE (copy from danhgiakh.html, replaces old footer-container) ========== -->
+  <div id="footer-container">
+    <div>
+      © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
+      63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
+    </div>
+  </div>
+  <!-- ========== END FOOTER ========== -->
   <script>
-    fetch('footer.html').then(r=>r.text()).then(html=>document.getElementById('footer-container').innerHTML=html);
+    // Ẩn footer khi bàn phím ảo xuất hiện trên mobile (giữ đúng behavior của danhgiakh.html)
+    (function(){
+      function isMobile() {
+        return window.innerWidth <= 768;
+      }
+      function hideFooter() {
+        var f = document.getElementById('footer-container');
+        if(f) f.style.display = 'none';
+      }
+      function showFooter() {
+        var f = document.getElementById('footer-container');
+        if(f) f.style.display = '';
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        if(!isMobile()) return;
+        var inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(function(el) {
+          el.addEventListener('focus', hideFooter);
+          el.addEventListener('blur', showFooter);
+        });
+        var oldHeight = window.innerHeight;
+        window.addEventListener('resize', function() {
+          if(!isMobile()) return;
+          if(window.innerHeight < oldHeight - 80) hideFooter();
+          else showFooter();
+          oldHeight = window.innerHeight;
+        });
+      });
+    })();
   </script>
   <script>
     let PRODUCT_STAFFS = [];
