@@ -15,7 +15,6 @@
       background: #fafbfc;
       color: #23272f;
       min-height: 100vh;
-      overflow-x: hidden;
     }
     body {
       min-height: 100vh;
@@ -40,29 +39,15 @@
       padding-bottom: 0;
     }
     #footer-container {
-      background: #228B22;
-      color: #fff;
       width: 100vw;
-      min-height: 54px;
-      height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1em;
-      box-sizing: border-box;
-      text-align: center;
-      padding: 0 10px;
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      z-index: 999;
+      background: #fff;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+      flex-shrink: 0;
     }
-    #footer-container div {
-      width: 100%;
-      text-align: center;
-      line-height: 1.15;
-      word-break: break-word;
+    @media (max-width: 600px) {
+      #footer-container { font-size: 14px; }
     }
+
     .container {
       max-width: 1200px;
       margin: 22px auto 18px;
@@ -74,12 +59,9 @@
     h2 {
       text-align: center;
       margin: 12px 0 18px;
-      font-size: 1.17em;
+      font-size: 1.35em;
       color: #157c07;
       letter-spacing: 1px;
-      font-family: Roboto,Arial,sans-serif;
-      font-weight: bold;
-      text-transform: uppercase;
     }
     .table-actions {
       display: flex;
@@ -113,211 +95,6 @@
       width: 200px;
       transition: border 0.2s;
     }
-
-    /* MOBILE TABLE CUSTOM - ONLY FOR MOBILE */
-    @media (max-width: 600px) {
-      h2 {
-        font-size: 1.2em !important;
-        margin: 10px 0 18px 0 !important;
-        letter-spacing: 0.5px;
-        font-weight: 700;
-        text-transform: none;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .container {
-        padding: 7px 1vw 10px 1vw !important;
-        border-radius: 0;
-        max-width: 100vw;
-        margin: 12px auto 0;
-        box-shadow: none;
-      }
-      .table-actions {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        gap: 10px;
-        align-items: center;
-        margin-bottom: 8px;
-        margin-top: 0;
-        padding-right: 0;
-        padding-left: 0;
-      }
-      .table-actions label[for="filterInput"] {
-        display: none !important;
-      }
-      .table-actions .entries-select {
-        font-size: 14px;
-        padding: 2px 6px;
-        margin: 0 2px 0 0;
-        height: 28px;
-      }
-      .table-actions .search-box {
-        margin-left: 0;
-        flex: 1 1 0;
-        width: 100%;
-      }
-      .table-actions input[type="text"] {
-        font-size: 14px;
-        width: 100%;
-        padding: 5px 8px;
-        margin: 0;
-        border-radius: 5px;
-      }
-      #entriesSelect, .entries-select {
-        min-width: 55px;
-        max-width: 70px;
-      }
-      /* Gộp show entries và ô tìm kiếm cùng 1 dòng */
-      .table-actions > div {
-        margin: 0;
-        padding: 0;
-      }
-      /* Bảng mobile */
-      .orders-table-wrap {
-        overflow-x: unset;
-        margin-bottom: 12px;
-      }
-      table.orders-table {
-        display: none !important;
-      }
-      /* Mobile table style */
-      .mobile-orders-table {
-        display: table;
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 8px;
-      }
-      .mobile-orders-table-head {
-        display: table-row;
-        background: #eafce4;
-        color: #20581f;
-        font-weight: 600;
-        font-size: 0.99em;
-        border-radius: 8px 8px 0 0;
-        border-bottom: 1.5px solid #cfd8dc;
-      }
-    .mobile-orders-table-head .col {
-    display: table-cell;
-    padding: 7px 2px 7px 5px;
-    text-align: center; /* canh giữa header */
-    font-size: 0.95em;
-    font-weight: 600;
-    color: #20581f;
-    border: 1px solid #cfd8dc;
-    background: #eafce4;
-    vertical-align: middle;
-  }
-      .mobile-orders-table-head .col.col-khach { text-align: center; }
-      .mobile-orders-table-head .col.col-ban { text-align: center; }
-      .mobile-orders-table-head .col.col-mnv { text-align: center;}
-      .mobile-orders-table-head .col.col-tong { text-align: center;}
-      .mobile-orders-table-head .col.col-xacnhan { text-align: center;}
-      /* Ẩn quản lý ghi chú mobile */
-      .mobile-orders-table-head .col.col-ghichu { display: none !important; }
-
-      .mobile-orders-table-row {
-        display: table-row;
-        border-radius: 0;
-        background: #fff;
-        box-shadow: none;
-        margin-bottom: 0;
-        overflow: hidden;
-      }
-      .mobile-orders-table-row .col {
-        display: table-cell;
-        padding: 7px 2px 7px 5px;
-        font-size: 0.97em;
-        border: 1px solid #cfd8dc;
-        vertical-align: middle;
-        overflow: hidden;
-        word-break: break-word;
-        text-align: center;
-        background: #fff;
-      }
-      .mobile-orders-table-row .col.col-khach {
-        min-width: 90px;
-        font-weight: 600;
-        color: #20581f;
-        text-align: left;
-        padding-left: 7px;
-        font-size: 0.98em;
-      }
-      .mobile-orders-table-row .col.col-ban {
-        min-width: 34px;
-        color: #1a237e;
-        font-weight: 500;
-        text-align: center;
-        padding-left: 0;
-        padding-right: 0;
-        font-size: 0.98em;
-      }
-      .mobile-orders-table-row .col.col-mnv {
-        min-width: 54px;
-        color: #20581f;
-        font-size: 0.97em;
-        word-break: break-all;
-        font-weight: 500;
-        text-align: left;
-        padding-left: 3px;
-      }
-    .mobile-orders-table-row .col.col-tong {
-    min-width: 54px;
-    color: #e53935;
-    font-weight: 600;
-    font-size: 0.99em;
-    text-align: center;  /* Đổi từ right sang center */
-    padding-right: 0;    /* Không cần padding phải nếu canh giữa */
-    padding-left: 0;
-  }
-      .mobile-orders-table-row .col.col-xacnhan {
-        min-width: 80px;
-        text-align: center;
-        display: table-cell;
-        vertical-align: middle;
-        padding: 0 2px;
-      }
-      .mobile-orders-table-row .col.col-ghichu {
-        display: none !important;
-      }
-      .mobile-orders-table-row .btn-confirm,
-      .mobile-orders-table-row .btn-daxacnhan,
-      .mobile-orders-table-row .btn-huy {
-        width: 72px;
-        min-width: 62px;
-        margin: 1px 0;
-        font-size: 0.96em;
-        padding: 4px 0;
-      }
-      .table-pagination {
-        justify-content: center !important;
-        margin-top: 10px !important;
-        margin-bottom: 0 !important;
-        gap: 0;
-      }
-      .table-pagination button {
-        min-width: 30px;
-        min-height: 28px;
-        font-size: 0.96em;
-        padding: 2px 8px;
-        margin: 0 2px;
-      }
-      .table-pagination span {
-        padding: 0 2px;
-        font-size: 0.93em;
-      }
-      #showingInfo {
-        font-size: 13px !important;
-        color: #444;
-        margin-top: 3px !important;
-        margin-bottom: 0 !important;
-        text-align: left;
-        padding-left: 2px;
-      }
-      /* Ẩn quản lý ghi chú mobile */
-      .mobile-orders-table-row .col.col-ghichu { display: none !important; }
-    }
-    /* END MOBILE TABLE */
     .orders-table-wrap {
       overflow-x: auto;
       margin-bottom: 12px;
@@ -333,7 +110,6 @@
       border: 1px solid #cfd8dc;
       text-align: center;
       font-size: 1em;
-      vertical-align: middle;
     }
     table.orders-table th {
       background: #eafce4;
@@ -393,6 +169,8 @@
       padding: 0 4px;
       color: #444;
     }
+    .orders-table th, .orders-table td { vertical-align: middle; }
+
     .ql-ghichu-box {
       min-width: 100px;
       text-align: left;
@@ -400,6 +178,7 @@
       color: #0b4fd7;
       word-break: break-word;
     }
+
     .modal {
       display: none;
       position: fixed;
@@ -616,202 +395,59 @@
       font-weight: 600;
       transition: color 0.2s;
     }
-     /* Responsive */
     @media (max-width: 600px) {
       .modal-dialog { max-width: 99vw !important; min-width: 0; }
       .staff-list-table th, .staff-list-table td { font-size: 0.92em; padding: 1px 0; }
       .staff-action-select { width: 55px; font-size: 0.93em; height: 22px; }
       .delete-staff-btn { min-width: 34px; min-height: 19px; font-size: 0.91em; }
-      .mobile-navbar {
-        position: relative;
-        display: flex !important;
-        align-items: center;
-        width: 100vw;
-        background: #228B22;
-        min-height: 54px;
-        height: 54px;
-        z-index: 10001;
-      }
-      .mobile-navbar .hamburger {
-        padding: 12px 12px 12px 7px;
-        font-size: 27px;
-        color: #fff;
-        background: none;
-        border: none;
-        outline: none;
-        margin-right: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .navbar-title {
-        flex: 1 1 70%;
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .mobile-navbar .navbar-title .brand-main {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 1.13em;
-        line-height: 1.1;
-        margin-bottom: 0;
-      }
-      .mobile-navbar .navbar-title .brand-sub {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 0.99em;
-        line-height: 1;
-        margin-top: 0;
-      }
-      .mobile-navbar .mobile-hotline {
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border-radius: 30px;
-        padding: 3px 16px 3px 11px;
-        box-shadow: 0 0 5px #1113;
-        height: 28px;
-        font-size: 0.98em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-decoration: none !important;
-      }
-      .mobile-navbar .mobile-hotline .hotline-number {
-        font-size: 1.07em;
-        margin-left: 3px;
-        font-weight: bold;
-        color: #0011ff;
-        letter-spacing: 0.5px;
-        text-decoration: none !important;
-      }
-      .mobile-navbar .mobile-hotline:link,
-      .mobile-navbar .mobile-hotline:visited,
-      .mobile-navbar .mobile-hotline:hover,
-      .mobile-navbar .mobile-hotline:active {
-        text-decoration: none !important;
-      }
-      .mobile-navbar-menu {
-        display: none;
-        position: fixed;
-        top: 54px;
-        left: 0;
-        width: 75vw;
-        max-width: 320px;
-        background: #228B22;
-        color: #fff;
-        z-index: 12000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
-        border-radius: 0 0 10px 0;
-        padding: 0 0 16px 0;
-        animation: slideInMenu 0.18s;
-      }
-      .mobile-navbar-menu.open { display: block; }
-      @keyframes slideInMenu {
-        from { transform: translateX(-90%); opacity: 0.5; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      .mobile-navbar-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 10px 0 0 0;
-      }
-      .mobile-navbar-menu li {
-        padding: 13px 0 9px 18px;
-        font-size: 1.12em;
-        cursor: pointer;
-        font-weight: bold;
-        border-bottom: 1px solid rgba(255,255,255,0.10);
-        transition: background 0.1s;
-      }
-      .mobile-navbar-menu li:active,
-      .mobile-navbar-menu li:hover {
-        background: #1c6e1b;
-      }
-      .mobile-navbar-menu li:last-child { border-bottom: none; }
-      .container {
-        padding: 7px 2vw 10px 2vw !important;
-        border-radius: 0;
-        max-width: 100vw;
-        margin: 12px auto 0;
-        box-shadow: none;
-      }
-      #footer-container {
-        min-height: 54px;
-        height: 54px;
-        font-size: 0.98em;
-        padding: 0 7px;
-        line-height: 1.15;
-      }
-      #footer-container div {
-        width: 100%;
-        text-align: center;
-        line-height: 1.15;
-        word-break: break-word;
-      }
-    }
-    @media (max-width: 768px) {
-      #navbar-container .desktop-navbar {
-        display: none !important;
-      }
-    }
-    @media (min-width: 769px) {
-      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
     </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <div id="navbar-container">
-    <!-- Mobile Navbar -->
-    <div class="mobile-navbar">
-      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
-        <i class="fa fa-bars"></i>
-      </button>
-      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
-        <span class="brand-main">Coffee & Beer</span>
-        <span class="brand-sub">DJ GooDjn</span>
-      </a>
-      <a class="mobile-hotline" href="tel:0902926636">
-        <i class="fa-solid fa-phone" style="color:#e53935"></i>
-        <span class="hotline-number">0902 926 636</span>
-      </a>
-    </div>
-    <nav class="mobile-navbar-menu" id="mobileMenu">
-      <ul>
-        <li data-href="index.html">Đặt dịch vụ</li>
-        <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
-        <li data-href="login.html">Login</li>
-      </ul>
-    </nav>
-    <!-- Desktop Navbar (tải động qua JS) -->
-    <div class="desktop-navbar"></div>
-  </div>
+ <div id="navbar-container"></div>
+  <script>
+// Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
+if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
 
+fetch('navbar.html').then(r=>r.text()).then(html=>{
+  document.getElementById('navbar-container').innerHTML=html;
+  showLogoutTabIfLoggedIn();
+});
+
+// Hiện tab Đăng xuất nếu đã đăng nhập
+function showLogoutTabIfLoggedIn() {
+  var logoutTab = document.getElementById('logoutTab');
+  if(localStorage.getItem('isAdmin') === '1') {
+    if (logoutTab) logoutTab.style.display = '';
+  } else {
+    if (logoutTab) logoutTab.style.display = 'none';
+  }
+}
+
+// Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
+function logout() {
+  localStorage.removeItem('isAdmin');
+  window.location.replace('index.html'); // Dùng replace để không thể quay lại bằng Back
+}
+  
+  </script>
   <div class="site-content">
     <div class="container">
       <h2>DANH SÁCH ĐƠN HÀNG TRONG 24H</h2>
       <div class="table-actions">
-        <div style="display:flex;align-items:center;gap:4px;">
-          <label for="entriesSelect" style="font-size:14px;">Show</label>
+        <div>
+          <label for="entriesSelect">Show</label>
           <select id="entriesSelect" class="entries-select">
             <option>10</option><option>20</option><option>50</option><option>100</option>
           </select>
-          <span style="font-size:14px;">entries</span>
+          entries
         </div>
         <div class="search-box">
-          <input type="text" id="filterInput" placeholder="Nhập từ khóa tìm kiếm">
+          <label for="filterInput">Tìm kiếm</label>
+          <input type="text" id="filterInput" placeholder="Nhập từ khóa...">
         </div>
       </div>
       <div class="orders-table-wrap">
-        <!-- TABLE DESKTOP -->
         <table class="orders-table" id="ordersTable">
           <thead>
             <tr>
@@ -830,39 +466,10 @@
           </thead>
           <tbody id="ordersTableBody"></tbody>
         </table>
-        <!-- TABLE MOBILE DYNAMIC -->
-        <div id="mobileOrdersTableWrap" style="display:none;"></div>
       </div>
       <div class="table-pagination" id="tablePagination"></div>
+      <div id="showingInfo" style="margin:7px 0 0 0; color:#333; font-size:15px"></div>
     </div>
-  <script>
-    // Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
-    if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
-
-    fetch('navbar.html')
-      .then(response => response.text())
-      .then(html => { 
-        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; 
-        showLogoutTabIfLoggedIn();
-      });
-
-    // Hiện tab Đăng xuất nếu đã đăng nhập
-    function showLogoutTabIfLoggedIn() {
-      var logoutTab = document.getElementById('logoutTab');
-      if(localStorage.getItem('isAdmin') === '1') {
-        if (logoutTab) logoutTab.style.display = '';
-      } else {
-        if (logoutTab) logoutTab.style.display = 'none';
-      }
-    }
-
-    // Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
-    function logout() {
-      localStorage.removeItem('isAdmin');
-      window.location.replace('index.html'); // Dùng replace để không thể quay lại bằng Back
-    }
-
-  </script>
     <!-- Popup xác nhận/hủy -->
     <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
       <div class="modal-dialog mt-4">
@@ -939,67 +546,9 @@
       </div>
     </div>
   </div>
-    <!-- FOOTER -->
-  <div id="footer-container">
-    <div>
-      © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
-      63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
-    </div>
-  </div>
+  <div id="footer-container"></div>
   <script>
-    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
-    fetch('navbar.html')
-      .then(response => response.text())
-      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
-
-    // Hamburger menu cho mobile
-    document.addEventListener('DOMContentLoaded', function(){
-      var hamburger = document.getElementById('hamburgerBtn');
-      var menu = document.getElementById('mobileMenu');
-      document.addEventListener('click', function(e){
-        if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
-          menu.classList.remove('open');
-        }
-      });
-      hamburger.onclick = function(e){
-        e.stopPropagation();
-        menu.classList.toggle('open');
-      };
-      menu.querySelectorAll('li').forEach(function(tab){
-        tab.onclick = function(){
-          menu.classList.remove('open');
-          window.location.href = tab.getAttribute('data-href');
-        };
-      });
-    });
-
-    // Footer auto-hide on mobile input focus (bàn phím ảo)
-    (function(){
-      function isMobile() { return window.innerWidth <= 768; }
-      function hideFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = 'none';
-      }
-      function showFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = '';
-      }
-      document.addEventListener('DOMContentLoaded', function() {
-        if(!isMobile()) return;
-        var inputs = document.querySelectorAll('input, textarea, select');
-        inputs.forEach(function(el) {
-          el.addEventListener('focus', hideFooter);
-          el.addEventListener('blur', showFooter);
-        });
-        var oldHeight = window.innerHeight;
-        window.addEventListener('resize', function() {
-          if(!isMobile()) return;
-          if(window.innerHeight < oldHeight - 80) hideFooter();
-          else showFooter();
-          oldHeight = window.innerHeight;
-        });
-      });
-    })();
+    fetch('footer.html').then(r=>r.text()).then(html=>document.getElementById('footer-container').innerHTML=html);
   </script>
   <script>
     let PRODUCT_STAFFS = [];
@@ -1028,8 +577,6 @@
         ORDERS = [];
       }
     }
-
-    // --- RENDER TABLES ---
     function renderTable() {
       let html = "";
       const start = (page-1)*entries, end = start+entries;
@@ -1056,48 +603,9 @@
         </tr>`;
       });
       document.getElementById("ordersTableBody").innerHTML = html;
+      document.getElementById("showingInfo").textContent = `Showing ${Math.min(FILTERED.length, start+1)} to ${Math.min(end,FILTERED.length)} of ${FILTERED.length} entries`;
       renderPagination();
-      renderMobileOrdersTable(); // update mobile view always!
     }
-
-    // --- RENDER MOBILE TABLE ONLY (when mobile) ---
-    function renderMobileOrdersTable() {
-      if(window.innerWidth > 600) {
-        document.getElementById("mobileOrdersTableWrap").style.display = "none";
-        return;
-      }
-      // Show table head
-      let head = `<div class="mobile-orders-table-head">
-        <div class="col col-khach">Tên khách hàng</div>
-        <div class="col col-ban">Số bàn</div>
-        <div class="col col-mnv">Mã NV</div>
-        <div class="col col-tong">Tổng tiền</div>
-        <div class="col col-xacnhan">Xác nhận<br>đơn hàng</div>
-      </div>`;
-      // Show rows
-      const start = (page-1)*entries, end = start+entries;
-      const paged = FILTERED.slice(start, end);
-      let rows = paged.map((o,i)=>{
-        let maNVs = o.staffList.map(s=>s.maNV).join(", ");
-        let btn = '';
-        if(o.confirmStatus==="chuaxacnhan")
-          btn = `<button class="btn-confirm" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
-        else if(o.confirmStatus==="daxacnhan")
-          btn = `<button class="btn-daxacnhan" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
-        else if(o.confirmStatus==="huydon")
-          btn = `<button class="btn-huy" style="width:72px;min-width:62px;" disabled>Hủy đơn</button>`;
-        return `<div class="mobile-orders-table-row">
-          <div class="col col-khach">${o.name}</div>
-          <div class="col col-ban">${o.table}</div>
-          <div class="col col-mnv">${maNVs}</div>
-          <div class="col col-tong">${parseInt(o.total||0).toLocaleString('vi-VN')}</div>
-          <div class="col col-xacnhan">${btn}</div>
-        </div>`;
-      }).join('');
-      document.getElementById("mobileOrdersTableWrap").innerHTML = `<div class="mobile-orders-table">${head}${rows}</div>`;
-      document.getElementById("mobileOrdersTableWrap").style.display = "";
-    }
-
     function renderPagination() {
       if(FILTERED.length===0) { document.getElementById("tablePagination").innerHTML = ""; return; }
       totalPages = Math.ceil(FILTERED.length/entries);
@@ -1143,9 +651,6 @@
         await fetchOrders();
         filterTable();
       }, 30000);
-
-      // Listen to resize for mobile table
-      window.addEventListener('resize', renderMobileOrdersTable);
     });
 
     // Popup & Staff Table
