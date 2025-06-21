@@ -117,8 +117,8 @@
     /* MOBILE TABLE CUSTOM - ONLY FOR MOBILE */
     @media (max-width: 600px) {
       h2 {
-        font-size: 1.05em !important;
-        margin: 10px 0 10px 0 !important;
+        font-size: 1.2em !important;
+        margin: 10px 0 18px 0 !important;
         letter-spacing: 0.5px;
         font-weight: 700;
         text-transform: none;
@@ -197,17 +197,17 @@
         border-radius: 8px 8px 0 0;
         border-bottom: 1.5px solid #cfd8dc;
       }
-      .mobile-orders-table-head .col {
-        display: table-cell;
-        padding: 7px 2px 7px 5px;
-        text-align: center;
-        font-size: 0.95em;
-        font-weight: 600;
-        color: #20581f;
-        border: 1px solid #cfd8dc;
-        background: #eafce4;
-        vertical-align: middle;
-      }
+    .mobile-orders-table-head .col {
+    display: table-cell;
+    padding: 7px 2px 7px 5px;
+    text-align: center; /* canh giữa header */
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #20581f;
+    border: 1px solid #cfd8dc;
+    background: #eafce4;
+    vertical-align: middle;
+  }
       .mobile-orders-table-head .col.col-khach { text-align: left; }
       .mobile-orders-table-head .col.col-ban { text-align: center; }
       .mobile-orders-table-head .col.col-mnv { text-align: left;}
@@ -261,14 +261,15 @@
         text-align: left;
         padding-left: 3px;
       }
-      .mobile-orders-table-row .col.col-tong {
-        min-width: 54px;
-        color: #e53935;
-        font-weight: 600;
-        font-size: 0.99em;
-        text-align: right;
-        padding-right: 7px;
-      }
+    .mobile-orders-table-row .col.col-tong {
+    min-width: 54px;
+    color: #e53935;
+    font-weight: 600;
+    font-size: 0.99em;
+    text-align: center;  /* Đổi từ right sang center */
+    padding-right: 0;    /* Không cần padding phải nếu canh giữa */
+    padding-left: 0;
+  }
       .mobile-orders-table-row .col.col-xacnhan {
         min-width: 80px;
         text-align: center;
