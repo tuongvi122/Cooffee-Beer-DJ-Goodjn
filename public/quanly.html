@@ -208,10 +208,10 @@
     background: #eafce4;
     vertical-align: middle;
   }
-      .mobile-orders-table-head .col.col-khach { text-align: left; }
+      .mobile-orders-table-head .col.col-khach { text-align: center; }
       .mobile-orders-table-head .col.col-ban { text-align: center; }
-      .mobile-orders-table-head .col.col-mnv { text-align: left;}
-      .mobile-orders-table-head .col.col-tong { text-align: right;}
+      .mobile-orders-table-head .col.col-mnv { text-align: center;}
+      .mobile-orders-table-head .col.col-tong { text-align: center;}
       .mobile-orders-table-head .col.col-xacnhan { text-align: center;}
       /* Ẩn quản lý ghi chú mobile */
       .mobile-orders-table-head .col.col-ghichu { display: none !important; }
@@ -834,7 +834,6 @@
         <div id="mobileOrdersTableWrap" style="display:none;"></div>
       </div>
       <div class="table-pagination" id="tablePagination"></div>
-      <div id="showingInfo" style="margin:7px 0 0 0; color:#333; font-size:15px"></div>
     </div>
   <script>
     // Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
@@ -1057,7 +1056,6 @@
         </tr>`;
       });
       document.getElementById("ordersTableBody").innerHTML = html;
-      document.getElementById("showingInfo").textContent = `Showing ${Math.min(FILTERED.length, start+1)} to ${Math.min(end,FILTERED.length)} of ${FILTERED.length} entries`;
       renderPagination();
       renderMobileOrdersTable(); // update mobile view always!
     }
