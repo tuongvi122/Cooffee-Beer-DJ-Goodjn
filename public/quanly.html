@@ -74,9 +74,12 @@
     h2 {
       text-align: center;
       margin: 12px 0 18px;
-      font-size: 1.35em;
+      font-size: 1.17em;
       color: #157c07;
       letter-spacing: 1px;
+      font-family: Roboto,Arial,sans-serif;
+      font-weight: bold;
+      text-transform: uppercase;
     }
     .table-actions {
       display: flex;
@@ -113,56 +116,132 @@
 
     /* MOBILE TABLE CUSTOM - ONLY FOR MOBILE */
     @media (max-width: 600px) {
+      h2 {
+        font-size: 1.05em !important;
+        margin: 10px 0 10px 0 !important;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        text-transform: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .container {
-        padding: 7px 2vw 10px 2vw !important;
+        padding: 7px 1vw 10px 1vw !important;
         border-radius: 0;
         max-width: 100vw;
         margin: 12px auto 0;
         box-shadow: none;
       }
+      .table-actions {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 8px;
+        margin-top: 0;
+        padding-right: 0;
+        padding-left: 0;
+      }
+      .table-actions label[for="filterInput"] {
+        display: none !important;
+      }
+      .table-actions .entries-select {
+        font-size: 14px;
+        padding: 2px 6px;
+        margin: 0 2px 0 0;
+        height: 28px;
+      }
+      .table-actions .search-box {
+        margin-left: 0;
+        flex: 1 1 0;
+        width: 100%;
+      }
+      .table-actions input[type="text"] {
+        font-size: 14px;
+        width: 100%;
+        padding: 5px 8px;
+        margin: 0;
+        border-radius: 5px;
+      }
+      #entriesSelect, .entries-select {
+        min-width: 55px;
+        max-width: 70px;
+      }
+      /* Gộp show entries và ô tìm kiếm cùng 1 dòng */
+      .table-actions > div {
+        margin: 0;
+        padding: 0;
+      }
+      /* Bảng mobile */
       .orders-table-wrap {
         overflow-x: unset;
         margin-bottom: 12px;
       }
-      /* Hide original table */
       table.orders-table {
-        display: none;
+        display: none !important;
       }
-      /* Show new mobile order table */
+      /* Mobile table style */
       .mobile-orders-table {
-        display: block;
+        display: table;
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 7px;
+        border-collapse: collapse;
         margin-bottom: 8px;
       }
+      .mobile-orders-table-head {
+        display: table-row;
+        background: #eafce4;
+        color: #20581f;
+        font-weight: 600;
+        font-size: 0.99em;
+        border-radius: 8px 8px 0 0;
+        border-bottom: 1.5px solid #cfd8dc;
+      }
+      .mobile-orders-table-head .col {
+        display: table-cell;
+        padding: 7px 2px 7px 5px;
+        text-align: center;
+        font-size: 0.95em;
+        font-weight: 600;
+        color: #20581f;
+        border: 1px solid #cfd8dc;
+        background: #eafce4;
+        vertical-align: middle;
+      }
+      .mobile-orders-table-head .col.col-khach { text-align: left; }
+      .mobile-orders-table-head .col.col-ban { text-align: center; }
+      .mobile-orders-table-head .col.col-mnv { text-align: left;}
+      .mobile-orders-table-head .col.col-tong { text-align: right;}
+      .mobile-orders-table-head .col.col-xacnhan { text-align: center;}
+      /* Ẩn quản lý ghi chú mobile */
+      .mobile-orders-table-head .col.col-ghichu { display: none !important; }
+
       .mobile-orders-table-row {
-        border-radius: 9px;
+        display: table-row;
+        border-radius: 0;
         background: #fff;
-        box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-        margin-bottom: 10px;
+        box-shadow: none;
+        margin-bottom: 0;
         overflow: hidden;
-        border: 1px solid #e4e4e4;
-        display: flex;
-        flex-direction: row;
-        min-height: 44px;
       }
       .mobile-orders-table-row .col {
-        flex: 1 1 0;
-        padding: 8px 3px 7px 5px;
-        font-size: 0.99em;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        display: table-cell;
+        padding: 7px 2px 7px 5px;
+        font-size: 0.97em;
+        border: 1px solid #cfd8dc;
+        vertical-align: middle;
         overflow: hidden;
+        word-break: break-word;
+        text-align: center;
+        background: #fff;
       }
       .mobile-orders-table-row .col.col-khach {
         min-width: 90px;
         font-weight: 600;
         color: #20581f;
-        justify-content: flex-start;
         text-align: left;
         padding-left: 7px;
+        font-size: 0.98em;
       }
       .mobile-orders-table-row .col.col-ban {
         min-width: 34px;
@@ -171,6 +250,7 @@
         text-align: center;
         padding-left: 0;
         padding-right: 0;
+        font-size: 0.98em;
       }
       .mobile-orders-table-row .col.col-mnv {
         min-width: 54px;
@@ -185,64 +265,58 @@
         min-width: 54px;
         color: #e53935;
         font-weight: 600;
-        font-size: 1.02em;
+        font-size: 0.99em;
         text-align: right;
         padding-right: 7px;
       }
       .mobile-orders-table-row .col.col-xacnhan {
         min-width: 80px;
         text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
+        display: table-cell;
+        vertical-align: middle;
+        padding: 0 2px;
       }
       .mobile-orders-table-row .col.col-ghichu {
-        min-width: 70px;
-        color: #0b4fd7;
-        font-size: 0.97em;
-        font-weight: 400;
-        padding-right: 4px;
-        text-align: left;
+        display: none !important;
       }
       .mobile-orders-table-row .btn-confirm,
       .mobile-orders-table-row .btn-daxacnhan,
       .mobile-orders-table-row .btn-huy {
-        width: 86px;
-        min-width: 72px;
-        margin: 2px 0;
-        font-size: 0.98em;
+        width: 72px;
+        min-width: 62px;
+        margin: 1px 0;
+        font-size: 0.96em;
         padding: 4px 0;
       }
-      .mobile-orders-table-head {
-        display: flex;
-        flex-direction: row;
-        background: #eafce4;
-        color: #20581f;
-        font-weight: 600;
-        font-size: 1.04em;
-        border-radius: 8px 8px 0 0;
-        border-bottom: 1.5px solid #cfd8dc;
-        margin-bottom: 4px;
+      .table-pagination {
+        justify-content: center !important;
+        margin-top: 10px !important;
+        margin-bottom: 0 !important;
+        gap: 0;
       }
-      .mobile-orders-table-head .col {
-        flex: 1 1 0;
-        padding: 8px 3px 7px 5px;
-        text-align: center;
-        font-size: 0.98em;
-        font-weight: 600;
-        color: #20581f;
+      .table-pagination button {
+        min-width: 30px;
+        min-height: 28px;
+        font-size: 0.96em;
+        padding: 2px 8px;
+        margin: 0 2px;
       }
-      .mobile-orders-table-head .col.col-khach { text-align: left; }
-      .mobile-orders-table-head .col.col-ban { text-align: center; }
-      .mobile-orders-table-head .col.col-mnv { text-align: left;}
-      .mobile-orders-table-head .col.col-tong { text-align: right;}
-      .mobile-orders-table-head .col.col-xacnhan { text-align: center;}
-      .mobile-orders-table-head .col.col-ghichu { text-align: left;}
+      .table-pagination span {
+        padding: 0 2px;
+        font-size: 0.93em;
+      }
+      #showingInfo {
+        font-size: 13px !important;
+        color: #444;
+        margin-top: 3px !important;
+        margin-bottom: 0 !important;
+        text-align: left;
+        padding-left: 2px;
+      }
+      /* Ẩn quản lý ghi chú mobile */
+      .mobile-orders-table-row .col.col-ghichu { display: none !important; }
     }
     /* END MOBILE TABLE */
-
     .orders-table-wrap {
       overflow-x: auto;
       margin-bottom: 12px;
@@ -693,7 +767,7 @@
     </style>
 </head>
 <body>
-<!-- NAVBAR -->
+  <!-- NAVBAR -->
   <div id="navbar-container">
     <!-- Mobile Navbar -->
     <div class="mobile-navbar">
@@ -724,16 +798,15 @@
     <div class="container">
       <h2>DANH SÁCH ĐƠN HÀNG TRONG 24H</h2>
       <div class="table-actions">
-        <div>
-          <label for="entriesSelect">Show</label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <label for="entriesSelect" style="font-size:14px;">Show</label>
           <select id="entriesSelect" class="entries-select">
             <option>10</option><option>20</option><option>50</option><option>100</option>
           </select>
-          entries
+          <span style="font-size:14px;">entries</span>
         </div>
         <div class="search-box">
-          <label for="filterInput">Tìm kiếm</label>
-          <input type="text" id="filterInput" placeholder="Nhập từ khóa...">
+          <input type="text" id="filterInput" placeholder="Nhập từ khóa tìm kiếm">
         </div>
       </div>
       <div class="orders-table-wrap">
@@ -788,7 +861,7 @@
       localStorage.removeItem('isAdmin');
       window.location.replace('index.html'); // Dùng replace để không thể quay lại bằng Back
     }
-  
+
   </script>
     <!-- Popup xác nhận/hủy -->
     <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
@@ -1001,7 +1074,6 @@
         <div class="col col-mnv">Mã NV</div>
         <div class="col col-tong">Tổng tiền</div>
         <div class="col col-xacnhan">Xác nhận<br>đơn hàng</div>
-        <div class="col col-ghichu">Quản lý ghi chú</div>
       </div>`;
       // Show rows
       const start = (page-1)*entries, end = start+entries;
@@ -1010,18 +1082,17 @@
         let maNVs = o.staffList.map(s=>s.maNV).join(", ");
         let btn = '';
         if(o.confirmStatus==="chuaxacnhan")
-          btn = `<button class="btn-confirm" style="width:86px;min-width:72px;" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
+          btn = `<button class="btn-confirm" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
         else if(o.confirmStatus==="daxacnhan")
-          btn = `<button class="btn-daxacnhan" style="width:86px;min-width:72px;" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
+          btn = `<button class="btn-daxacnhan" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
         else if(o.confirmStatus==="huydon")
-          btn = `<button class="btn-huy" style="width:86px;min-width:72px;" disabled>Hủy đơn</button>`;
+          btn = `<button class="btn-huy" style="width:72px;min-width:62px;" disabled>Hủy đơn</button>`;
         return `<div class="mobile-orders-table-row">
           <div class="col col-khach">${o.name}</div>
           <div class="col col-ban">${o.table}</div>
           <div class="col col-mnv">${maNVs}</div>
           <div class="col col-tong">${parseInt(o.total||0).toLocaleString('vi-VN')}</div>
           <div class="col col-xacnhan">${btn}</div>
-          <div class="col col-ghichu">${o.qlNote||""}</div>
         </div>`;
       }).join('');
       document.getElementById("mobileOrdersTableWrap").innerHTML = `<div class="mobile-orders-table">${head}${rows}</div>`;
