@@ -549,13 +549,6 @@
         line-height: 1.15;
         word-break: break-word;
       }
-    .desktop-navbar, .desktop-navbar *, .desktop-navbar * * {
-    display: none !important;
-    height: 0 !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
     }
     @media (max-width: 768px) {
       #navbar-container .desktop-navbar {
@@ -638,8 +631,10 @@
 // Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
 if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
 
-fetch('navbar.html').then(r=>r.text()).then(html=>{
-  document.getElementById('navbar-container').innerHTML=html;
+fetch('navbar.html')
+  .then(response => response.text())
+  .then(html => { 
+    document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; 
   showLogoutTabIfLoggedIn();
 });
 
