@@ -7,16 +7,31 @@
   <!-- Font Awesome cho hamburger icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background:#f6f7fb; min-height:100vh; margin:0; }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { min-height: 100vh; background:#f6f7fb; margin:0; font-family: Arial, sans-serif; }
+    .login-mobile-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      width: 100vw;
+    }
     .login-container {
-      max-width: 390px; margin: 110px auto; background: #fff;
-      border-radius: 15px; box-shadow: 0 2px 20px #0002; padding: 38px 30px;
+      width: 100%;
+      max-width: 390px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 2px 20px #0002;
+      padding: 38px 30px 28px 30px;
+      margin-top: 110px;
+      margin-bottom: 80px;
     }
     h2 { text-align:center; color:#228B22; margin-bottom:24px; }
     input { width:100%; margin-bottom:14px; padding:10px; font-size:16px; border-radius:5px; border:1px solid #bbb; }
     button { width:100%; padding:10px; background:#228B22; color:#fff; font-weight:bold; border:none; border-radius:7px; font-size:17px; cursor:pointer; }
     #loginError { color:#d32f2f; text-align:center; margin-bottom:10px; font-size:14px; display:none; }
-    /* --- Navbar & Footer CSS từ index.html --- */
     #navbar-container {
       position: fixed;
       top: 0;
@@ -44,23 +59,23 @@
       left: 0;
       z-index: 10000;
     }
+    /* === MOBILE NAVBAR === */
     @media (max-width: 768px) {
-      #navbar-container {
-        padding: 0;
-        min-height: 54px;
-        height: 54px;
-      }
+      .desktop-navbar { display: none !important; }
       .mobile-navbar {
-        position: relative;
         display: flex !important;
         align-items: center;
+        justify-content: space-between;
         width: 100vw;
         background: #228B22;
         min-height: 54px;
         height: 54px;
         z-index: 10001;
+        padding: 0;
+        box-sizing: border-box;
       }
       .mobile-navbar .hamburger {
+        flex: 0 0 auto;
         padding: 12px 12px 12px 7px;
         font-size: 27px;
         color: #fff;
@@ -73,35 +88,31 @@
         align-items: center;
       }
       .mobile-navbar .navbar-title {
-        flex: 1 1 70%;
+        flex: 1 1 auto;
         display: flex;
         flex-direction: column;
-        line-height: 1.1;
+        align-items: flex-start;
+        justify-content: center;
         min-width: 0;
         white-space: nowrap;
         overflow: hidden;
+        margin-left: 3px;
       }
-      .mobile-navbar .navbar-title .brand-main {
+      .mobile-navbar .brand-main,
+      .mobile-navbar .brand-sub {
         color: #e1ba0a;
         font-weight: bold;
-        font-size: 1.13em;
         line-height: 1.1;
-        margin-bottom: 0;
       }
-      .mobile-navbar .navbar-title .brand-sub {
-        color: #e1ba0a;
-        font-weight: bold;
+      .mobile-navbar .brand-main {
+        font-size: 1.13em;
+      }
+      .mobile-navbar .brand-sub {
         font-size: 0.99em;
-        line-height: 1;
-        margin-top: 0;
       }
       .mobile-navbar .mobile-hotline {
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
+        flex: 0 0 auto;
+        margin-left: 7px;
         background: #fff;
         border-radius: 30px;
         padding: 3px 16px 3px 11px;
@@ -111,6 +122,8 @@
         white-space: nowrap;
         overflow: hidden;
         text-decoration: none !important;
+        display: flex;
+        align-items: center;
       }
       .mobile-navbar .mobile-hotline .hotline-number {
         font-size: 1.07em;
@@ -118,12 +131,6 @@
         font-weight: bold;
         color: #0011ff;
         letter-spacing: 0.5px;
-        text-decoration: none !important;
-      }
-      .mobile-navbar .mobile-hotline:link,
-      .mobile-navbar .mobile-hotline:visited,
-      .mobile-navbar .mobile-hotline:hover,
-      .mobile-navbar .mobile-hotline:active {
         text-decoration: none !important;
       }
       .mobile-navbar-menu {
@@ -180,46 +187,37 @@
         line-height: 1.15;
         word-break: break-word;
       }
-    }
-    @media (max-width: 768px) {
-      #navbar-container .desktop-navbar {
-        display: none !important;
+      .login-container {
+        margin-top: 70px;
+        margin-bottom: 70px;
+        padding: 26px 8px 18px 8px;
+        max-width: 99vw;
+        border-radius: 10px;
       }
     }
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
-    }
-    .desktop-navbar {
-      /* chỉ định để tránh bị ẩn trên desktop */
-      display: block;
-    }
-    /* Padding cho login-container để không bị che bởi navbar/footer */
-    .login-container { 
-      margin-top: 110px;
-      margin-bottom: 80px;
-    }
-    @media (max-width: 600px) {
-      .login-container { margin-top: 70px; margin-bottom: 70px; }
+      .desktop-navbar { display: block; }
+      .login-container { margin-top: 110px; margin-bottom: 80px; }
     }
   </style>
 </head>
 <body>
-  <!-- NAVBAR: Desktop & Mobile (đồng bộ với index.html) -->
   <div id="navbar-container">
-    <!-- Mobile Navbar (Ẩn trên desktop) -->
+    <!-- Mobile Navbar -->
     <div class="mobile-navbar">
-    <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
-      <i class="fa fa-bars"></i>
-    </button>
-    <div class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
-      <span class="brand-main">Coffee & Beer</span>
-      <span class="brand-sub">DJ GooDjn</span>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
+        <i class="fa fa-bars"></i>
+      </button>
+      <div class="navbar-title" id="navbarTitleLink">
+        <span class="brand-main">Coffee & Beer</span>
+        <span class="brand-sub">DJ GooDjn</span>
+      </div>
+      <a class="mobile-hotline" href="tel:0902926636">
+        <i class="fa-solid fa-phone" style="color:#e53935"></i>
+        <span class="hotline-number">0902 926 636</span>
+      </a>
     </div>
-    <a class="mobile-hotline" href="tel:0902926636">
-      <i class="fa-solid fa-phone" style="color:#e53935"></i>
-      <span class="hotline-number">0902 926 636</span>
-    </a>
-  </div>
     <!-- Mobile Hamburger menu overlay -->
     <nav class="mobile-navbar-menu" id="mobileMenu">
       <ul>
@@ -228,11 +226,11 @@
         <li data-href="login.html">Login</li>
       </ul>
     </nav>
-    <!-- Desktop Navbar (giữ nguyên load từ navbar.html) -->
+    <!-- Desktop Navbar -->
     <div class="desktop-navbar"></div>
   </div>
   <script>
-    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
+    // Tải navbar.html vào desktop-navbar
     fetch('navbar.html')
       .then(response => response.text())
       .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
@@ -258,13 +256,14 @@
       });
     });
   </script>
-
-  <div class="login-container">
-    <h2>Đăng nhập quản lý</h2>
-    <input id="loginUser" type="text" placeholder="Tên đăng nhập">
-    <input id="loginPass" type="password" placeholder="Mật khẩu">
-    <div id="loginError"></div>
-    <button onclick="doLogin()">Đăng nhập</button>
+  <div class="login-mobile-wrap">
+    <div class="login-container">
+      <h2>Đăng nhập quản lý</h2>
+      <input id="loginUser" type="text" placeholder="Tên đăng nhập">
+      <input id="loginPass" type="password" placeholder="Mật khẩu">
+      <div id="loginError"></div>
+      <button onclick="doLogin()">Đăng nhập</button>
+    </div>
   </div>
   <script>
   const LOGIN_API_URL = '/api/get-login';
