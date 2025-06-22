@@ -145,42 +145,41 @@
         align-items: center;
       }
       .mobile-navbar .navbar-title {
-        flex: 1 1 auto;
+        flex: 1 1 70%;
         display: flex;
         flex-direction: column;
         line-height: 1.1;
         min-width: 0;
-        padding-right: 115px;  /* Đảm bảo brand không bị hotline che */
-        white-space: normal;
+        white-space: nowrap;
         overflow: hidden;
       }
-      .mobile-navbar .navbar-title .brand-main,
-      .mobile-navbar .navbar-title .brand-sub {
-        white-space: normal;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        font-size: 1.13em;
-        font-weight: bold;
+      .mobile-navbar .navbar-title .brand-main {
         color: #e1ba0a;
+        font-weight: bold;
+        font-size: 1.13em;
+        line-height: 1.1;
+        margin-bottom: 0;
       }
       .mobile-navbar .navbar-title .brand-sub {
+        color: #e1ba0a;
+        font-weight: bold;
         font-size: 0.99em;
+        line-height: 1;
+        margin-top: 0;
       }
       .mobile-navbar .mobile-hotline {
-        max-width: 120px;
-        min-width: 97px;
-        right: 6px;
         position: absolute;
         top: 50%;
+        right: 12px;
         transform: translateY(-50%);
         display: flex;
         align-items: center;
         background: #fff;
         border-radius: 30px;
-        padding: 3px 8px 3px 8px;
+        padding: 3px 16px 3px 11px;
         box-shadow: 0 0 5px #1113;
         height: 28px;
-        font-size: 0.95em;
+        font-size: 0.98em;
         white-space: nowrap;
         overflow: hidden;
         text-decoration: none !important;
@@ -251,7 +250,7 @@
 <body>
   <!-- NAVBAR -->
   <div id="navbar-container">
-    <!-- Mobile Navbar -->
+    <!-- Mobile Navbar (Đồng bộ với Test.html)-->
     <div class="mobile-navbar">
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
@@ -270,6 +269,7 @@
         <li data-href="index.html">Đặt dịch vụ</li>
         <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
         <li data-href="login.html">Login</li>
+        <li id="mobileLogoutTab" style="display:none;">Đăng xuất</li>
       </ul>
     </nav>
     <!-- Desktop Navbar (tải động qua JS) -->
@@ -296,9 +296,30 @@
     // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
     fetch('navbar.html')
       .then(response => response.text())
-      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
+      .then(html => { 
+        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; 
+        showLogoutTabIfLoggedIn();
+      });
 
-    // Hamburger menu cho mobile
+    // Hàm hiển thị tab Đăng xuất trên cả desktop và mobile
+    function showLogoutTabIfLoggedIn() {
+      var logoutTab = document.getElementById('logoutTab');
+      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+      if(localStorage.getItem('isAdmin') === '1') {
+        if (logoutTab) logoutTab.style.display = '';
+        if (mobileLogoutTab) mobileLogoutTab.style.display = '';
+      } else {
+        if (logoutTab) logoutTab.style.display = 'none';
+        if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
+      }
+    }
+    // Hàm logout chung
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      window.location.replace('index.html');
+    }
+
+    // Hamburger menu cho mobile + xử lý đăng xuất
     document.addEventListener('DOMContentLoaded', function(){
       var hamburger = document.getElementById('hamburgerBtn');
       var menu = document.getElementById('mobileMenu');
@@ -312,11 +333,19 @@
         menu.classList.toggle('open');
       };
       menu.querySelectorAll('li').forEach(function(tab){
+        // Nếu là tab đăng xuất thì không chuyển trang
+        if(tab.id === "mobileLogoutTab") return;
         tab.onclick = function(){
           menu.classList.remove('open');
           window.location.href = tab.getAttribute('data-href');
         };
       });
+      // Gắn sự kiện cho nút Đăng xuất trên mobile
+      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+      if(mobileLogoutTab) {
+        mobileLogoutTab.onclick = function() { logout(); };
+      }
+      showLogoutTabIfLoggedIn();
     });
 
     // Footer auto-hide on mobile input focus (bàn phím ảo)
