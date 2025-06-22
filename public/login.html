@@ -63,7 +63,7 @@
       border-radius: 15px;
       box-shadow: 0 2px 20px #0002;
       padding: 38px 30px;
-      margin-bottom: 80px; /* Để không bị footer che trên mobile */
+      margin-bottom: 80px;
     }
     h2 {
       text-align:center;
@@ -148,42 +148,40 @@
         flex: 1 1 auto;
         display: flex;
         flex-direction: column;
-        line-height: 1.1;
+        justify-content: center;
         min-width: 0;
-        padding-right: 115px;  /* Đảm bảo brand không bị hotline che */
         white-space: normal;
         overflow: hidden;
+        text-align: left;
+        padding-right: 0 !important;
       }
-      .mobile-navbar .navbar-title .brand-main,
-      .mobile-navbar .navbar-title .brand-sub {
-        white-space: normal;
-        text-overflow: ellipsis;
-        overflow: hidden;
+      .mobile-navbar .brand-main,
+      .mobile-navbar .brand-sub {
         font-size: 1.13em;
         font-weight: bold;
         color: #e1ba0a;
+        line-height: 1.15;
+        word-break: break-word;
       }
       .mobile-navbar .navbar-title .brand-sub {
         font-size: 0.99em;
       }
       .mobile-navbar .mobile-hotline {
-        max-width: 120px;
-        min-width: 97px;
-        right: 6px;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
+        margin-left: 6px;
+        position: relative;
+        right: 0;
+        top: auto;
+        transform: none;
         background: #fff;
         border-radius: 30px;
-        padding: 3px 8px 3px 8px;
+        padding: 3px 8px;
         box-shadow: 0 0 5px #1113;
-        height: 28px;
         font-size: 0.95em;
         white-space: nowrap;
-        overflow: hidden;
         text-decoration: none !important;
+        height: 28px;
+        display: flex;
+        align-items: center;
       }
       .mobile-navbar .mobile-hotline .hotline-number {
         font-size: 1.07em;
@@ -281,7 +279,7 @@
     <input id="loginUser" type="text" placeholder="Tên đăng nhập" autocomplete="username">
     <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
     <div id="loginError"></div>
-    <button onclick="doLogin()">Đăng nhập</button>
+    <button id="loginBtn" onclick="doLogin()">Đăng nhập</button>
   </div>
   <!-- FOOTER -->
   <div id="footer-container">
@@ -377,18 +375,19 @@
   function checkLoginLock() {
     var lockTime = localStorage.getItem('loginLockTime');
     var now = Date.now();
+    var loginBtn = document.getElementById('loginBtn');
     if (lockTime && now < parseInt(lockTime)) {
       var left = Math.ceil((parseInt(lockTime) - now) / 60000);
       document.getElementById('loginError').innerText = 'Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau ' + left + ' phút!';
       document.getElementById('loginError').style.display = 'block';
-      document.querySelector('button').disabled = true;
+      if(loginBtn) loginBtn.disabled = true;
       return true;
     } else {
       if (lockTime) {
         localStorage.removeItem('loginFailCount');
         localStorage.removeItem('loginLockTime');
       }
-      document.querySelector('button').disabled = false;
+      if(loginBtn) loginBtn.disabled = false;
       return false;
     }
   }
@@ -420,7 +419,7 @@
         localStorage.setItem('loginLockTime', lockUntil.toString());
         document.getElementById('loginError').innerText = 'Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau 10 phút!';
         document.getElementById('loginError').style.display = 'block';
-        document.querySelector('button').disabled = true;
+        document.getElementById('loginBtn').disabled = true;
       } else {
         document.getElementById('loginError').innerText = 'Sai tên đăng nhập hoặc mật khẩu! (' + currentFailCount + '/5)';
         document.getElementById('loginError').style.display = 'block';
@@ -458,7 +457,10 @@
     var loginPass = document.getElementById('loginPass');
     [loginUser, loginPass].forEach(function(input) {
       input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') doLogin();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          doLogin();
+        }
       });
     });
   });
