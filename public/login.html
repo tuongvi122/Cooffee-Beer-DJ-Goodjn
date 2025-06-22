@@ -7,40 +7,143 @@
   <!-- Font Awesome cho hamburger icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    html, body { height: 100%; margin: 0; padding: 0; }
-    body { min-height: 100vh; background:#f6f7fb; margin:0; font-family: Arial, sans-serif; }
-    .login-mobile-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      width: 100vw;
+    html, body { height: 100%; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { min-height: 100vh; background:#f6f7fb; margin:0; }
+    /* === Navbar Mobile === */
+    @media (max-width: 768px) {
+      #navbar-container {
+        position: fixed;
+        top: 0; left: 0; width: 100vw;
+        background: #228B22; z-index: 10000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+      }
+      .mobile-navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100vw;
+        min-height: 54px; height: 54px;
+        background: #228B22;
+        z-index: 10001;
+        padding: 0;
+      }
+      .mobile-navbar .hamburger {
+        flex: 0 0 auto;
+        padding: 12px 12px 12px 7px;
+        font-size: 27px;
+        color: #fff;
+        background: none; border: none;
+        outline: none;
+        margin-right: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+      .mobile-navbar .navbar-title {
+        flex: 1 1 auto;
+        display: flex; flex-direction: column;
+        align-items: flex-start; justify-content: center;
+        min-width: 0;
+        white-space: nowrap; overflow: hidden;
+        margin-left: 3px;
+      }
+      .mobile-navbar .brand-main,
+      .mobile-navbar .brand-sub {
+        color: #e1ba0a;
+        font-weight: bold;
+        line-height: 1.1;
+      }
+      .mobile-navbar .brand-main { font-size: 1.13em; }
+      .mobile-navbar .brand-sub { font-size: 0.99em; }
+      .mobile-navbar .mobile-hotline {
+        flex: 0 0 auto;
+        margin-left: 7px;
+        background: #fff;
+        border-radius: 30px;
+        padding: 3px 16px 3px 11px;
+        box-shadow: 0 0 5px #1113;
+        height: 28px;
+        font-size: 0.98em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-decoration: none !important;
+        display: flex; align-items: center;
+      }
+      .mobile-navbar .mobile-hotline .hotline-number {
+        font-size: 1.07em;
+        margin-left: 3px;
+        font-weight: bold;
+        color: #0011ff;
+        letter-spacing: 0.5px;
+        text-decoration: none !important;
+      }
+      .mobile-navbar-menu {
+        display: none;
+        position: fixed;
+        top: 54px; left: 0;
+        width: max-content; min-width: 140px; max-width: 70vw;
+        background: #228B22; color: #fff;
+        z-index: 12000;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+        border-radius: 0 0 10px 0;
+        padding: 0 0 12px 0;
+        animation: slideInMenu 0.18s;
+      }
+      .mobile-navbar-menu.open { display: block; }
+      @keyframes slideInMenu {
+        from { transform: translateX(-90%); opacity: 0.5; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      .mobile-navbar-menu ul {
+        list-style: none; margin: 0; padding: 10px 0 0 0;
+      }
+      .mobile-navbar-menu li {
+        padding: 13px 0 9px 18px;
+        font-size: 1.12em;
+        cursor: pointer;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        transition: background 0.1s;
+      }
+      .mobile-navbar-menu li:active,
+      .mobile-navbar-menu li:hover { background: #1c6e1b; }
+      .mobile-navbar-menu li:last-child { border-bottom: none; }
+      .mobile-navbar-menu .logout-li { color: #fff; }
+      .desktop-navbar { display: none !important; }
+      /* login form mobile */
+      .login-mobile-wrap {
+        display: block;
+        margin-top: 60px;
+        margin-bottom: 64px;
+        width: 100vw;
+      }
+      .login-container {
+        background: #fff;
+        max-width: 98vw;
+        width: 100vw;
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0 auto;
+        padding: 28px 8px 18px 8px;
+      }
+      h2 { font-size: 1.25em; }
     }
-    .login-container {
-      width: 100%;
-      max-width: 390px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 2px 20px #0002;
-      padding: 38px 30px 28px 30px;
-      margin-top: 110px;
-      margin-bottom: 80px;
+    @media (min-width: 769px) {
+      #navbar-container { position: fixed; top: 0; left: 0; width: 100vw; z-index: 10000; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.09);}
+      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
+      .desktop-navbar { display: block; }
+      .login-mobile-wrap {
+        display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+        min-height: 100vh; width: 100vw;
+      }
+      .login-container {
+        max-width: 390px; margin: 110px auto 80px auto; background: #fff;
+        border-radius: 15px; box-shadow: 0 2px 20px #0002; padding: 38px 30px 28px 30px;
+      }
     }
-    h2 { text-align:center; color:#228B22; margin-bottom:24px; }
-    input { width:100%; margin-bottom:14px; padding:10px; font-size:16px; border-radius:5px; border:1px solid #bbb; }
+    input { width:100%; margin-bottom:14px; padding:10px; font-size:16px; border-radius:5px; border:1px solid #bbb; box-sizing: border-box;}
     button { width:100%; padding:10px; background:#228B22; color:#fff; font-weight:bold; border:none; border-radius:7px; font-size:17px; cursor:pointer; }
     #loginError { color:#d32f2f; text-align:center; margin-bottom:10px; font-size:14px; display:none; }
-    #navbar-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      z-index: 10000;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
-    }
     #footer-container {
       background: #228B22;
       color: #fff;
@@ -58,147 +161,6 @@
       bottom: 0;
       left: 0;
       z-index: 10000;
-    }
-    /* === MOBILE NAVBAR === */
-    @media (max-width: 768px) {
-      .desktop-navbar { display: none !important; }
-      .mobile-navbar {
-        display: flex !important;
-        align-items: center;
-        justify-content: space-between;
-        width: 100vw;
-        background: #228B22;
-        min-height: 54px;
-        height: 54px;
-        z-index: 10001;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      .mobile-navbar .hamburger {
-        flex: 0 0 auto;
-        padding: 12px 12px 12px 7px;
-        font-size: 27px;
-        color: #fff;
-        background: none;
-        border: none;
-        outline: none;
-        margin-right: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .navbar-title {
-        flex: 1 1 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        margin-left: 3px;
-      }
-      .mobile-navbar .brand-main,
-      .mobile-navbar .brand-sub {
-        color: #e1ba0a;
-        font-weight: bold;
-        line-height: 1.1;
-      }
-      .mobile-navbar .brand-main {
-        font-size: 1.13em;
-      }
-      .mobile-navbar .brand-sub {
-        font-size: 0.99em;
-      }
-      .mobile-navbar .mobile-hotline {
-        flex: 0 0 auto;
-        margin-left: 7px;
-        background: #fff;
-        border-radius: 30px;
-        padding: 3px 16px 3px 11px;
-        box-shadow: 0 0 5px #1113;
-        height: 28px;
-        font-size: 0.98em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-decoration: none !important;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .mobile-hotline .hotline-number {
-        font-size: 1.07em;
-        margin-left: 3px;
-        font-weight: bold;
-        color: #0011ff;
-        letter-spacing: 0.5px;
-        text-decoration: none !important;
-      }
-      .mobile-navbar-menu {
-        display: none;
-        position: fixed;
-        top: 54px;
-        left: 0;
-        width: max-content;
-        min-width: 140px;
-        max-width: 70vw;
-        background: #228B22;
-        color: #fff;
-        z-index: 12000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
-        border-radius: 0 0 10px 0;
-        padding: 0 0 12px 0;
-        animation: slideInMenu 0.18s;
-      }
-      .mobile-navbar-menu.open {
-        display: block;
-      }
-      @keyframes slideInMenu {
-        from { transform: translateX(-90%); opacity: 0.5; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      .mobile-navbar-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 10px 0 0 0;
-      }
-      .mobile-navbar-menu li {
-        padding: 13px 0 9px 18px;
-        font-size: 1.12em;
-        cursor: pointer;
-        font-weight: bold;
-        border-bottom: 1px solid rgba(255,255,255,0.10);
-        transition: background 0.1s;
-      }
-      .mobile-navbar-menu li:active,
-      .mobile-navbar-menu li:hover {
-        background: #1c6e1b;
-      }
-      .mobile-navbar-menu li:last-child { border-bottom: none; }
-      .mobile-navbar-menu .logout-li { color: #fff; }
-      #footer-container {
-        min-height: 54px;
-        height: 54px;
-        font-size: 0.98em;
-        padding: 0 7px;
-      }
-      #footer-container div {
-        width: 100%;
-        text-align: center;
-        line-height: 1.15;
-        word-break: break-word;
-      }
-      .login-container {
-        margin-top: 70px;
-        margin-bottom: 70px;
-        padding: 26px 8px 18px 8px;
-        max-width: 99vw;
-        border-radius: 10px;
-      }
-    }
-    @media (min-width: 769px) {
-      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
-      .desktop-navbar { display: block; }
-      .login-container { margin-top: 110px; margin-bottom: 80px; }
     }
   </style>
 </head>
@@ -359,7 +321,7 @@
   <script>
     fetch('footer.html')
       .then(response => response.text())
-      .then(html => { document.getElementById('footer-container').innerHTML = html });
+      .then(html => { document.getElementById('footer-container').innerHTML = html; });
   </script>
   <script>
     // Ẩn footer khi focus vào input trên mobile để tránh che khuất
