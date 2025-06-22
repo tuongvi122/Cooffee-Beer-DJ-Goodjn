@@ -432,8 +432,10 @@
       #ordersTable tfoot tr td {
   display: none !important;
 }
+#ordersTable tfoot tr td:nth-child(4),
 #ordersTable tfoot tr td:nth-child(5),
-#ordersTable tfoot tr td:nth-child(6) {
+#ordersTable tfoot tr td:nth-child(6),
+#ordersTable tfoot tr td:nth-child(7) {
   display: table-cell !important;
   background: #e3f1e6 !important;
   color: #234d20;
@@ -726,19 +728,20 @@
             </tr>
           </thead>
           <tbody id="ordersTableBody"></tbody>
-          <tfoot>
+    <tfoot>
   <tr class="sum-row">
-    <td></td>
     <td></td>
     <td></td>
     <td></td>
     <td style="text-align:right; font-weight:bold; background:#e3f1e6;">Tổng tiền</td>
     <td id="sumTotal" style="font-weight:bold; color:#234d20; background:#e3f1e6;"></td>
-    <td></td>
+    <td style="background:#e3f1e6;"></td>
+    <td style="background:#e3f1e6;"></td>
     <td></td>
     <td id="sumPoint" style="font-weight:bold; color:#234d20; background:#e3f1e6;"></td>
   </tr>
 </tfoot>
+
         </table>
       </div>
     </div>
