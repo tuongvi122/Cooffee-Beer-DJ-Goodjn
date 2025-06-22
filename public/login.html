@@ -122,75 +122,81 @@
         line-height: 1.15;
         word-break: break-word;
       }
-      .mobile-navbar {
-        position: relative;
-        display: flex !important;
-        align-items: center;
-        width: 100vw;
-        background: #228B22;
-        min-height: 54px;
-        height: 54px;
-        z-index: 10001;
-      }
-      .mobile-navbar .hamburger {
-        padding: 12px 12px 12px 7px;
-        font-size: 27px;
-        color: #fff;
-        background: none;
-        border: none;
-        outline: none;
-        margin-right: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .navbar-title {
-        flex: 1 1 auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-width: 0;
-        white-space: normal;
-        overflow: hidden;
-        text-align: left;
-        padding-right: 0 !important;
-      }
-      .mobile-navbar .brand-main,
-      .mobile-navbar .brand-sub {
-        font-size: 1.13em;
-        font-weight: bold;
-        color: #e1ba0a;
-        line-height: 1.15;
-        word-break: break-word;
-      }
-      .mobile-navbar .navbar-title .brand-sub {
-        font-size: 0.99em;
-      }
-      .mobile-navbar .mobile-hotline {
-        margin-left: 6px;
-        position: relative;
-        right: 0;
-        top: auto;
-        transform: none;
-        background: #fff;
-        border-radius: 30px;
-        padding: 3px 8px;
-        box-shadow: 0 0 5px #1113;
-        font-size: 0.95em;
-        white-space: nowrap;
-        text-decoration: none !important;
-        height: 28px;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .mobile-hotline .hotline-number {
-        font-size: 1.07em;
-        margin-left: 3px;
-        font-weight: bold;
-        color: #0011ff;
-        letter-spacing: 0.5px;
-        text-decoration: none !important;
-      }
+        .mobile-navbar {
+    display: flex !important;
+    align-items: center;
+    width: 100vw;
+    background: #228B22;
+    min-height: 54px;
+    height: 54px;
+    z-index: 10001;
+    position: relative;
+    padding: 0 7px;
+    box-sizing: border-box;
+  }
+  .mobile-navbar .hamburger {
+    padding: 12px 10px 12px 2px;
+    font-size: 27px;
+    color: #fff;
+    background: none;
+    border: none;
+    outline: none;
+    margin-right: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .mobile-navbar .navbar-title {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    color: #e1ba0a;
+    font-size: 1.11em;
+    font-weight: bold;
+    padding-right: 8px;
+    text-align: left;
+    line-height: 1.18;
+  }
+  .mobile-navbar .brand-main {
+    display: inline;
+    color: #e1ba0a;
+    font-weight: bold;
+    font-size: 1.11em;
+  }
+  .mobile-navbar .brand-sub {
+    display: inline;
+    color: #e1ba0a;
+    font-size: 1.02em;
+    font-weight: bold;
+    margin-left: 2px;
+  }
+  .mobile-navbar .mobile-hotline {
+    display: flex;
+    align-items: center;
+    position: static;
+    margin-left: 0;
+    background: #fff;
+    border-radius: 30px;
+    padding: 3px 8px;
+    box-shadow: 0 0 5px #1113;
+    font-size: 0.97em;
+    white-space: nowrap;
+    text-decoration: none !important;
+    height: 28px;
+    min-width: 0;
+    max-width: 125px;
+  }
+  .mobile-navbar .mobile-hotline .hotline-number {
+    font-size: 1.07em;
+    margin-left: 3px;
+    font-weight: bold;
+    color: #0011ff;
+    letter-spacing: 0.5px;
+    text-decoration: none !important;
+  }
       .mobile-navbar .mobile-hotline:link,
       .mobile-navbar .mobile-hotline:visited,
       .mobile-navbar .mobile-hotline:hover,
@@ -249,27 +255,25 @@
 <body>
   <!-- NAVBAR -->
   <div id="navbar-container">
-    <!-- Mobile Navbar -->
-    <div class="mobile-navbar">
-      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
-        <i class="fa fa-bars"></i>
-      </button>
-      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
-        <span class="brand-main">Coffee & Beer</span>
-        <span class="brand-sub">DJ GooDjn</span>
-      </a>
-      <a class="mobile-hotline" href="tel:0902926636">
-        <i class="fa-solid fa-phone" style="color:#e53935"></i>
-        <span class="hotline-number">0902 926 636</span>
-      </a>
-    </div>
-    <nav class="mobile-navbar-menu" id="mobileMenu">
-      <ul>
-        <li data-href="index.html">Đặt dịch vụ</li>
-        <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
-        <li data-href="login.html">Login</li>
-      </ul>
-    </nav>
+  <div class="mobile-navbar">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
+      <i class="fa fa-bars"></i>
+    </button>
+    <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
+      <span class="brand-main">Coffee & Beer</span> <span class="brand-sub">DJ GooDjn</span>
+    </a>
+    <a class="mobile-hotline" href="tel:0902926636">
+      <i class="fa-solid fa-phone" style="color:#e53935"></i>
+      <span class="hotline-number">0902 926 636</span>
+    </a>
+  </div>
+  <nav class="mobile-navbar-menu" id="mobileMenu">
+    <ul>
+      <li data-href="index.html">Đặt dịch vụ</li>
+      <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
+      <li data-href="login.html">Login</li>
+    </ul>
+  </nav>
     <!-- Desktop Navbar (tải động qua JS) -->
     <div class="desktop-navbar"></div>
   </div>
