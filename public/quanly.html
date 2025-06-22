@@ -113,7 +113,6 @@
       width: 200px;
       transition: border 0.2s;
     }
-
     /* MOBILE TABLE CUSTOM - ONLY FOR MOBILE */
     @media (max-width: 600px) {
       h2 {
@@ -168,12 +167,10 @@
         min-width: 55px;
         max-width: 70px;
       }
-      /* Gộp show entries và ô tìm kiếm cùng 1 dòng */
       .table-actions > div {
         margin: 0;
         padding: 0;
       }
-      /* Bảng mobile */
       .orders-table-wrap {
         overflow-x: unset;
         margin-bottom: 12px;
@@ -197,25 +194,23 @@
         border-radius: 8px 8px 0 0;
         border-bottom: 1.5px solid #cfd8dc;
       }
-    .mobile-orders-table-head .col {
-    display: table-cell;
-    padding: 7px 2px 7px 5px;
-    text-align: center; /* canh giữa header */
-    font-size: 0.95em;
-    font-weight: 600;
-    color: #20581f;
-    border: 1px solid #cfd8dc;
-    background: #eafce4;
-    vertical-align: middle;
-  }
+      .mobile-orders-table-head .col {
+        display: table-cell;
+        padding: 7px 2px 7px 5px;
+        text-align: center;
+        font-size: 0.95em;
+        font-weight: 600;
+        color: #20581f;
+        border: 1px solid #cfd8dc;
+        background: #eafce4;
+        vertical-align: middle;
+      }
       .mobile-orders-table-head .col.col-khach { text-align: center; }
       .mobile-orders-table-head .col.col-ban { text-align: center; }
       .mobile-orders-table-head .col.col-mnv { text-align: center;}
       .mobile-orders-table-head .col.col-tong { text-align: center;}
       .mobile-orders-table-head .col.col-xacnhan { text-align: center;}
-      /* Ẩn quản lý ghi chú mobile */
       .mobile-orders-table-head .col.col-ghichu { display: none !important; }
-
       .mobile-orders-table-row {
         display: table-row;
         border-radius: 0;
@@ -261,15 +256,15 @@
         text-align: left;
         padding-left: 3px;
       }
-    .mobile-orders-table-row .col.col-tong {
-    min-width: 54px;
-    color: #e53935;
-    font-weight: 600;
-    font-size: 0.99em;
-    text-align: center;  /* Đổi từ right sang center */
-    padding-right: 0;    /* Không cần padding phải nếu canh giữa */
-    padding-left: 0;
-  }
+      .mobile-orders-table-row .col.col-tong {
+        min-width: 54px;
+        color: #e53935;
+        font-weight: 600;
+        font-size: 0.99em;
+        text-align: center;
+        padding-right: 0;
+        padding-left: 0;
+      }
       .mobile-orders-table-row .col.col-xacnhan {
         min-width: 80px;
         text-align: center;
@@ -314,7 +309,6 @@
         text-align: left;
         padding-left: 2px;
       }
-      /* Ẩn quản lý ghi chú mobile */
       .mobile-orders-table-row .col.col-ghichu { display: none !important; }
     }
     /* END MOBILE TABLE */
@@ -584,7 +578,6 @@
       font-style: italic;
       font-size: 12px;
     }
-    /* Thu nhỏ nút Xóa */
     .delete-staff-btn {
       background: #e53935;
       color: #fff;
@@ -602,7 +595,6 @@
     .delete-staff-btn:hover {
       background: #c62828;
     }
-    /* Thu nhỏ dropdown */
     .staff-action-select {
       width: 140px;
       min-width: 75px;
@@ -616,7 +608,6 @@
       font-weight: 600;
       transition: color 0.2s;
     }
-     /* Responsive */
     @media (max-width: 600px) {
       .modal-dialog { max-width: 99vw !important; min-width: 0; }
       .staff-list-table th, .staff-list-table td { font-size: 0.92em; padding: 1px 0; }
@@ -648,10 +639,13 @@
         flex: 1 1 70%;
         display: flex;
         flex-direction: column;
-        line-height: 1.1;
+        align-items: center;
+        justify-content: center;
         min-width: 0;
+        line-height: 1.1;
         white-space: nowrap;
         overflow: hidden;
+        padding-right: 0;
       }
       .mobile-navbar .navbar-title .brand-main {
         color: #e1ba0a;
@@ -765,7 +759,7 @@
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
-    </style>
+  </style>
 </head>
 <body>
   <!-- NAVBAR -->
@@ -836,37 +830,6 @@
       </div>
       <div class="table-pagination" id="tablePagination"></div>
     </div>
-  <script>
-    // Kiểm tra đăng nhập NGAY KHI VỪA VÀO trang quản lý
-    if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
-
-    fetch('navbar.html')
-      .then(response => response.text())
-      .then(html => { 
-        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; 
-        showLogoutTabIfLoggedIn();
-      });
-
-    // Hiện tab Đăng xuất nếu đã đăng nhập
-  function showLogoutTabIfLoggedIn() {
-  var logoutTab = document.getElementById('logoutTab');
-  var mobileLogoutTab = document.getElementById('mobileLogoutTab');
-  if(localStorage.getItem('isAdmin') === '1') {
-    if (logoutTab) logoutTab.style.display = '';
-    if (mobileLogoutTab) mobileLogoutTab.style.display = '';
-  } else {
-    if (logoutTab) logoutTab.style.display = 'none';
-    if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
-  }
-} 
-
-    // Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
-    function logout() {
-      localStorage.removeItem('isAdmin');
-      window.location.replace('index.html'); // Dùng replace để không thể quay lại bằng Back
-    }
-
-  </script>
     <!-- Popup xác nhận/hủy -->
     <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
       <div class="modal-dialog mt-4">
@@ -943,20 +906,44 @@
       </div>
     </div>
   </div>
-    <!-- FOOTER -->
+  <!-- FOOTER -->
   <div id="footer-container">
     <div>
       © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
       63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
     </div>
   </div>
+  <!-- SCRIPT ĐĂNG NHẬP VÀ NAVBAR -->
   <script>
+    // Kiểm tra đăng nhập, nếu chưa sẽ chuyển về login.html
+    if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
+
+    // Hàm hiện/ẩn tab Đăng xuất cả desktop và mobile
+    function showLogoutTabIfLoggedIn() {
+      var logoutTab = document.getElementById('logoutTab');
+      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+      if(localStorage.getItem('isAdmin') === '1') {
+        if (logoutTab) logoutTab.style.display = '';
+        if (mobileLogoutTab) mobileLogoutTab.style.display = '';
+      } else {
+        if (logoutTab) logoutTab.style.display = 'none';
+        if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
+      }
+    }
+    // Hàm đăng xuất
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      window.location.replace('index.html');
+    }
     // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
     fetch('navbar.html')
       .then(response => response.text())
-      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
+      .then(html => {
+        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html;
+        showLogoutTabIfLoggedIn();
+      });
 
-    // Hamburger menu cho mobile
+    // Xử lý menu mobile
     document.addEventListener('DOMContentLoaded', function(){
       var hamburger = document.getElementById('hamburgerBtn');
       var menu = document.getElementById('mobileMenu');
@@ -964,23 +951,23 @@
         if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
           menu.classList.remove('open');
         }
-    showLogoutTabIfLoggedIn(); // Hiển thị/ẩn Đăng xuất đúng trạng thái
-  // Gắn sự kiện cho nút Đăng xuất trên mobile
-  var mobileLogoutTab = document.getElementById('mobileLogoutTab');
-  if(mobileLogoutTab) {
-    mobileLogoutTab.onclick = function() { logout(); };
-  }
       });
       hamburger.onclick = function(e){
         e.stopPropagation();
         menu.classList.toggle('open');
       };
-      menu.querySelectorAll('li').forEach(function(tab){
+      menu.querySelectorAll('li[data-href]').forEach(function(tab){
         tab.onclick = function(){
           menu.classList.remove('open');
           window.location.href = tab.getAttribute('data-href');
         };
       });
+      // Gắn sự kiện cho nút Đăng xuất trên mobile
+      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+      if(mobileLogoutTab) {
+        mobileLogoutTab.onclick = function() { logout(); };
+      }
+      showLogoutTabIfLoggedIn();
     });
 
     // Footer auto-hide on mobile input focus (bàn phím ảo)
