@@ -2,6 +2,22 @@ require('dotenv').config();
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
 
+// Helper: Lấy thời gian VN định dạng DD/MM/YYYY HH:mm:ss
+function getVNTimeForSheet() {
+  const now = new Date();
+  // Chuyển về múi giờ Việt Nam
+  const vnTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+
+  const day = String(vnTime.getDate()).padStart(2, '0');
+  const month = String(vnTime.getMonth() + 1).padStart(2, '0');
+  const year = vnTime.getFullYear();
+  const hours = String(vnTime.getHours()).padStart(2, '0');
+  const minutes = String(vnTime.getMinutes()).padStart(2, '0');
+  const seconds = String(vnTime.getSeconds()).padStart(2, '0');
+
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -22,35 +38,24 @@ module.exports = async (req, res) => {
   const sheets = google.sheets({ version: 'v4', auth });
   const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
-  // 2. Ghi vào sheet "KHđánh giá"
-  // --- Format ngày giờ VN: DD/MM/YYYY HH:MM:SS ---
-  const d = new Date();
-  const two = v => v.toString().padStart(2, '0');
-  const now = [
-    two(d.getDate()),
-    two(d.getMonth()+1),
-    d.getFullYear()
-  ].join('/') + ' ' + [
-    two(d.getHours()),
-    two(d.getMinutes()),
-    two(d.getSeconds())
-  ].join(':');
+  // 2. Ghi vào sheet "KHđánh giá" với thời gian VN
+  const nowStr = getVNTimeForSheet();
 
   const rows = staffReviews.map((nv, idx) => ([
-  now,                   // Thời gian
-  order.orderId,         // Mã đơn
-  order.name,            // Tên KH
-  order.phone,           // SĐT
-  order.email,           // Email
-  order.table,           // Số bàn (nếu cần)
-  nv.code,               // Mã NV
-  nv.shift,              // Ca LV
-  nv.stars,              // Đánh giá sao NV
-  serviceStars,          // Đánh giá sao quán
-  speed,                 // Tốc độ phục vụ
-  comment,               // Nhận xét chung
-  idx === 0 ? (order.point || 10) : '' // <-- CHỈ DÒNG ĐẦU ghi điểm thưởng
-]));
+    nowStr,                // Thời gian
+    order.orderId,         // Mã đơn
+    order.name,            // Tên KH
+    order.phone,           // SĐT
+    order.email,           // Email
+    order.table,           // Số bàn (nếu cần)
+    nv.code,               // Mã NV
+    nv.shift,              // Ca LV
+    nv.stars,              // Đánh giá sao NV
+    serviceStars,          // Đánh giá sao quán
+    speed,                 // Tốc độ phục vụ
+    comment,               // Nhận xét chung
+    idx === 0 ? (order.point || 10) : '' // <-- CHỈ DÒNG ĐẦU ghi điểm thưởng
+  ]));
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
