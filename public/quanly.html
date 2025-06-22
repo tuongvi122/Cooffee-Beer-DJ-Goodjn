@@ -789,6 +789,7 @@
         <li data-href="index.html">Đặt dịch vụ</li>
         <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
         <li data-href="login.html">Login</li>
+        <li id="mobileLogoutTab" style="display:none;">Đăng xuất</li>
       </ul>
     </nav>
     <!-- Desktop Navbar (tải động qua JS) -->
@@ -847,14 +848,17 @@
       });
 
     // Hiện tab Đăng xuất nếu đã đăng nhập
-    function showLogoutTabIfLoggedIn() {
-      var logoutTab = document.getElementById('logoutTab');
-      if(localStorage.getItem('isAdmin') === '1') {
-        if (logoutTab) logoutTab.style.display = '';
-      } else {
-        if (logoutTab) logoutTab.style.display = 'none';
-      }
-    }
+  function showLogoutTabIfLoggedIn() {
+  var logoutTab = document.getElementById('logoutTab');
+  var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+  if(localStorage.getItem('isAdmin') === '1') {
+    if (logoutTab) logoutTab.style.display = '';
+    if (mobileLogoutTab) mobileLogoutTab.style.display = '';
+  } else {
+    if (logoutTab) logoutTab.style.display = 'none';
+    if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
+  }
+} 
 
     // Hàm đăng xuất: xóa login và quay về trang chủ, không thể back quay lại quản lý
     function logout() {
@@ -960,6 +964,12 @@
         if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
           menu.classList.remove('open');
         }
+    showLogoutTabIfLoggedIn(); // Hiển thị/ẩn Đăng xuất đúng trạng thái
+  // Gắn sự kiện cho nút Đăng xuất trên mobile
+  var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+  if(mobileLogoutTab) {
+    mobileLogoutTab.onclick = function() { logout(); };
+  }
       });
       hamburger.onclick = function(e){
         e.stopPropagation();
