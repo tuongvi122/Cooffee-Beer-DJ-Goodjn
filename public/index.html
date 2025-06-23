@@ -51,12 +51,6 @@
   text-align: center;
   padding: 0 10px;
 }
-      #footer-container div {
-      width: 100%;
-      text-align: center;
-      line-height: 1.15;
-      word-break: break-word;
-    }
     h2 { text-align: center; }
     #products {
       display: flex;
@@ -337,18 +331,16 @@
 
     #footer-container {
     min-height: 54px;
+    height: 54px;
     font-size: 0.98em;
     padding: 0 7px;
-    position: fixed;   /* Nếu muốn Footer luôn nằm dưới màn hình */
-    bottom: 0;
-    left: 0;
   }
   #footer-container div {
     width: 100%;
     text-align: center;
     line-height: 1.15;
     word-break: break-word;
-  }
+}
       .marquee-flex-wrap {
         margin: 4px 0 6px 0;
         height: auto !important;
@@ -510,7 +502,7 @@
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
       </button>
-    <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
+      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
       <span class="brand-main">Coffee & Beer</span>
       <span class="brand-sub">DJ GooDjn</span>
     </a>
@@ -593,10 +585,21 @@
             </table>
             <div id="order-total" style="text-align:right; font-weight:bold; margin-bottom:10px;"></div>
             <input placeholder="Họ và tên" id="name"><br>
-            <input placeholder="Số điện thoại" id="phone" maxlength="10" pattern="[0-9]{10}" oninput="validatePhoneInput(this)"><br>
+           <input
+  placeholder="Số điện thoại"
+  id="phone"
+  name="phone"
+  type="tel"
+  pattern="[0-9]{10,11}"
+  maxlength="11"
+  inputmode="numeric"
+  autocomplete="tel"
+  oninput="validatePhoneInput(this)"
+><br>
+
             <input placeholder="Email" id="contact"><br>
             <input placeholder="Bàn số 1-50" id="table-number" type="number" min="1" max="50"><br>
-            <textarea placeholder="Ghi chú" id="address"></textarea><br><br>
+            <textarea placeholder="Ghi chú" id="note" name="note"></textarea><br><br>
             <div class="form-buttons">
               <button class="confirm-btn" onclick="submitOrder()">Đặt dịch vụ</button>
               <button class="close-btn" onclick="closeCartModal()">Đóng</button>
@@ -857,6 +860,7 @@
     }
 
     function showCartModal() {
+      loadProducts();
       renderCartTable();
       document.getElementById('alert_order').style.display = 'none';
       document.getElementById('alert_order_sucess').style.display = 'none';
@@ -866,6 +870,17 @@
       document.getElementById('floating-cart').style.display = 'none';
       document.getElementById('scrollToTopBtn').style.display = 'none';
       document.getElementById('search-bar-area').classList.add('hide');
+      let info = localStorage.getItem("customerInfo"); // THÊM DÒNG NÀY
+      if (info) {
+  try {
+    const { name, phone, contact, tableNum } = JSON.parse(info);
+    if(name) document.getElementById('name').value = name;
+    if(phone) document.getElementById('phone').value = phone;
+    if(contact) document.getElementById('contact').value = contact;
+    if(tableNum) document.getElementById('table-number').value = tableNum;
+    // KHÔNG điền lại trường "Ghi chú"
+  } catch(e) {}
+  }
       closeSearchBar();
     }
 
@@ -881,15 +896,15 @@
       }
     }
 
-    function validatePhoneInput(input) {
-      input.value = input.value.replace(/[^0-9]/g, '').slice(0, 10);
-    }
+  function validatePhoneInput(input) {
+  input.value = input.value.replace(/[^0-9]/g, '').slice(0, 11);
+  }
 
     async function submitOrder() {
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const contact = document.getElementById('contact').value.trim();
-      const address = document.getElementById('address').value.trim();
+      const note = document.getElementById('note').value.trim();
       const tableNum = document.getElementById('table-number').value.trim();
       const alertOrder = document.getElementById('alert_order');
       const alertSuccess = document.getElementById('alert_order_sucess');
@@ -899,23 +914,24 @@
       alertSuccess.style.display = 'none';
       orderThankyou.style.display = 'none';
 
-      if (!name || !phone || !contact || !tableNum || !address) {
+      if (!name || !phone || !contact || !tableNum) {
         alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số bàn, Ghi chú";
         alertOrder.style.display = 'block';
         return;
       }
-      if (!/^[0-9]{10}$/.test(phone)) {
-        alertOrder.innerText = "Số điện thoại phải gồm đúng 10 số.";
-        alertOrder.style.display = 'block';
-        return;
-      }
+      if (!/^[0-9]{10,11}$/.test(phone)) {
+      alertOrder.innerText = "Số điện thoại phải gồm 10 hoặc 11 số.";
+      alertOrder.style.display = 'block';
+      return;
+    }
+
       if (cart.length === 0) {
         alertOrder.innerText = "Giỏ hàng trống chưa có sản phẩm!";
         alertOrder.style.display = 'block';
         return;
       }
 
-      const order = { name, phone, contact, address, tableNum, items: cart };
+      const order = { name, phone, contact, tableNum, note, items: cart };
 
       try {
         const result = await fetch('/api/submitOrder', {
@@ -929,6 +945,8 @@
           alertSuccess.style.display = 'none';
           orderThankyou.innerText = `Đơn hàng ${result.orderCode} của bạn đã gửi đến GooDjn DJ Coffee & Beer, cảm ơn bạn!`;
           orderThankyou.style.display = 'block';
+          localStorage.setItem("customerInfo", JSON.stringify({ name, phone, contact, tableNum }));
+
           cart = [];
           document.getElementById('cart-count-floating').innerText = '0';
           setTimeout(() => {
@@ -1058,7 +1076,7 @@
       .then(response => response.text())
       .then(html => { document.getElementById('footer-container').innerHTML = html });
   </script>
-  <script>
+    <script>
 (function(){
   // Chỉ thực hiện trên thiết bị di động
   function isMobile() {
