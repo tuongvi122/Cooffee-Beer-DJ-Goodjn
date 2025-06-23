@@ -65,7 +65,7 @@ async function generateOrderCode(tableNum) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   try {
-    const { name, phone, contact, tableNum, address, items } = req.body;
+   const { name, phone, contact, tableNum, note, items } = req.body;
     await auth.authorize();
 
   // 1. Sinh mã, tổng, thời gian VN
@@ -78,7 +78,7 @@ const rows = items.map((it, idx) => ([
   timeVNStr,               // Thời gian
   Number(orderCode),       // Mã đơn hàng
   name,                    // Họ tên
-  phone,                   // SĐT
+  String(phone),           // SĐT
   contact,                 // Email
   String(it.maNV),         // Mã NV
   Number(it.caLV),         // Ca làm việc
@@ -86,7 +86,7 @@ const rows = items.map((it, idx) => ([
   Number(it.donGia),       // Thành tiền
   idx === 0 ? Number(total) : '', // Tổng cộng (chỉ dòng đầu)
   Number(tableNum),        // Số bàn
-  address,                 // Ghi chú
+  note,                 // Ghi chú
   "V"                      // Cột M: Ghi thêm chữ V
 ]));
 
@@ -116,7 +116,7 @@ const rows = items.map((it, idx) => ([
 `│ 📞 SĐT: ${phone}\n` +
 `│ ✉️ Email: ${contact}\n` +
 `│ 🪑 Bàn số: ${tableNum}\n` +
-`│ 📝 Ghi chú: ${address}\n` +
+`│ 📝 Ghi chú: ${note}\n` +
 "│\n" +
 "│ **Danh sách dịch vụ:**\n" +
 items.map(i => 
@@ -153,79 +153,6 @@ items.map(i =>
       );
     }
     await Promise.all(discordPromises);
-
-    // 6. Gửi email xác nhận đơn (theo mẫu đẹp)
-    const html = `
-  <div class="receipt-container" style="
-    font-family: Arial, sans-serif;
-    background: #fff;
-    max-width:420px;
-    margin:0 auto;
-    border-radius:10px;
-    border:1px solid #d9e2e7;
-    box-shadow:0 2px 8px rgba(0,0,0,0.09);
-    padding: 22px 18px 18px 18px;
-  ">
-    <div class="logo" style="text-align:left;margin-bottom:10px;">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logo_Vietcombank.png" alt="Logo" style="height:34px;" />
-    </div>
-    <div class="receipt-title" style="text-align:center;font-size:20px;font-weight:bold;margin-bottom:5px;color:#168d49;">Biên nhận đặt dịch vụ</div>
-    <div class="order-code" style="text-align:center;font-size:16px;font-weight:bold;color:#d63384;margin-bottom:14px;padding:7px 0;background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;">Mã đơn hàng: ${orderCode}</div>
-    <table class="details-table" style="width:100%;border-collapse:collapse;margin-bottom:18px;">
-      <tr>
-        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Thời gian đặt</th>
-        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${timeVNStr}</td>
-      </tr>
-      <tr>
-        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Khách hàng</th>
-        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${name}</td>
-      </tr>
-      <tr>
-        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Số điện thoại</th>
-        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${phone}</td>
-      </tr>
-      <tr>
-        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Email</th>
-        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${contact}</td>
-      </tr>
-      <tr>
-        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Bàn số</th>
-        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${tableNum}</td>
-      </tr>
-      <tr>
-        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Ghi chú</th>
-        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${address}</td>
-      </tr>
-    </table>
-    <table class="product-table" style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13.5px;">
-      <tr>
-        <th style="background:#f2f7fa;font-weight:600;border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">Mã NV</th>
-        <th style="background:#f2f7fa;font-weight:600;border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">Ca LV</th>
-        <th style="background:#f2f7fa;font-weight:600;border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">Đơn giá</th>
-      </tr>
-      ${items.map(i => `
-      <tr>
-        <td style="border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">${i.maNV}</td>
-        <td style="border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">${i.caLV}</td>
-        <td style="border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">${formatCurrency(i.donGia)}</td>
-      </tr>
-      `).join('')}
-      <tr class="total-row">
-        <td colspan="2" style="font-weight:bold;background:#fff;text-align:center;color:#111;font-size:16px;border:1px solid #e6ecf2;">Tổng cộng</td>
-        <td style="font-weight:bold;background:#fff;text-align:center;color:#111;font-size:16px;border:1px solid #e6ecf2;">${formatCurrency(total)}</td>
-      </tr>
-    </table>
-    <div class="thankyou" style="text-align:center;color:#168d49;font-size:16px;margin-top:12px;font-weight:600;">
-      Cảm ơn Quý khách đã đặt dịch vụ tại GooDjn DJ Coffee & Beer!
-    </div>
-  </div>`;
-
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: contact,
-      subject: `Đơn đặt dịch vụ từ GooDjn DJ Coffee & Beer`,
-      html
-    });
 
     res.status(200).json({ success: true, orderCode });
   } catch (err) {
