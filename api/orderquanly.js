@@ -170,54 +170,76 @@ function discordOrderBox({
 }
 
 // Tạo HTML email xác nhận mới chuyên nghiệp (chỉ show NV "Đồng ý")
-function htmlOrderConfirmEmail({orderId, table, note, staffList, total}) {
+function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table, note, staffList, total }) {
+  const contact = email;
+  const orderCode = orderId;
+  const tableNum = table;
+  const address = note;
+  const items = staffList;
   return `
-  <div style="background:#f5fafd;border:1px solid #2196f3;max-width:510px;width:100%;margin:26px auto 0 auto;border-radius:12px;padding:0;box-shadow:0 2px 12px #e3edf7;">
-    <div style="background:#e3f2fd;border-radius:12px 12px 0 0;padding:26px 28px 10px 28px;text-align:center;">
-      <div style="font-size:16px;font-weight:bold;color:#168d49;margin-bottom:2px;">
-        Cooffee & Beer DJ Goodjn Đơn hàng số ${orderId} của quý khách được chấp nhận thành công.
-      </div>
-      <div style="font-size:20px;font-weight:bold;color:#0288d1;margin-bottom:10px;letter-spacing:0.5px;">
-        THÔNG TIN ĐƠN HÀNG
-      </div>
-      <div style="text-align:left;max-width:330px;margin:0 auto 7px auto;font-size:15px;line-height:1.6;color:#187b4e;">
-        <b>Mã đơn:</b> ${orderId}<br>
-        <b>Bàn số:</b> ${table}<br>
-        <b>Ghi chú:</b> ${note}
-      </div>
+  <div class="receipt-container" style="
+    font-family: Arial, sans-serif;
+    background: #fff;
+    max-width:420px;
+    margin:0 auto;
+    border-radius:10px;
+    border:1px solid #d9e2e7;
+    box-shadow:0 2px 8px rgba(0,0,0,0.09);
+    padding: 22px 18px 18px 18px;
+  ">
+    <div class="logo" style="text-align:left;margin-bottom:10px;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logo_Vietcombank.png" alt="Logo" style="height:34px;" />
     </div>
-    <div style="padding:0 0 18px 0;display:flex;justify-content:center;">
-      <table border="0" cellpadding="0" cellspacing="0" style="
-        margin:10px auto 0 auto;
-        border-collapse:collapse;
-        font-size:15px;
-        background:#fff;
-        box-shadow:0 2px 8px #dbeff2;
-        border-radius:8px;
-        overflow:hidden;
-        min-width:265px;
-        ">
-        <tr style="background:#e0f8e9;font-weight:700;color:#168d49;">
-          <th style="padding:7px 16px;">Mã NV</th>
-          <th style="padding:7px 10px;">Ca LV</th>
-          <th style="padding:7px 16px;">Đơn giá</th>
-        </tr>
-        ${staffList.map(s=>`<tr>
-          <td style="border-bottom:1px solid #e0e0e0;text-align:center;padding:7px 12px;color:#14613a;">${s.maNV}</td>
-          <td style="border-bottom:1px solid #e0e0e0;text-align:center;padding:7px 8px;color:#14613a;">${s.caLV}</td>
-          <td style="border-bottom:1px solid #e0e0e0;text-align:right;padding:7px 14px 7px 0;color:#168d49;">${formatCurrency(s.donGia)}</td>
-        </tr>`).join('')}
-        <tr>
-          <td colspan="2" style="font-weight:bold;background:#f7fff8;text-align:right;padding:9px 10px 9px 0;color:#168d49;border-radius:0 0 0 8px;">Tổng cộng</td>
-          <td style="font-weight:bold;background:#f7fff8;text-align:right;padding:9px 14px 9px 0;color:#168d49;border-radius:0 0 8px 0;">${formatCurrency(total)}</td>
-        </tr>
-      </table>
+    <div class="receipt-title" style="text-align:center;font-size:20px;font-weight:bold;margin-bottom:5px;color:#168d49;">Biên nhận đặt dịch vụ</div>
+    <div class="order-code" style="text-align:center;font-size:16px;font-weight:bold;color:#d63384;margin-bottom:14px;padding:7px 0;background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;">Mã đơn hàng: ${orderCode}</div>
+    <table class="details-table" style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+      <tr>
+        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Thời gian đặt</th>
+        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${timeVNStr}</td>
+      </tr>
+      <tr>
+        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Khách hàng</th>
+        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${name}</td>
+      </tr>
+      <tr>
+        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Số điện thoại</th>
+        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${phone}</td>
+      </tr>
+      <tr>
+        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Email</th>
+        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${contact}</td>
+      </tr>
+      <tr>
+        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Bàn số</th>
+        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${tableNum}</td>
+      </tr>
+      <tr>
+        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Ghi chú</th>
+        <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${address}</td>
+      </tr>
+    </table>
+    <table class="product-table" style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13.5px;">
+      <tr>
+        <th style="background:#f2f7fa;font-weight:600;border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">Mã NV</th>
+        <th style="background:#f2f7fa;font-weight:600;border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">Ca LV</th>
+        <th style="background:#f2f7fa;font-weight:600;border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">Đơn giá</th>
+      </tr>
+      ${items.map(i => `
+      <tr>
+        <td style="border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">${i.maNV}</td>
+        <td style="border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">${i.caLV}</td>
+        <td style="border:1px solid #e6ecf2;padding:6px 4px;text-align:center;">${formatCurrency(i.donGia)}</td>
+      </tr>
+      `).join('')}
+      <tr class="total-row">
+        <td colspan="2" style="font-weight:bold;background:#fff;text-align:center;color:#111;font-size:16px;border:1px solid #e6ecf2;">Tổng cộng</td>
+        <td style="font-weight:bold;background:#fff;text-align:center;color:#111;font-size:16px;border:1px solid #e6ecf2;">${formatCurrency(total)}</td>
+      </tr>
+    </table>
+    <div class="thankyou" style="text-align:center;color:#168d49;font-size:16px;margin-top:12px;font-weight:600;">
+      Cảm ơn Quý khách đã đặt dịch vụ tại GooDjn DJ Coffee & Beer!
     </div>
-    <div style="text-align:center;color:#1976d2;font-size:15px;margin-bottom:18px;font-weight:500;">
-      Chúc quý khách vui vẻ!
-    </div>
-  </div>
-  `;
+  </div>`;
 }
 
 // Gửi Email/Discord sau khi lưu đơn (Email chỉ NV "Đồng ý")
@@ -258,22 +280,26 @@ async function sendMailAndDiscord({staffList, orderId, name, phone, email, table
 
   // Chỉ cần có NV "Đồng ý" (có giá trị) thì gửi email xác nhận cho khách, chỉ liệt kê NV này
   if (staffDongY.length > 0) {
-    try {
-      await sendEmail(
+  try {
+    await sendEmail(
+      email,
+      `Đơn đặt dịch vụ từ GooDjn DJ Coffee & Beer`,
+      htmlOrderConfirmEmailV2({
+        orderId,
+        timeVNStr,
+        name,
+        phone,
         email,
-        "XÁC NHẬN ĐƠN HÀNG COFFEE & BEER DJ GOODJN",
-        htmlOrderConfirmEmail({
-          orderId,
-          table,
-          note,
-          staffList: staffDongY,
-          total: staffDongY.reduce((sum, s) => sum + cleanNumber(s.donGia), 0)
-        })
-      );
-    } catch(e) {
-      console.error('LỖI gửi Email xác nhận:', e.message);
-    }
+        table,
+        note,
+        staffList: staffDongY,
+        total: staffDongY.reduce((sum, s) => sum + cleanNumber(s.donGia), 0)
+      })
+    );
+  } catch(e) {
+    console.error('LỖI gửi Email xác nhận:', e.message);
   }
+}
   // Email hủy đơn vẫn giữ như cũ (gửi cho khách)
   if (allCancel) {
     try {
@@ -289,7 +315,6 @@ async function sendMailAndDiscord({staffList, orderId, name, phone, email, table
     }
   }
 }
-
 export default async function handler(req, res) {
   // --- GET products ---
   if (req.method === 'GET' && req.query && req.query.products === '1') {
