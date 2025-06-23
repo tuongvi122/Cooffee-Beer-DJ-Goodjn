@@ -904,11 +904,10 @@
       }
     }
 
-  if (!/^[0-9]{10,11}$/.test(phone)) {
-  alertOrder.innerText = "Số điện thoại phải gồm 10 hoặc 11 số.";
-  alertOrder.style.display = 'block';
-  return;
-  }
+    function validatePhoneInput(input) {
+      // Giữ lại chỉ số và tối đa 11 số
+      input.value = input.value.replace(/[^0-9]/g, '').slice(0, 11);
+    }
 
     async function submitOrder() {
       const name = document.getElementById('name').value.trim();
@@ -929,8 +928,8 @@
         alertOrder.style.display = 'block';
         return;
       }
-      if (!/^[0-9]{10}$/.test(phone)) {
-        alertOrder.innerText = "Số điện thoại phải gồm đúng 10 số.";
+      if (!/^[0-9]{10,11}$/.test(phone)) {
+        alertOrder.innerText = "Số điện thoại phải gồm 10 hoặc 11 số.";
         alertOrder.style.display = 'block';
         return;
       }
