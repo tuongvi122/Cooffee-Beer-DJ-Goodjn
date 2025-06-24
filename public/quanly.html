@@ -760,7 +760,6 @@
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
   <div id="navbar-container">
     <!-- Mobile Navbar -->
     <div class="mobile-navbar">
@@ -784,10 +783,8 @@
         <li id="mobileLogoutTab" style="display:none;">Đăng xuất</li>
       </ul>
     </nav>
-    <!-- Desktop Navbar (tải động qua JS) -->
     <div class="desktop-navbar"></div>
   </div>
-
   <div class="site-content">
     <div class="container">
       <h2>DANH SÁCH ĐƠN HÀNG TRONG 24H</h2>
@@ -804,7 +801,6 @@
         </div>
       </div>
       <div class="orders-table-wrap">
-        <!-- TABLE DESKTOP -->
         <table class="orders-table" id="ordersTable">
           <thead>
             <tr>
@@ -823,12 +819,10 @@
           </thead>
           <tbody id="ordersTableBody"></tbody>
         </table>
-        <!-- TABLE MOBILE DYNAMIC -->
         <div id="mobileOrdersTableWrap" style="display:none;"></div>
       </div>
       <div class="table-pagination" id="tablePagination"></div>
     </div>
-    <!-- Popup xác nhận/hủy -->
     <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
       <div class="modal-dialog mt-4">
         <div class="modal-content">
@@ -893,7 +887,6 @@
         </div>
       </div>
     </div>
-    <!-- Popup cảm ơn -->
     <div class="modal fade" id="thankModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="popup-thank" role="alert">
@@ -904,19 +897,16 @@
       </div>
     </div>
   </div>
-  <!-- FOOTER -->
   <div id="footer-container">
     <div>
       © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
       63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
     </div>
   </div>
-  <!-- SCRIPT ĐĂNG NHẬP VÀ NAVBAR -->
   <script>
     // Kiểm tra đăng nhập, nếu chưa sẽ chuyển về login.html
     if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
 
-    // Hàm hiện/ẩn tab Đăng xuất cả desktop và mobile
     function showLogoutTabIfLoggedIn() {
       var logoutTab = document.getElementById('logoutTab');
       var mobileLogoutTab = document.getElementById('mobileLogoutTab');
@@ -928,12 +918,10 @@
         if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
       }
     }
-    // Hàm đăng xuất
     function logout() {
       localStorage.removeItem('isAdmin');
       window.location.replace('index.html');
     }
-    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
     fetch('navbar.html')
       .then(response => response.text())
       .then(html => {
@@ -941,7 +929,6 @@
         showLogoutTabIfLoggedIn();
       });
 
-    // Xử lý menu mobile
     document.addEventListener('DOMContentLoaded', function(){
       var hamburger = document.getElementById('hamburgerBtn');
       var menu = document.getElementById('mobileMenu');
@@ -960,7 +947,6 @@
           window.location.href = tab.getAttribute('data-href');
         };
       });
-      // Gắn sự kiện cho nút Đăng xuất trên mobile
       var mobileLogoutTab = document.getElementById('mobileLogoutTab');
       if(mobileLogoutTab) {
         mobileLogoutTab.onclick = function() { logout(); };
@@ -968,7 +954,6 @@
       showLogoutTabIfLoggedIn();
     });
 
-    // Footer auto-hide on mobile input focus (bàn phím ảo)
     (function(){
       function isMobile() { return window.innerWidth <= 768; }
       function hideFooter() {
@@ -1005,6 +990,10 @@
     let modalOrder = null, modalOrderIndex = -1, modalStaffs = [], modalStatus = '';
     let modalHasNewStaff = false;
 
+    function isMobile() {
+      return window.innerWidth <= 600;
+    }
+
     async function fetchProductStaffs() {
       try {
         const res = await fetch('/api/orderquanly?products=1');
@@ -1024,7 +1013,6 @@
       }
     }
 
-    // --- RENDER TABLES ---
     function renderTable() {
       let html = "";
       const start = (page-1)*entries, end = start+entries;
@@ -1052,16 +1040,14 @@
       });
       document.getElementById("ordersTableBody").innerHTML = html;
       renderPagination();
-      renderMobileOrdersTable(); // update mobile view always!
+      renderMobileOrdersTable();
     }
 
-    // --- RENDER MOBILE TABLE ONLY (when mobile) ---
     function renderMobileOrdersTable() {
       if(window.innerWidth > 600) {
         document.getElementById("mobileOrdersTableWrap").style.display = "none";
         return;
       }
-      // Show table head
       let head = `<div class="mobile-orders-table-head">
         <div class="col col-khach">Tên khách hàng</div>
         <div class="col col-ban">Số bàn</div>
@@ -1069,7 +1055,6 @@
         <div class="col col-tong">Tổng tiền</div>
         <div class="col col-xacnhan">Xác nhận<br>đơn hàng</div>
       </div>`;
-      // Show rows
       const start = (page-1)*entries, end = start+entries;
       const paged = FILTERED.slice(start, end);
       let rows = paged.map((o,i)=>{
@@ -1139,15 +1124,32 @@
         filterTable();
       }, 30000);
 
-      // Listen to resize for mobile table
-      window.addEventListener('resize', renderMobileOrdersTable);
+      window.addEventListener('resize', function() {
+        renderMobileOrdersTable();
+        if(document.getElementById('orderModal').style.display === "block") {
+          renderModalStaffTable();
+        }
+      });
     });
 
-    // Popup & Staff Table
+    function renderDatalistMaNV() {
+      let html = '<datalist id="availableNVs">';
+      PRODUCT_STAFFS.forEach(p => {
+        html += `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ"></option>`;
+      });
+      html += '</datalist>';
+      if (!document.getElementById('availableNVs')) {
+        let el = document.createElement('div');
+        el.innerHTML = html;
+        document.body.appendChild(el.firstChild);
+      } else {
+        document.getElementById('availableNVs').outerHTML = html;
+      }
+    }
+
     function openOrderModal(idx) {
       modalOrderIndex = idx;
       modalOrder = {...ORDERS[idx]};
-      // Đảm bảo trạng thái luôn là "Đồng ý" cho nhân viên gốc nếu thiếu
       modalStaffs = modalOrder.staffList.map(s=>({
         ...s,
         isOriginal: true,
@@ -1173,6 +1175,7 @@
       document.getElementById("orderModal").classList.remove("show");
       document.getElementById("orderModal").style.display = "none";
     }
+
     function renderModalStaffTable() {
       let html = "";
       let total = 0;
@@ -1183,100 +1186,96 @@
           `<span class="original-staff-label">Nhân viên gốc</span>` : 
           `<button class="delete-staff-btn" onclick="modalXoaNhanVien(${i})">Xóa</button>`;
         const rowClass = s.isOriginal ? '' : 'new-staff-row';
-        html += `<tr class="${rowClass}">
-          <td>
-            ${s.isOriginal
-              ? `<input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">`
-              : `<input type="text" value="${s.maNV||''}" style="width: 65px; text-align:center;font-size:0.96em;" list="availableNVs" onchange="modalChangeMaNV(${i},this.value)">`
-            }
-          </td>
-          <td>
-            ${s.isOriginal
-              ? `<input type="text" value="${s.caLV}" readonly style="width: 30px; border:none; background:transparent;text-align:center;font-size:0.96em;">`
-              : `<select onchange="modalChangeCaLV(${i},this.value)" style="width: 38px; text-align:center;font-size:0.96em;">${modalGetCaOptions(s.maNV,s.caLV)}</select>`
-            }
-          </td>
-          <td>
-            <input type="text" value="${donGiaShow.toLocaleString('vi-VN')}" readonly style="width:60px;border:none;text-align:right;background:transparent;font-weight:bold;color:#0b8e0b;font-size:0.96em;">
-          </td>
-          <td>
-            <select class="staff-action-select" onchange="modalStaffChange(${i},this)">
-              <option value="Đồng ý"${s.trangThai==="Đồng ý"?" selected":""}>Đồng ý</option>
-              <option value="Không tham gia"${s.trangThai==="Không tham gia"?" selected":""}>Không tham gia</option>
-              <option value="Hủy đơn"${s.trangThai==="Hủy đơn"?" selected":""}>Hủy đơn</option>
-            </select>
-          </td>
-          <td>${deleteBtn}</td>
-        </tr>`;
+        html += `<tr class="${rowClass}">`;
+
+        if (s.isOriginal) {
+          html += `<td>
+            <input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">
+          </td>`;
+        } else {
+          if (isMobile()) {
+            html += `<td>
+              <select style="width:120px;" onchange="modalSelectMaNV(${i},this.value)">
+                <option value="">Chọn nhân viên</option>
+                ${PRODUCT_STAFFS.map(p =>
+                  `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ"
+                    ${s.maNV===p.maNV && s.caLV==p.caLV ? 'selected' : ''}>${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ</option>`
+                ).join('')}
+              </select>
+            </td>`;
+          } else {
+            html += `<td>
+              <input type="text" value="${s.maNV && s.caLV && s.donGia ? `${s.maNV} - Ca ${s.caLV} - ${(s.donGia).toLocaleString('vi-VN')} VNĐ` : ''}" 
+                style="width: 120px; text-align:left;font-size:0.96em;" 
+                list="availableNVs" 
+                onchange="modalChangeMaNV(${i},this.value)">
+            </td>`;
+          }
+        }
+
+        html += `<td>
+          <input type="text" value="${s.caLV||''}" readonly style="width: 30px; border:none; background:transparent;text-align:center;font-size:0.96em;">
+        </td>`;
+        html += `<td>
+          <input type="text" value="${(donGiaShow).toLocaleString('vi-VN')}" readonly style="width:60px;border:none;text-align:right;background:transparent;font-weight:bold;color:#0b8e0b;font-size:0.96em;">
+        </td>`;
+        html += `<td>
+          <select class="staff-action-select" onchange="modalStaffChange(${i},this)">
+            <option value="Đồng ý"${s.trangThai==="Đồng ý"?" selected":""}>Đồng ý</option>
+            <option value="Không tham gia"${s.trangThai==="Không tham gia"?" selected":""}>Không tham gia</option>
+            <option value="Hủy đơn"${s.trangThai==="Hủy đơn"?" selected":""}>Hủy đơn</option>
+          </select>
+        </td>`;
+        html += `<td>${deleteBtn}</td></tr>`;
       });
       document.querySelector("#modalStaffTable tbody").innerHTML = html;
       document.getElementById("staffTotal").innerText = total.toLocaleString('vi-VN');
       renderDatalistMaNV();
       setAllDropdownColors();
     }
-    function modalGetCaOptions(maNV, caLV) {
-      const cas = PRODUCT_STAFFS.filter(x=>x.maNV===maNV).map(x=>x.caLV);
-      let uniqueCas = [...new Set(cas)];
-      return uniqueCas.map(ca=>
-        `<option value="${ca}"${ca==caLV?' selected':''}>${ca}</option>`
-      ).join('');
-    }
-    // Datalist cho input mã NV khi thêm mới
-    function renderDatalistMaNV() {
-      let html = '<datalist id="availableNVs">';
-      PRODUCT_STAFFS.forEach(p=>{
-        html += `<option value="${p.maNV}">${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ</option>`;
-      });
-      html += '</datalist>';
-      if (!document.getElementById('availableNVs')) {
-        let el = document.createElement('div');
-        el.innerHTML = html;
-        document.body.appendChild(el.firstChild);
-      } else {
-        document.getElementById('availableNVs').outerHTML = html;
-      }
-    }
-    // Khi đổi mã NV ở dòng mới
+
     function modalChangeMaNV(i, val) {
-      let found = PRODUCT_STAFFS.filter(x=>x.maNV===val);
+      const regex = /^(.+?) - Ca (\d+) - ([\d.,]+) VNĐ$/;
+      const match = val.match(regex);
+      if (match) {
+        modalStaffs[i].maNV = match[1].trim();
+        modalStaffs[i].caLV = match[2].trim();
+        modalStaffs[i].donGia = parseInt(match[3].replace(/[.,]/g, ''));
+        modalStaffs[i].donGiaOrigin = parseInt(match[3].replace(/[.,]/g, ''));
+        modalStaffs[i].trangThai = "Đồng ý";
+        modalHasNewStaff = true;
+        renderModalStaffTable();
+        return;
+      }
+      let found = PRODUCT_STAFFS.filter(x => x.maNV === val);
       if (found.length) {
         modalStaffs[i].maNV = val;
         modalStaffs[i].caLV = found[0].caLV;
-        modalStaffs[i].donGia = parseInt(found[0].donGia||0);
-        modalStaffs[i].donGiaOrigin = parseInt(found[0].donGia||0);
+        modalStaffs[i].donGia = parseInt(found[0].donGia || 0);
+        modalStaffs[i].donGiaOrigin = parseInt(found[0].donGia || 0);
         modalStaffs[i].trangThai = "Đồng ý";
         modalHasNewStaff = true;
       }
       renderModalStaffTable();
     }
-    // Khi đổi ca LV ở dòng mới
-    function modalChangeCaLV(i, val) {
-      let found = PRODUCT_STAFFS.find(x=>x.maNV===modalStaffs[i].maNV && x.caLV==val);
-      if (found) {
-        modalStaffs[i].caLV = val;
-        modalStaffs[i].donGia = parseInt(found.donGia||0);
-        modalStaffs[i].donGiaOrigin = parseInt(found.donGia||0);
-        modalHasNewStaff = true;
+    function modalSelectMaNV(i, val) {
+      modalChangeMaNV(i, val);
+    }
+
+    function modalStaffChange(i,sel) {
+      let staff = modalStaffs[i];
+      staff.trangThai = sel.value;
+      if (sel.value === "Hủy đơn" || sel.value === "Không tham gia") {
+        staff.donGia = 0;
+      } else if (sel.value === "Đồng ý") {
+        let found = PRODUCT_STAFFS.find(x=>
+          String(x.maNV).trim() === String(staff.maNV).trim() &&
+          String(x.caLV).trim() === String(staff.caLV).trim()
+        );
+        staff.donGia = found ? parseInt(found.donGia||0) : (staff.donGiaOrigin||0);
       }
       renderModalStaffTable();
     }
-
-    // === CẬP NHẬT ĐƠN GIÁ KHI ĐỔI TRẠNG THÁI NHÂN VIÊN ===
-  function modalStaffChange(i,sel) {
-  let staff = modalStaffs[i];
-  staff.trangThai = sel.value;
-  if (sel.value === "Hủy đơn" || sel.value === "Không tham gia") {
-    staff.donGia = 0;
-  } else if (sel.value === "Đồng ý") {
-    // Lấy lại đơn giá gốc từ PRODUCTS, loại bỏ dấu cách và so sánh kiểu chuỗi
-    let found = PRODUCT_STAFFS.find(x=>
-      String(x.maNV).trim() === String(staff.maNV).trim() &&
-      String(x.caLV).trim() === String(staff.caLV).trim()
-    );
-    staff.donGia = found ? parseInt(found.donGia||0) : (staff.donGiaOrigin||0);
-  }
-  renderModalStaffTable();
-}
     function modalTatCaDongY() {
       modalStaffs.forEach(s=>{
         s.trangThai="Đồng ý";
@@ -1323,13 +1322,11 @@
         renderModalStaffTable();
       }
     }
-    // ================== QUAN TRỌNG: HÀM SUBMIT XÁC NHẬN ĐƠN HÀNG ======================
     async function modalSubmitXacNhan() {
       if(modalOrderIndex<0) return;
       try {
         let tongcong = 0;
         let staffListSend = [];
-        // Đảm bảo luôn có trạng thái cho tất cả nhân viên (nếu rỗng thì mặc định "Đồng ý")
         modalStaffs.forEach(s=>{
           let trangThai = s.trangThai || "Đồng ý";
           let donGia = (trangThai==="Đồng ý") ? (parseInt(s.donGia)||0) : 0;
@@ -1348,12 +1345,11 @@
           ghiChu: document.getElementById("modalGhiChu").value.trim(),
           huydon: modalStatus==="huydon",
           tongcong: tongcong,
-          // === LẤY GIÁ TRỊ TỪ INPUT, KHÔNG LẤY TỪ modalOrder ===
           name: document.getElementById("modalTenKH").value.trim(),
           phone: document.getElementById("modalSDT").value.trim(),
           email: document.getElementById("modalEmail").value.trim(),
           table: document.getElementById("modalTable").value.trim(),
-          note: modalOrder.note // Nếu muốn cho phép sửa ghi chú khách, hãy thêm input và lấy value tại đây
+          note: modalOrder.note
         };
         const response = await fetch('/api/orderquanly', {
           method:'POST',
@@ -1370,8 +1366,6 @@
         alert('Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.');
       }
     }
-    // ================== END SUBMIT ======================
-
     function openThankPopup(msg) {
       document.getElementById("thankMsg").textContent = msg;
       document.getElementById("thankModal").classList.add("show");
@@ -1381,7 +1375,6 @@
       document.getElementById("thankModal").classList.remove("show");
       document.getElementById("thankModal").style.display = "none";
     }
-    // ĐỔI MÀU CHỮ DROPDOWN THEO GIÁ TRỊ
     function updateDropdownColor(sel) {
       if (!sel) return;
       let val = sel.value;
@@ -1402,4 +1395,4 @@
     });
   </script>
 </body>
-</html>
+</html> 
