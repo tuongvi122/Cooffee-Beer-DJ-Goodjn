@@ -1194,23 +1194,23 @@
           </td>`;
         } else {
           if (isMobile()) {
-            html += `<td>
-              <select style="width:120px;" onchange="modalSelectMaNV(${i},this.value)">
-                <option value="">Chọn nhân viên</option>
-                ${PRODUCT_STAFFS.map(p =>
-                  `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ"
-                    ${s.maNV===p.maNV && s.caLV==p.caLV ? 'selected' : ''}>${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ</option>`
-                ).join('')}
-              </select>
-            </td>`;
-          } else {
-            html += `<td>
-              <input type="text" value="${s.maNV && s.caLV && s.donGia ? `${s.maNV} - Ca ${s.caLV} - ${(s.donGia).toLocaleString('vi-VN')} VNĐ` : ''}" 
-                style="width: 120px; text-align:left;font-size:0.96em;" 
-                list="availableNVs" 
-                onchange="modalChangeMaNV(${i},this.value)">
-            </td>`;
-          }
+  html += `<td>
+    <select style="width:120px;" onchange="modalSelectMaNV(${i},this.value)">
+      <option value="">Chọn nhân viên</option>
+      ${PRODUCT_STAFFS.map(p =>
+        `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ"
+          ${s.maNV===p.maNV && s.caLV==p.caLV ? 'selected' : ''}>${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ</option>`
+      ).join('')}
+    </select>
+  </td>`;
+} else {
+  html += `<td>
+  <input type="text" value="${s.maNV || ''}" 
+    style="width: 120px; text-align:center;font-size:0.96em; border:none; background:transparent;"
+    list="availableNVs" 
+    onchange="modalChangeMaNV(${i},this.value)">
+</td>`;
+}
         }
 
         html += `<td>
@@ -1235,29 +1235,26 @@
     }
 
     function modalChangeMaNV(i, val) {
-      const regex = /^(.+?) - Ca (\d+) - ([\d.,]+) VNĐ$/;
-      const match = val.match(regex);
-      if (match) {
-        modalStaffs[i].maNV = match[1].trim();
-        modalStaffs[i].caLV = match[2].trim();
-        modalStaffs[i].donGia = parseInt(match[3].replace(/[.,]/g, ''));
-        modalStaffs[i].donGiaOrigin = parseInt(match[3].replace(/[.,]/g, ''));
-        modalStaffs[i].trangThai = "Đồng ý";
-        modalHasNewStaff = true;
-        renderModalStaffTable();
-        return;
-      }
-      let found = PRODUCT_STAFFS.filter(x => x.maNV === val);
-      if (found.length) {
-        modalStaffs[i].maNV = val;
-        modalStaffs[i].caLV = found[0].caLV;
-        modalStaffs[i].donGia = parseInt(found[0].donGia || 0);
-        modalStaffs[i].donGiaOrigin = parseInt(found[0].donGia || 0);
-        modalStaffs[i].trangThai = "Đồng ý";
-        modalHasNewStaff = true;
-      }
-      renderModalStaffTable();
-    }
+  // Regex tách đúng 3 trường (mã NV, ca LV, đơn giá)
+  const regex = /^(.+?) - Ca (\d+) - ([\d.,]+) VNĐ$/;
+  const match = val.match(regex);
+  if (match) {
+    modalStaffs[i].maNV = match[1].trim();
+    modalStaffs[i].caLV = match[2].trim();
+    modalStaffs[i].donGia = parseInt(match[3].replace(/[.,]/g, ''));
+    modalStaffs[i].donGiaOrigin = parseInt(match[3].replace(/[.,]/g, ''));
+    modalStaffs[i].trangThai = "Đồng ý";
+    modalHasNewStaff = true;
+    renderModalStaffTable();
+    return;
+  }
+  // Nếu user chỉ gõ mã NV (hoặc chưa chọn đúng option chuẩn), reset lại các trường liên quan
+  modalStaffs[i].maNV = val.trim();
+  modalStaffs[i].caLV = '';
+  modalStaffs[i].donGia = 0;
+  modalStaffs[i].donGiaOrigin = 0;
+  renderModalStaffTable();
+}
     function modalSelectMaNV(i, val) {
       modalChangeMaNV(i, val);
     }
