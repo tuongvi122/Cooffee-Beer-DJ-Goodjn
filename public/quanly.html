@@ -1132,20 +1132,22 @@
       });
     });
 
-    function renderDatalistMaNV() {
-      let html = '<datalist id="availableNVs">';
-      PRODUCT_STAFFS.forEach(p => {
-        html += `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ"></option>`;
-      });
-      html += '</datalist>';
-      if (!document.getElementById('availableNVs')) {
-        let el = document.createElement('div');
-        el.innerHTML = html;
-        document.body.appendChild(el.firstChild);
-      } else {
-        document.getElementById('availableNVs').outerHTML = html;
-      }
-    }
+  // Hàm render datalist cho input chọn nhân viên (dùng cho cả desktop & mobile)
+function renderDatalistMaNV() {
+  let html = '<datalist id="availableNVs">';
+  PRODUCT_STAFFS.forEach(p => {
+    html += `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ"></option>`;
+  });
+  html += '</datalist>';
+  // Gắn hoặc cập nhật lại datalist vào DOM
+  if (!document.getElementById('availableNVs')) {
+    let el = document.createElement('div');
+    el.innerHTML = html;
+    document.body.appendChild(el.firstChild);
+  } else {
+    document.getElementById('availableNVs').outerHTML = html;
+  }
+}
 
     function openOrderModal(idx) {
       modalOrderIndex = idx;
@@ -1176,8 +1178,7 @@
       document.getElementById("orderModal").style.display = "none";
     }
 
-   // Hàm renderModalStaffTable đã tối ưu và đồng bộ giao diện desktop/mobile (chỉ hiện mã NV sau khi chọn, căn giữa, ...)
-
+// Hàm renderModalStaffTable: DÙNG input + datalist CHO CẢ MOBILE VÀ DESKTOP, đồng bộ trải nghiệm
 function renderModalStaffTable() {
   let html = "";
   let total = 0;
@@ -1190,45 +1191,18 @@ function renderModalStaffTable() {
     const rowClass = s.isOriginal ? '' : 'new-staff-row';
     html += `<tr class="${rowClass}">`;
 
-    // --- Cột Mã NV ---
-    if (isMobile()) {
-      if (s.isOriginal) {
-        html += `<td>
-          <input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">
-        </td>`;
-      } else {
-        // Nếu đã chọn nhân viên (mã NV, caLV, donGia đã có): HIỆN MÃ NV, căn giữa (readonly, như desktop)
-        if (s.maNV && s.caLV && s.donGia) {
-          html += `<td>
-            <input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">
-          </td>`;
-        } else {
-          // Chưa chọn: hiện dropdown cho chọn
-          html += `<td>
-            <select style="width:120px;text-align:center;" onchange="modalSelectMaNV(${i},this.value)">
-              <option value="">Chọn nhân viên</option>
-              ${PRODUCT_STAFFS.map(p =>
-                `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ">
-                  ${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ
-                </option>`
-              ).join('')}
-            </select>
-          </td>`;
-        }
-      }
+    // --- Cột Mã NV: input + datalist CHO CẢ MOBILE & DESKTOP ---
+    if (s.isOriginal) {
+      html += `<td>
+        <input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">
+      </td>`;
     } else {
-      if (s.isOriginal) {
-        html += `<td>
-          <input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">
-        </td>`;
-      } else {
-        html += `<td>
-          <input type="text" value="${s.maNV || ''}" 
-            style="width: 120px; text-align:center; font-size:0.96em; border:none; background:transparent;" 
-            list="availableNVs" 
-            onchange="modalChangeMaNV(${i},this.value)">
-        </td>`;
-      }
+      html += `<td>
+        <input type="text" value="${s.maNV || ''}" 
+          style="width: 120px; text-align:center; font-size:0.96em; border:none; background:transparent;" 
+          list="availableNVs" 
+          onchange="modalChangeMaNV(${i},this.value)">
+      </td>`;
     }
 
     // --- Cột Ca LV ---
@@ -1259,8 +1233,9 @@ function renderModalStaffTable() {
   renderDatalistMaNV();
   setAllDropdownColors();
 }
-    function modalChangeMaNV(i, val) {
-  // Regex tách đúng 3 trường (mã NV, ca LV, đơn giá)
+ // Hàm xử lý khi chọn hoặc sửa input mã NV (dùng cho cả desktop & mobile)
+function modalChangeMaNV(i, val) {
+  // Regex tách mã NV, ca làm việc, đơn giá từ chuỗi option chuẩn
   const regex = /^(.+?) - Ca (\d+) - ([\d.,]+) VNĐ$/;
   const match = val.match(regex);
   if (match) {
@@ -1273,7 +1248,7 @@ function renderModalStaffTable() {
     renderModalStaffTable();
     return;
   }
-  // Nếu user chỉ gõ mã NV (hoặc chưa chọn đúng option chuẩn), reset lại các trường liên quan
+  // Nếu không đúng format chuẩn (người dùng đang xóa/gõ lại), reset lại các trường
   modalStaffs[i].maNV = val.trim();
   modalStaffs[i].caLV = '';
   modalStaffs[i].donGia = 0;
