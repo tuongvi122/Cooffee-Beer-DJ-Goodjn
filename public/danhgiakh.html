@@ -679,7 +679,11 @@
   max-width:210px;
   box-shadow: 0 1px 4px #0001;
 }
-
+#phone-suggest-list > div.selected,
+#phone-suggest-list > div:focus {
+  background: #e9f5ec !important;
+  color: #1976d2 !important;
+}
     #phone-suggest-list div {
       padding:6px 10px;
       cursor:pointer;
@@ -891,24 +895,67 @@
       }
     }
 
-    // Gợi ý số điện thoại đã nhập
-    function showSuggestions() {
-      let val = phoneInput.value.trim();
-      let arr = JSON.parse(localStorage.getItem('phoneHistory') || '[]');
-      if (!val) { phoneSuggest.innerHTML = ""; return; }
-      let filtered = arr.filter(sdt => sdt.startsWith(val));
-      if (filtered.length === 0) { phoneSuggest.innerHTML = ""; return; }
-      let html = '<div id="phone-suggest-list">';
-      html += filtered.map(sdt => `<div onclick="selectPhone('${sdt}')">${sdt}</div>`).join('');
-      html += '</div>';
-      phoneSuggest.innerHTML = html;
-    }
+// --- BẮT ĐẦU: Dùng cho gợi ý số điện thoại, điều hướng bàn phím ---
+let phoneSuggestIndex = -1; // Chỉ số đang chọn
+let phoneSuggestList = [];
 
-    window.selectPhone = function(sdt) {
-      phoneInput.value = sdt;
-      phoneSuggest.innerHTML = "";
-      phoneInput.focus();
-    };
+function showSuggestions() {
+  let val = phoneInput.value.trim();
+  let arr = JSON.parse(localStorage.getItem('phoneHistory') || '[]');
+  if (!val) { phoneSuggest.innerHTML = ""; phoneSuggestList = []; phoneSuggestIndex = -1; return; }
+  let filtered = arr.filter(sdt => sdt.startsWith(val));
+  phoneSuggestList = filtered;
+  if (filtered.length === 0) { phoneSuggest.innerHTML = ""; phoneSuggestIndex = -1; return; }
+  phoneSuggestIndex = -1; // reset highlight mỗi lần nhập mới
+  let html = '<div id="phone-suggest-list">';
+  html += filtered.map((sdt, i) =>
+    `<div data-idx="${i}" onclick="selectPhone('${sdt}')">${sdt}</div>`
+  ).join('');
+  html += '</div>';
+  phoneSuggest.innerHTML = html;
+}
+
+window.selectPhone = function(sdt) {
+  phoneInput.value = sdt;
+  phoneSuggest.innerHTML = "";
+  phoneInput.focus();
+  phoneSuggestIndex = -1;
+};
+
+// LẮNG NGHE SỰ KIỆN BÀN PHÍM TRÊN Ô SĐT
+phoneInput.addEventListener('keydown', function(e) {
+  let suggestBox = document.getElementById('phone-suggest-list');
+  if (!suggestBox || phoneSuggestList.length === 0) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    phoneSuggestIndex = (phoneSuggestIndex + 1) % phoneSuggestList.length;
+    updateSuggestHighlight();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    phoneSuggestIndex = (phoneSuggestIndex - 1 + phoneSuggestList.length) % phoneSuggestList.length;
+    updateSuggestHighlight();
+  } else if (e.key === "Enter") {
+    if (phoneSuggestIndex >= 0 && phoneSuggestIndex < phoneSuggestList.length) {
+      e.preventDefault();
+      selectPhone(phoneSuggestList[phoneSuggestIndex]);
+    }
+  }
+});
+
+// HÀM LÀM NỔI BẬT DÒNG GỢI Ý ĐANG CHỌN
+function updateSuggestHighlight() {
+  let suggestItems = document.querySelectorAll('#phone-suggest-list > div');
+  suggestItems.forEach((el, idx) => {
+    if (idx === phoneSuggestIndex) {
+      el.classList.add('selected');
+      el.scrollIntoView({block:'nearest'});
+    } else {
+      el.classList.remove('selected');
+    }
+  });
+}
+// --- KẾT THÚC ---
 
     phoneInput.addEventListener('input', showSuggestions);
     phoneInput.addEventListener('blur', () => setTimeout(()=>{phoneSuggest.innerHTML="";},200));
