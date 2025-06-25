@@ -1173,7 +1173,7 @@
       document.getElementById("orderModal").classList.remove("show");
       document.getElementById("orderModal").style.display = "none";
     }
-   function renderModalStaffTable() {
+  function renderModalStaffTable() {
   let html = "";
   let total = 0;
   modalStaffs.forEach((s, i) => {
@@ -1185,33 +1185,26 @@
     const rowClass = s.isOriginal ? '' : 'new-staff-row';
     html += `<tr class="${rowClass}">`;
 
-    // ---- Cột Mã NV ----
-    if (s.isOriginal) {
-      html += `<td>
-        <input type="text" value="${s.maNV || ''}" readonly style="width:65px;text-align:center;font-size:0.96em;border:none;background:transparent;">
-      </td>`;
-    } else {
-      // Luôn là input + datalist, cho phép sửa/xóa/tìm lại sau khi đã chọn
-      html += `<td>
-        <input type="text" value="${s.maNV || ''}" 
-          style="width:65px;text-align:center;font-size:0.96em;" 
-          list="availableNVs" autocomplete="off" inputmode="text" autocapitalize="off" spellcheck="false"
-          onclick="this.select()" onfocus="this.select()"
-          onchange="modalChangeMaNV(${i},this.value)">
-      </td>`;
-    }
+    // Cột Mã NV (luôn cho phép sửa/xóa/tìm lại)
+    html += `<td>
+      <input type="text" value="${s.maNV || ''}" 
+        style="width:65px;text-align:center;font-size:0.96em;" 
+        list="availableNVs" autocomplete="off" inputmode="text" autocapitalize="off" spellcheck="false"
+        onclick="this.select()" onfocus="this.select()"
+        onchange="modalChangeMaNV(${i},this.value)">
+    </td>`;
 
-    // ---- Cột Ca LV ----
+    // Cột Ca LV (readonly, chỉ hiện số ca đã chọn)
     html += `<td>
       <input type="text" value="${s.caLV || ''}" readonly style="width:30px;text-align:center;font-size:0.96em;border:none;background:transparent;">
     </td>`;
 
-    // ---- Cột Đơn giá ----
+    // Cột Đơn giá (readonly, chỉ hiện giá đúng ca)
     html += `<td>
       <input type="text" value="${donGiaShow.toLocaleString('vi-VN')}" readonly style="width:60px;border:none;text-align:right;background:transparent;font-weight:bold;color:#0b8e0b;font-size:0.96em;">
     </td>`;
 
-    // ---- Cột Thực hiện đơn hàng ----
+    // Cột Thực hiện đơn hàng
     html += `<td>
       <select class="staff-action-select" onchange="modalStaffChange(${i},this)">
         <option value="Đồng ý"${s.trangThai === "Đồng ý" ? " selected" : ""}>Đồng ý</option>
@@ -1220,7 +1213,7 @@
       </select>
     </td>`;
 
-    // ---- Cột Trạng thái/Xóa ----
+    // Trạng thái/Xóa
     html += `<td>${deleteBtn}</td></tr>`;
   });
 
@@ -1229,7 +1222,6 @@
   renderDatalistMaNV();
   setAllDropdownColors();
 }
-
     function modalGetCaOptions(maNV, caLV) {
       const cas = PRODUCT_STAFFS.filter(x=>x.maNV===maNV).map(x=>x.caLV);
       let uniqueCas = [...new Set(cas)];
@@ -1239,22 +1231,22 @@
     }
     // Datalist cho input mã NV khi thêm mới
     function renderDatalistMaNV() {
-      let html = '<datalist id="availableNVs">';
-      PRODUCT_STAFFS.forEach(p=>{
-        html += `<option value="${p.maNV}">${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ</option>`;
-      });
-      html += '</datalist>';
-      if (!document.getElementById('availableNVs')) {
-        let el = document.createElement('div');
-        el.innerHTML = html;
-        document.body.appendChild(el.firstChild);
-      } else {
-        document.getElementById('availableNVs').outerHTML = html;
-      }
-    }
+  let html = '<datalist id="availableNVs">';
+  PRODUCT_STAFFS.forEach(p => {
+    html += `<option value="${p.maNV} - Ca ${p.caLV} - ${parseInt(p.donGia).toLocaleString('vi-VN')} VNĐ"></option>`;
+  });
+  html += '</datalist>';
+  if (!document.getElementById('availableNVs')) {
+    let el = document.createElement('div');
+    el.innerHTML = html;
+    document.body.appendChild(el.firstChild);
+  } else {
+    document.getElementById('availableNVs').outerHTML = html;
+  }
+}
     // Khi đổi mã NV ở dòng mới
-    function modalChangeMaNV(i, val) {
-  // Dạng: MS02 - Ca 1 - 120.000 VNĐ
+ function modalChangeMaNV(i, val) {
+  // Format: MS04 - Ca 2 - 150.000 VNĐ
   const regex = /^(.+?)\s*-\s*Ca\s*(\d+)\s*-\s*([\d.,]+)\s*VNĐ$/;
   const match = val.match(regex);
   if (match) {
@@ -1267,7 +1259,7 @@
     renderModalStaffTable();
     return;
   }
-  // Nếu không đúng format, reset lại ca/đơn giá (cho phép nhập lại)
+  // Nếu người dùng nhập tay không đúng format => reset caLV, donGia
   modalStaffs[i].maNV = val.trim();
   modalStaffs[i].caLV = '';
   modalStaffs[i].donGia = 0;
