@@ -1173,60 +1173,63 @@
       document.getElementById("orderModal").classList.remove("show");
       document.getElementById("orderModal").style.display = "none";
     }
-    function renderModalStaffTable() {
-      let html = "";
-      let total = 0;
-      modalStaffs.forEach((s,i)=>{
-        let donGiaShow = (s.trangThai === "Hủy đơn" || s.trangThai === "Không tham gia") ? 0 : parseInt(s.donGia||0);
-        if (donGiaShow > 0) total += donGiaShow;
-        const deleteBtn = s.isOriginal ? 
-          `<span class="original-staff-label">Nhân viên gốc</span>` : 
-          `<button class="delete-staff-btn" onclick="modalXoaNhanVien(${i})">Xóa</button>`;
-        const rowClass = s.isOriginal ? '' : 'new-staff-row';
-        html += `<tr class="${rowClass}">
-          <td>
-            ${
-              s.isOriginal
-              ? `<input type="text" value="${s.maNV}" readonly style="width: 56px; border:none; background:transparent;text-align:center;font-size:0.96em;">`
-              : `<input 
-                    type="text" 
-                    value="${s.maNV||''}" 
-                    style="width: 65px; text-align:center;font-size:0.96em;" 
-                    list="availableNVs" 
-                    autocomplete="off"
-                    inputmode="text"
-                    autocapitalize="off"
-                    spellcheck="false"
-                    onclick="this.select()"
-                    onfocus="this.select()"
-                    onchange="modalChangeMaNV(${i},this.value)"
-                    >`
-            }
-          </td>
-          <td>
-            ${s.isOriginal
-              ? `<input type="text" value="${s.caLV}" readonly style="width: 30px; border:none; background:transparent;text-align:center;font-size:0.96em;">`
-              : `<select onchange="modalChangeCaLV(${i},this.value)" style="width: 38px; text-align:center;font-size:0.96em;">${modalGetCaOptions(s.maNV,s.caLV)}</select>`
-            }
-          </td>
-          <td>
-            <input type="text" value="${donGiaShow.toLocaleString('vi-VN')}" readonly style="width:60px;border:none;text-align:right;background:transparent;font-weight:bold;color:#0b8e0b;font-size:0.96em;">
-          </td>
-          <td>
-            <select class="staff-action-select" onchange="modalStaffChange(${i},this)">
-              <option value="Đồng ý"${s.trangThai==="Đồng ý"?" selected":""}>Đồng ý</option>
-              <option value="Không tham gia"${s.trangThai==="Không tham gia"?" selected":""}>Không tham gia</option>
-              <option value="Hủy đơn"${s.trangThai==="Hủy đơn"?" selected":""}>Hủy đơn</option>
-            </select>
-          </td>
-          <td>${deleteBtn}</td>
-        </tr>`;
-      });
-      document.querySelector("#modalStaffTable tbody").innerHTML = html;
-      document.getElementById("staffTotal").innerText = total.toLocaleString('vi-VN');
-      renderDatalistMaNV();
-      setAllDropdownColors();
+   function renderModalStaffTable() {
+  let html = "";
+  let total = 0;
+  modalStaffs.forEach((s, i) => {
+    let donGiaShow = (s.trangThai === "Hủy đơn" || s.trangThai === "Không tham gia") ? 0 : parseInt(s.donGia || 0);
+    if (donGiaShow > 0) total += donGiaShow;
+    const deleteBtn = s.isOriginal
+      ? `<span class="original-staff-label">Nhân viên gốc</span>`
+      : `<button class="delete-staff-btn" onclick="modalXoaNhanVien(${i})">Xóa</button>`;
+    const rowClass = s.isOriginal ? '' : 'new-staff-row';
+    html += `<tr class="${rowClass}">`;
+
+    // ---- Cột Mã NV ----
+    if (s.isOriginal) {
+      html += `<td>
+        <input type="text" value="${s.maNV || ''}" readonly style="width:65px;text-align:center;font-size:0.96em;border:none;background:transparent;">
+      </td>`;
+    } else {
+      // Luôn là input + datalist, cho phép sửa/xóa/tìm lại sau khi đã chọn
+      html += `<td>
+        <input type="text" value="${s.maNV || ''}" 
+          style="width:65px;text-align:center;font-size:0.96em;" 
+          list="availableNVs" autocomplete="off" inputmode="text" autocapitalize="off" spellcheck="false"
+          onclick="this.select()" onfocus="this.select()"
+          onchange="modalChangeMaNV(${i},this.value)">
+      </td>`;
     }
+
+    // ---- Cột Ca LV ----
+    html += `<td>
+      <input type="text" value="${s.caLV || ''}" readonly style="width:30px;text-align:center;font-size:0.96em;border:none;background:transparent;">
+    </td>`;
+
+    // ---- Cột Đơn giá ----
+    html += `<td>
+      <input type="text" value="${donGiaShow.toLocaleString('vi-VN')}" readonly style="width:60px;border:none;text-align:right;background:transparent;font-weight:bold;color:#0b8e0b;font-size:0.96em;">
+    </td>`;
+
+    // ---- Cột Thực hiện đơn hàng ----
+    html += `<td>
+      <select class="staff-action-select" onchange="modalStaffChange(${i},this)">
+        <option value="Đồng ý"${s.trangThai === "Đồng ý" ? " selected" : ""}>Đồng ý</option>
+        <option value="Không tham gia"${s.trangThai === "Không tham gia" ? " selected" : ""}>Không tham gia</option>
+        <option value="Hủy đơn"${s.trangThai === "Hủy đơn" ? " selected" : ""}>Hủy đơn</option>
+      </select>
+    </td>`;
+
+    // ---- Cột Trạng thái/Xóa ----
+    html += `<td>${deleteBtn}</td></tr>`;
+  });
+
+  document.querySelector("#modalStaffTable tbody").innerHTML = html;
+  document.getElementById("staffTotal").innerText = total.toLocaleString('vi-VN');
+  renderDatalistMaNV();
+  setAllDropdownColors();
+}
+
     function modalGetCaOptions(maNV, caLV) {
       const cas = PRODUCT_STAFFS.filter(x=>x.maNV===maNV).map(x=>x.caLV);
       let uniqueCas = [...new Set(cas)];
@@ -1251,17 +1254,26 @@
     }
     // Khi đổi mã NV ở dòng mới
     function modalChangeMaNV(i, val) {
-      let found = PRODUCT_STAFFS.filter(x=>x.maNV===val);
-      if (found.length) {
-        modalStaffs[i].maNV = val;
-        modalStaffs[i].caLV = found[0].caLV;
-        modalStaffs[i].donGia = parseInt(found[0].donGia||0);
-        modalStaffs[i].donGiaOrigin = parseInt(found[0].donGia||0);
-        modalStaffs[i].trangThai = "Đồng ý";
-        modalHasNewStaff = true;
-      }
-      renderModalStaffTable();
-    }
+  // Dạng: MS02 - Ca 1 - 120.000 VNĐ
+  const regex = /^(.+?)\s*-\s*Ca\s*(\d+)\s*-\s*([\d.,]+)\s*VNĐ$/;
+  const match = val.match(regex);
+  if (match) {
+    modalStaffs[i].maNV = match[1].trim();
+    modalStaffs[i].caLV = match[2].trim();
+    modalStaffs[i].donGia = parseInt(match[3].replace(/[.,]/g, ''));
+    modalStaffs[i].donGiaOrigin = parseInt(match[3].replace(/[.,]/g, ''));
+    modalStaffs[i].trangThai = "Đồng ý";
+    modalHasNewStaff = true;
+    renderModalStaffTable();
+    return;
+  }
+  // Nếu không đúng format, reset lại ca/đơn giá (cho phép nhập lại)
+  modalStaffs[i].maNV = val.trim();
+  modalStaffs[i].caLV = '';
+  modalStaffs[i].donGia = 0;
+  modalStaffs[i].donGiaOrigin = 0;
+  renderModalStaffTable();
+}
     // Khi đổi ca LV ở dòng mới
     function modalChangeCaLV(i, val) {
       let found = PRODUCT_STAFFS.find(x=>x.maNV===modalStaffs[i].maNV && x.caLV==val);
