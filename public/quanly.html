@@ -1173,7 +1173,7 @@
       document.getElementById("orderModal").classList.remove("show");
       document.getElementById("orderModal").style.display = "none";
     }
-  function renderModalStaffTable() {
+function renderModalStaffTable() {
   let html = "";
   let total = 0;
   modalStaffs.forEach((s, i) => {
@@ -1185,26 +1185,28 @@
     const rowClass = s.isOriginal ? '' : 'new-staff-row';
     html += `<tr class="${rowClass}">`;
 
-    // Cột Mã NV (luôn cho phép sửa/xóa/tìm lại)
-    html += `<td>
-      <input type="text" value="${s.maNV || ''}" 
-        style="width:65px;text-align:center;font-size:0.96em;" 
-        list="availableNVs" autocomplete="off" inputmode="text" autocapitalize="off" spellcheck="false"
-        onclick="this.select()" onfocus="this.select()"
-        onchange="modalChangeMaNV(${i},this.value)">
-    </td>`;
+    // ======= Cột Mã NV =======
+    if (s.isOriginal) {
+      html += `<td>
+        <input type="text" value="${s.maNV || ''}" readonly style="width:65px;text-align:center;font-size:0.96em;border:none;background:transparent;">
+      </td>`;
+    } else {
+      html += `<td>
+        <input type="text" value="${s.maNV || ''}" 
+          style="width:65px;text-align:center;font-size:0.96em;" 
+          list="availableNVs" autocomplete="off" inputmode="text" autocapitalize="off" spellcheck="false"
+          onclick="this.select()" onfocus="this.select()"
+          onchange="modalChangeMaNV(${i},this.value)">
+      </td>`;
+    }
 
-    // Cột Ca LV (readonly, chỉ hiện số ca đã chọn)
+    // Các cột khác giữ nguyên...
     html += `<td>
       <input type="text" value="${s.caLV || ''}" readonly style="width:30px;text-align:center;font-size:0.96em;border:none;background:transparent;">
     </td>`;
-
-    // Cột Đơn giá (readonly, chỉ hiện giá đúng ca)
     html += `<td>
       <input type="text" value="${donGiaShow.toLocaleString('vi-VN')}" readonly style="width:60px;border:none;text-align:right;background:transparent;font-weight:bold;color:#0b8e0b;font-size:0.96em;">
     </td>`;
-
-    // Cột Thực hiện đơn hàng
     html += `<td>
       <select class="staff-action-select" onchange="modalStaffChange(${i},this)">
         <option value="Đồng ý"${s.trangThai === "Đồng ý" ? " selected" : ""}>Đồng ý</option>
@@ -1212,8 +1214,6 @@
         <option value="Hủy đơn"${s.trangThai === "Hủy đơn" ? " selected" : ""}>Hủy đơn</option>
       </select>
     </td>`;
-
-    // Trạng thái/Xóa
     html += `<td>${deleteBtn}</td></tr>`;
   });
 
