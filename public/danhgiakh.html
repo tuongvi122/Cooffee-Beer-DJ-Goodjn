@@ -655,23 +655,31 @@
       min-height: 20px;
     }
     /* Gợi ý số điện thoại */
-    #phone-suggest {
-      position:relative;
-      z-index:9999;
-      min-width:160px;
-      max-width:210px;
-    }
-    #phone-suggest-list {
-      border:1px solid #ddd;
-      background:#fff;
-      border-radius:5px;
-      position:absolute;
-      margin-top:2px;
-      min-width:160px;
-      max-width:210px;
-      left: 0;
-      box-shadow: 0 1px 4px #0001;
-    }
+  .input-suggest-wrapper {
+  position: relative;
+  display: inline-block;
+  width: auto;
+  max-width: 220px; /* match với input */
+}
+
+#phone-suggest {
+  position: absolute;
+  left: 0;
+  top: 100%;   /* đặt ngay dưới input */
+  width: 100%;
+  z-index: 10001;
+}
+
+#phone-suggest-list {
+  border:1px solid #ddd;
+  background:#fff;
+  border-radius:5px;
+  margin-top:2px;
+  min-width:160px;
+  max-width:210px;
+  box-shadow: 0 1px 4px #0001;
+}
+
     #phone-suggest-list div {
       padding:6px 10px;
       cursor:pointer;
@@ -741,15 +749,18 @@
   <div class="site-content">
     <div class="container">
       <div class="search-row">
-        <input type="tel" id="phoneInput" maxlength="11" minlength="10"
-          pattern="[0-9]{10,11}" placeholder="Nhập số điện thoại"
-          autocomplete="off" inputmode="numeric" required />
-        <button id="searchBtn" type="button">Tìm kiếm</button>
-        <span class="label-point">Tổng điểm tích lũy trong 24h <span id="currentMonth"></span>:</span>
-        <span class="point-box" id="totalPointBox">0</span>
-      </div>
+  <div class="input-suggest-wrapper">
+    <input type="tel" id="phoneInput" maxlength="11" minlength="10"
+      pattern="[0-9]{10,11}" placeholder="Nhập số điện thoại"
+      autocomplete="off" inputmode="numeric" required />
+    <div id="phone-suggest"></div>
+  </div>
+  <button id="searchBtn" type="button">Tìm kiếm</button>
+  <span class="label-point">Tổng điểm tích lũy trong 24h <span id="currentMonth"></span>:</span>
+  <span class="point-box" id="totalPointBox">0</span>
+</div>
+
       <div id="noteBox"></div>
-      <div id="phone-suggest"></div>
       <h2>Danh sách dịch vụ đã sử dụng trong 24h</h2>
       <div class="table-wrap">
         <table id="ordersTable">
