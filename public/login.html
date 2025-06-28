@@ -274,16 +274,17 @@
         });
         const data = await resp.json();
         if (data.success) {
-          if (role === 'Quản lý') {
-            localStorage.setItem('isAdmin', '1');
-            window.location.href = 'quanly.html';
-          } else if (role === 'Nhân viên') {
-            localStorage.removeItem('isAdmin');
-            window.location.href = 'inbill.html';
-          } else {
-            localStorage.removeItem('isAdmin');
-            window.location.href = 'index.html';
-          }
+  localStorage.setItem('isLoggedIn', '1'); // <--- THÊM DÒNG NÀY
+  if (role === 'Quản lý') {
+    localStorage.setItem('isAdmin', '1');
+    window.location.href = 'quanly.html';
+  } else if (role === 'Nhân viên') {
+    localStorage.removeItem('isAdmin');
+    window.location.href = 'inbill.html';
+  } else {
+    localStorage.removeItem('isAdmin');
+    window.location.href = 'index.html';
+  }
         } else {
           err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
           err.style.display = 'block';
