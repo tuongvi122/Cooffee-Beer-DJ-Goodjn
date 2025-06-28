@@ -26,13 +26,13 @@
       top: 0;
       position: fixed;
     }
-    .desktop-navbar { display: block !important; }
+    .desktop-navbar { display: block !important; min-height:54px;}
     .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     @media (max-width: 768px) {
-  .mobile-navbar { display: block !important; }
-  .mobile-navbar-menu { display: none !important; }
-  .desktop-navbar { display: none !important; }
-}
+      .mobile-navbar { display: block !important; }
+      .mobile-navbar-menu { display: none !important; }
+      .desktop-navbar { display: none !important; }
+    }
     .login-container {
       max-width: 390px;
       margin: 110px auto 80px auto;
@@ -273,14 +273,14 @@
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
       </button>
-    <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
-      <span class="brand-main">Coffee & Beer</span>
-      <span class="brand-sub">DJ GooDjn</span>
-    </a>
-    <a class="mobile-hotline" href="tel:0902926636">
-    <i class="fa-solid fa-phone" style="color:#e53935"></i>
-    <span class="hotline-number">0902 926 636</span>
-   </a>
+      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
+        <span class="brand-main">Coffee & Beer</span>
+        <span class="brand-sub">DJ GooDjn</span>
+      </a>
+      <a class="mobile-hotline" href="tel:0902926636">
+        <i class="fa-solid fa-phone" style="color:#e53935"></i>
+        <span class="hotline-number">0902 926 636</span>
+      </a>
     </div>
     <!-- Mobile Hamburger menu overlay -->
     <nav class="mobile-navbar-menu" id="mobileMenu">
@@ -293,17 +293,15 @@
     <div class="desktop-navbar"></div>
   </div>
   <!-- FORM ĐĂNG NHẬP -->
-  <form class="login-container" onsubmit="doLogin();return false;">
+  <form class="login-container" id="loginForm">
     <h2>Đăng nhập hệ thống</h2>
     <label for="loginRole" style="font-weight:600;margin-bottom:3px;display:block;">Chọn vai trò</label>
     <select id="loginRole">
       <option value="Quản lý">Quản lý</option>
       <option value="Nhân viên">Nhân viên</option>
     </select>
-    <input id="loginUser" type="text" placeholder="Tên đăng nhập" autocomplete="username"
-           onkeydown="if(event.key==='Enter'){event.preventDefault();doLogin();}">
-    <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password"
-           onkeydown="if(event.key==='Enter'){event.preventDefault();doLogin();}">
+    <input id="loginUser" type="text" placeholder="Tên đăng nhập" autocomplete="username">
+    <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
     <div id="loginError"></div>
     <button type="submit">Đăng nhập</button>
   </form>
@@ -315,7 +313,7 @@
     </div>
   </div>
   <!-- SCRIPTS -->
-<script>
+  <script>
     // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
     fetch('navbar.html')
       .then(response => response.text())
@@ -340,17 +338,30 @@
           window.location.href = tab.getAttribute('data-href');
         };
       });
+
+      // Tối ưu submit form đăng nhập
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        doLogin();
+      });
     });
+
     // Đăng nhập
     async function doLogin() {
       var role = document.getElementById('loginRole').value.trim();
       var user = document.getElementById('loginUser').value.trim();
       var pass = document.getElementById('loginPass').value.trim();
       var err = document.getElementById('loginError');
+      var btn = document.querySelector('.login-container button[type="submit"]');
       err.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = "Đang đăng nhập...";
+
       if (!role || !user || !pass) {
         err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
         err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = "Đăng nhập";
         return;
       }
       try {
@@ -364,21 +375,25 @@
           // Đăng nhập thành công: chuyển hướng đúng trang tuỳ role
           if (role === 'Quản lý') {
             localStorage.setItem('isAdmin', '1');
-            window.location = 'quanly.html';
+            window.location.href = 'quanly.html';
           } else if (role === 'Nhân viên') {
             localStorage.removeItem('isAdmin');
-            window.location = 'inbill.html';
+            window.location.href = 'inbill.html';
           } else {
             localStorage.removeItem('isAdmin');
-            window.location = 'index.html';
+            window.location.href = 'index.html';
           }
         } else {
           err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
           err.style.display = 'block';
+          btn.disabled = false;
+          btn.innerText = "Đăng nhập";
         }
       } catch (e) {
         err.innerText = 'Lỗi máy chủ. Thử lại sau!';
         err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = "Đăng nhập";
       }
     }
   </script>
