@@ -929,10 +929,11 @@
       }
     }
     // Hàm đăng xuất
-    function logout() {
-      localStorage.removeItem('isAdmin');
-      window.location.replace('login.html');
-    }
+function logout() {
+  localStorage.removeItem('isAdmin');
+  localStorage.removeItem('isLoggedIn');
+  window.location.replace('login.html');
+}
     // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
     fetch('navbar.html')
       .then(response => response.text())
