@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* ... giữ nguyên các CSS như đã tối ưu trước đó ... */
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
@@ -103,7 +102,7 @@
       }
       h2 { font-size: 1.18em; }
     }
-    /* --- MOBILE NAVBAR Style ... giữ nguyên --- */
+    /* --- MOBILE NAVBAR Style (đồng bộ với index.html) --- */
     @media (max-width: 768px) {
       #navbar-container {
         padding: 0;
@@ -294,7 +293,7 @@
     <div class="desktop-navbar"></div>
   </div>
   <!-- FORM ĐĂNG NHẬP -->
-  <form class="login-container" id="loginForm" autocomplete="off">
+  <form class="login-container" id="loginForm">
     <h2>Đăng nhập hệ thống</h2>
     <label for="loginRole" style="font-weight:600;margin-bottom:3px;display:block;">Chọn vai trò</label>
     <select id="loginRole">
@@ -304,7 +303,7 @@
     <input id="loginUser" type="text" placeholder="Tên đăng nhập" autocomplete="username">
     <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
     <div id="loginError"></div>
-    <button type="submit" id="loginBtn">Đăng nhập</button>
+    <button type="submit">Đăng nhập</button>
   </form>
   <!-- FOOTER -->
   <div id="footer-container">
@@ -315,101 +314,120 @@
   </div>
   <!-- SCRIPTS -->
   <script>
-    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
-    fetch('navbar.html')
-      .then(response => response.text())
-      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
+  // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
+  fetch('navbar.html')
+    .then(response => response.text())
+    .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
 
-    // Hamburger menu và submit form
-    document.addEventListener('DOMContentLoaded', function(){
-      var hamburger = document.getElementById('hamburgerBtn');
-      var menu = document.getElementById('mobileMenu');
-      document.addEventListener('click', function(e){
-        if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
-          menu.classList.remove('open');
-        }
-      });
-      hamburger.onclick = function(e){
-        e.stopPropagation();
-        menu.classList.toggle('open');
+  // Mobile Hamburger menu JS
+  document.addEventListener('DOMContentLoaded', function(){
+    var hamburger = document.getElementById('hamburgerBtn');
+    var menu = document.getElementById('mobileMenu');
+    document.addEventListener('click', function(e){
+      if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
+        menu.classList.remove('open');
+      }
+    });
+    hamburger.onclick = function(e){
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    };
+    menu.querySelectorAll('li').forEach(function(tab){
+      tab.onclick = function(){
+        menu.classList.remove('open');
+        window.location.href = tab.getAttribute('data-href');
       };
-      menu.querySelectorAll('li').forEach(function(tab){
-        tab.onclick = function(){
-          menu.classList.remove('open');
-          window.location.href = tab.getAttribute('data-href');
-        };
-      });
-
-      // Submit form đăng nhập
-      document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        doLogin();
-      });
     });
 
-    // Đăng nhập (tối ưu trải nghiệm mobile)
-    let isLoggingIn = false;
-    async function doLogin() {
-      if (isLoggingIn) return; // Ngăn double submit
-      isLoggingIn = true;
-      var role = document.getElementById('loginRole').value.trim();
-      var user = document.getElementById('loginUser').value.trim();
-      var pass = document.getElementById('loginPass').value.trim();
-      var err = document.getElementById('loginError');
-      var btn = document.getElementById('loginBtn');
-      var footer = document.getElementById('footer-container');
-      err.style.display = 'none';
-      btn.disabled = true;
-      btn.innerText = "Đang đăng nhập...";
-      // Ẩn footer khi bắt đầu đăng nhập (tránh shift layout)
-      if (window.innerWidth <= 768 && footer) footer.style.display = 'none';
+    // Submit form đăng nhập
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      doLogin();
+    });
 
-      if (!role || !user || !pass) {
-        err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
-        err.style.display = 'block';
-        btn.disabled = false;
-        btn.innerText = "Đăng nhập";
-        isLoggingIn = false;
-        if (window.innerWidth <= 768 && footer) footer.style.display = '';
-        return;
-      }
-      try {
-        const resp = await fetch('/api/get-login', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({username: user, password: pass, role: role})
-        });
-        const data = await resp.json();
-        if (data.success) {
-          // Đăng nhập thành công: chuyển hướng đúng trang tuỳ role
-          if (role === 'Quản lý') {
-            localStorage.setItem('isAdmin', '1');
-            window.location.href = 'quanly.html';
-          } else if (role === 'Nhân viên') {
-            localStorage.removeItem('isAdmin');
-            window.location.href = 'inbill.html';
-          } else {
-            localStorage.removeItem('isAdmin');
-            window.location.href = 'index.html';
-          }
-        } else {
-          err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
-          err.style.display = 'block';
-          btn.disabled = false;
-          btn.innerText = "Đăng nhập";
-          isLoggingIn = false;
-          if (window.innerWidth <= 768 && footer) footer.style.display = '';
+    // Bắt phím Enter ở mọi input, nếu đang không submit
+    var loginInputs = document.querySelectorAll('#loginForm input, #loginForm select');
+    loginInputs.forEach(function(inp){
+      inp.addEventListener('keydown', function(ev){
+        if(ev.key === 'Enter') {
+          ev.preventDefault();
+          doLogin();
         }
-      } catch (e) {
-        err.innerText = 'Lỗi máy chủ. Thử lại sau!';
+      });
+    });
+  });
+
+  // Đăng nhập
+  let isLoggingIn = false;
+  async function doLogin() {
+    if(isLoggingIn) return;
+    isLoggingIn = true;
+
+    var role = document.getElementById('loginRole').value.trim();
+    var user = document.getElementById('loginUser').value.trim();
+    var pass = document.getElementById('loginPass').value.trim();
+    var err = document.getElementById('loginError');
+    var btn = document.querySelector('.login-container button[type="submit"]');
+    var loginInputs = document.querySelectorAll('#loginForm input, #loginForm select');
+
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.innerText = "Đang đăng nhập...";
+    // Disable all input khi submit để tránh nháy focus lại
+    loginInputs.forEach(el => el.disabled = true);
+
+    // Ẩn footer để tránh bị tụt khi bàn phím ảo đóng lại
+    document.getElementById('footer-container').style.display = 'none';
+
+    if (!role || !user || !pass) {
+      err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.innerText = "Đăng nhập";
+      loginInputs.forEach(el => el.disabled = false);
+      document.getElementById('footer-container').style.display = '';
+      isLoggingIn = false;
+      return;
+    }
+    try {
+      const resp = await fetch('/api/get-login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: user, password: pass, role: role})
+      });
+      const data = await resp.json();
+      if (data.success) {
+        // Đăng nhập thành công: chuyển hướng đúng trang tuỳ role
+        if (role === 'Quản lý') {
+          localStorage.setItem('isAdmin', '1');
+          window.location.href = 'quanly.html';
+        } else if (role === 'Nhân viên') {
+          localStorage.removeItem('isAdmin');
+          window.location.href = 'inbill.html';
+        } else {
+          localStorage.removeItem('isAdmin');
+          window.location.href = 'index.html';
+        }
+      } else {
+        err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = "Đăng nhập";
+        loginInputs.forEach(el => el.disabled = false);
+        document.getElementById('footer-container').style.display = '';
         isLoggingIn = false;
-        if (window.innerWidth <= 768 && footer) footer.style.display = '';
       }
+    } catch (e) {
+      err.innerText = 'Lỗi máy chủ. Thử lại sau!';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.innerText = "Đăng nhập";
+      loginInputs.forEach(el => el.disabled = false);
+      document.getElementById('footer-container').style.display = '';
+      isLoggingIn = false;
     }
-  </script>
+  }
+</script>
   <script>
     (function(){
       // Chỉ thực hiện trên thiết bị di động
@@ -417,15 +435,14 @@
         return window.innerWidth <= 768;
       }
       function hideFooter() {
-        if (window.isLoggingIn) return; // Không show/hide khi đang đăng nhập
         var f = document.getElementById('footer-container');
         if(f) f.style.display = 'none';
       }
       function showFooter() {
-        if (window.isLoggingIn) return;
         var f = document.getElementById('footer-container');
         if(f) f.style.display = '';
       }
+      // Tìm tất cả input, textarea để gán sự kiện focus/blur
       document.addEventListener('DOMContentLoaded', function() {
         if(!isMobile()) return;
         var inputs = document.querySelectorAll('input, textarea, select');
@@ -433,6 +450,7 @@
           el.addEventListener('focus', hideFooter);
           el.addEventListener('blur', showFooter);
         });
+        // Nếu dùng thêm bàn phím ảo ngoài, có thể check thêm event resize
         var oldHeight = window.innerHeight;
         window.addEventListener('resize', function() {
           if(!isMobile()) return;
