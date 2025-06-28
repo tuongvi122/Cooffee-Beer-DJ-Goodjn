@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>In Bill | Coffee & Beer GooDjn</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; display: flex; flex-direction: column;
+      font-family: 'Segoe UI', Arial, sans-serif; background-color: #f9f9f9;
+    }
+    #navbar-container {
+      position: fixed; top: 0; left: 0; width: 100vw; z-index: 10000;
+      background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+    }
+    .site-content {
+      flex: 1 0 auto; display: flex; flex-direction: column;
+      padding-top: 28px; align-items: center;
+    }
+    #footer-container {
+      background: #228B22; color: #fff; width: 100vw; min-height: 54px; height: 54px;
+      display: flex; align-items: center; justify-content: center; font-size: 1em;
+      box-sizing: border-box; text-align: center; padding: 0 10px; position: fixed; left: 0; bottom: 0;
+    }
+    #footer-container div { width: 100%; text-align: center; line-height: 1.15; word-break: break-word; }
+
+    .bill-panel {
+      width: 100%; max-width: 410px; margin: 0 auto 80px auto; margin-top: 22px;
+      background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      padding: 16px 0 22px 0; display: flex; flex-direction: column; align-items: center;
+    }
+    .bill-header {
+      display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin-bottom: 14px;
+      width: 100%; padding: 0 20px; font-size: 1em; font-weight: 500; border: 1.5px solid #e1e6ed;
+      border-radius: 10px; background: #f6f7fb; height: 48px; box-sizing: border-box;
+    }
+    .bill-header label { font-weight: 500; color: #155fa0; margin-right: 3px; font-size: 1em; }
+    #bill-order-code {
+      width: 68px; font-size: 1em; text-align: center; border: 1.2px solid #c3c8d2; border-radius: 5px;
+      padding: 5px 9px; transition: border-color 0.2s; outline: none;
+    }
+    #bill-order-code:focus { border-color: #1d5ecd; }
+    .header-btn {
+      display: flex; align-items: center; gap: 4px; font-weight: 500; border: none; border-radius: 6px;
+      padding: 6px 15px; font-size: 0.98em; cursor: pointer; transition: background 0.18s, box-shadow 0.13s;
+      outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.04); min-width: 0;
+    }
+    #bill-search-btn.header-btn {
+      background: linear-gradient(to bottom, #36c16a, #219a50); color: #fff; font-weight: 600;
+    }
+    #bill-search-btn.header-btn:hover { background: linear-gradient(to bottom, #219a50, #36c16a);}
+    #bill-print-btn.header-btn {
+      background: linear-gradient(to bottom, #4f80e1, #1d5ecd); color: #fff; font-weight: 600;
+    }
+    #bill-print-btn.header-btn:disabled {
+      opacity: 0.55; background: #bfcbe8; color: #fff; cursor: not-allowed;
+    }
+    #bill-print-btn.header-btn:hover:not(:disabled) { background: linear-gradient(to bottom, #1d5ecd, #4f80e1);}
+    #bill-reset-btn.header-btn {
+      background: linear-gradient(to bottom, #f47373, #e53935); color: #fff; font-weight: 600; padding: 6px 12px;
+    }
+    #bill-reset-btn.header-btn:hover { background: linear-gradient(to bottom, #e53935, #f47373);}
+    #bill-status-note {
+      margin-top: 4px; margin-bottom: 8px; font-size: 1.03em; width: 100%; text-align: left; padding-left: 27px;
+      min-height: 20px; display: flex; align-items: center; gap: 7px;
+    }
+    .bill-status-paid {
+      color: #219a50; font-weight: 600; display: flex; align-items: center; gap: 5px;
+    }
+    .bill-status-unpaid {
+      color: #e53935; font-weight: 600; display: flex; align-items: center; gap: 5px;
+    }
+    .bill-print-wrapper {
+      width: 100%; max-width: 330px; margin: 0 auto; background: #fff; border: 1.2px solid #cddc39; border-radius: 10px;
+      padding: 12px 17px 15px 17px; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 1em; margin-top: 2px; box-shadow: 0 1.5px 5px rgba(0,0,0,0.06);
+    }
+    .bill-logo-title {
+      color: #08810a; font-weight: 700; font-size: 1.08em; text-align: center; margin-bottom: 0px; margin-top: 2px;
+      letter-spacing: 0.02em; font-family: 'Segoe UI Semibold', 'Segoe UI', Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .bill-addr { color: #434343; font-size: 0.97em; text-align: center; margin-bottom: 0px; line-height: 1.17; font-family: 'Segoe UI', Arial, sans-serif;}
+    .bill-phone { text-align: center; color: #1762a8; font-size: 0.96em; margin-bottom: 4px; margin-top: 0px; font-family: 'Segoe UI', Arial, sans-serif; letter-spacing: 0.01em;}
+    .bill-title-main {
+      color: #1a237e; font-weight: 700; font-size: 1.16em; text-align: center; margin-top: 7px; margin-bottom: 9px;
+      letter-spacing: 0.4px; font-family: 'Segoe UI Semibold', 'Segoe UI', Arial, sans-serif;
+    }
+    .bill-info-row { display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 0.95em; }
+    .bill-section-title { font-weight: 600; color: #1d5ecd; margin-top: 8px; margin-bottom: 2px; font-size: 1em; }
+    .bill-section { border-top: 1px solid #bbb; padding-top: 7px; margin-top: 8px; margin-bottom: 2px;}
+    .bill-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; font-size: 0.97em; }
+    .bill-table th, .bill-table td { border: none; padding: 4px 2px 2px 2px; text-align: left; }
+    .bill-table th { color: #1d5ecd; font-weight: 600; font-size: 1em; border-bottom: 1px solid #bbb; background: #f7faff; letter-spacing: 0.01em; }
+    .bill-table td { font-size: 0.96em; }
+    .bill-table .td-num, .bill-table .td-price, .bill-table .td-total { text-align: right; }
+    .bill-total-row { border-top: 1.5px solid #333; font-weight: 700; color: #155724; font-size: 1.06em; background: #f4ffe6; }
+    .bill-customer-thank {
+      color: #08810a; font-size: 1em; font-weight: 600; text-align: center; margin-top: 7px; margin-bottom: 0; letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      .bill-panel { max-width: 99vw !important; }
+      .bill-print-wrapper { max-width: 95vw !important; }
+      .site-content { padding-bottom: 54px !important; }
+      #footer-container { min-height: 54px; font-size: 0.98em; padding: 0 7px; }
+      .bill-header { font-size: 0.98em; }
+      #bill-order-code { font-size: 0.97em; }
+    }
+    @media (max-width: 400px) {
+      .bill-print-wrapper { padding: 6px 2px 10px 2px; }
+      .bill-header { padding: 0 2px; }
+    }
+       @media print {
+      body * { visibility: hidden !important; }
+      .bill-print-wrapper, .bill-print-wrapper * { 
+        visibility: visible !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .bill-print-wrapper {
+        position: absolute;
+        left: 0; top: 0;
+        width: 54mm !important;
+        min-width: 54mm !important;
+        max-width: 54mm !important;
+        padding-left: 2mm !important;
+        padding-right: 2mm !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-top: 10mm !important;
+        margin-bottom: 5mm !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: #fff !important;
+      }
+      @page {
+        size: 58mm auto;
+        margin: 10mm 2mm 5mm 2mm !important;
+      }
+    }
+    .main-flex-container {
+      display: flex; justify-content: center; align-items: flex-start; width: 100%; max-width: 1200px;
+      margin: 0 auto; gap: 32px; padding: 24px 0 0 0; min-height: 600px; box-sizing: border-box;
+    }
+    .order-list-title {
+      text-align: center; font-size: 1.45em; font-weight: 800; color: #14a904f4; margin-bottom: 18px;
+      letter-spacing: 0.01em; text-shadow: 0 1px 6px #e1f0fe;
+    }
+    .order-list-panel {
+      background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+      padding: 26px 42px 28px 42px; width: 100%;
+      min-width: 800px; max-width: 1100px; margin-top: 24px; font-size: 1.03em; box-sizing: border-box;
+    }
+    .order-list-table {
+      width: 100%; border-collapse: separate; border-spacing: 0; background: #fcfcfc; margin-bottom: 8px;
+    }
+    .order-list-table th, .order-list-table td { padding: 5px 6px; font-size: 1em; }
+    .order-list-table th { background: #e8f2ff; font-weight: 600; color: #1663b1; font-size: 0.9em; }
+    .order-list-table tr:nth-child(even) td { background: #f8fbff; }
+    .order-list-table tr:hover td { background: #a6f5e5; }
+    .order-list-table td { font-size: 0.9em; max-height: 32px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .order-status-btn, .order-status-paid {
+  padding: 6px 16px;
+  min-width: 140px;
+  /* hoặc dùng width: 130px; nếu muốn cố định luôn */
+  font-size: 1em;
+  line-height: 1.2;
+  border: none;
+  border-radius: 8px;
+  display: inline-block;
+  text-align: center;
+  box-sizing: border-box;
+  font-weight: 500;
+  height: 30px;
+}
+    .order-status-btn { background: #e20808; color: #fff; cursor: pointer; transition: background 0.15s; }
+    .order-status-btn:hover { background: #9e2323; }
+    .order-status-paid { background: #0cac11; color: #fff; cursor: default; }
+    .order-pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: relative;
+}
+    .order-entries-select {
+      font-size: 1em; padding: 2px 5px; border-radius: 4px; border: 1px solid #b5c8db;
+    }
+    .order-pagination { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; }
+    .order-pagination button, .order-pagination span {
+      min-width: 32px; padding: 5px 7px; border: none; background: none; color: #1976d2; font-weight: 500;
+      border-radius: 5px; cursor: pointer; font-size: 1em;
+    }
+    .order-pagination .active { background: #2196f3; color: #fff; font-weight: bold; pointer-events: none; }
+    .order-pagination button:disabled { color: #bbb; background: #f1f1f1; pointer-events: none; }
+    @media (max-width: 1100px) {
+      .main-flex-container { max-width: 98vw; }
+      .order-list-panel { max-width: 95vw; }
+    }
+    @media (max-width: 700px) {
+      .order-list-panel { min-width: unset; width: 99vw !important; max-width: none !important;}
+      .order-list-table th, .order-list-table td { font-size: 0.96em; padding: 6px 2px;}
+    }
+    /* Tối ưu input tìm kiếm */
+  .order-search-box {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* Đảm bảo nằm sát phải */
+}
+#order-search-input {
+  height: 26px;
+  min-width: 100px;
+  width: 140px;
+  font-size: 0.96em;
+  padding: 2px 7px;
+  border: 2px solid #2ecc40;
+  border-radius: 6px;
+  outline: none;
+  transition: border .16s;
+}
+    #order-search-input:focus { border-color: #1663b1;}
+.order-pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: relative;
+}
+
+.order-search-box {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* Đảm bảo nằm sát phải */
+}
+
+#order-search-input {
+  height: 26px;
+  min-width: 100px;
+  width: 140px;
+  font-size: 0.96em;
+  padding: 2px 7px;
+  border: 2px solid #2ecc40;
+  border-radius: 6px;
+  outline: none;
+  transition: border .16s;
+}
+
+#order-search-clear {
+  height: 26px;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  padding: 0 7px;
+  cursor: pointer;
+  transition: background 0.14s;
+  margin-left: 2px;
+}
+#order-search-clear:hover { background: #a72816; }
+  </style>
+</head>
+body>
+  <div id="navbar-container"><div class="desktop-navbar"></div></div>
+  <div class="site-content">
+    <div class="main-flex-container">
+      <div class="order-list-panel">
+        <div class="order-list-title">Danh sách đơn hàng</div>
+        <div class="order-pagination-container">
+          <div>
+            Hiển thị 
+            <select id="order-entries-select" class="order-entries-select">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+            đơn hàng
+          </div>
+          <div class="order-search-box">
+            <input id="order-search-input" type="text" placeholder="Tìm kiếm..." autocomplete="off">
+            <button id="order-search-clear" title="Xóa tìm"><i class="fa fa-times"></i></button>
+          </div>
+          <div id="order-pagination" class="order-pagination"></div>
+        </div>
+        <table class="order-list-table" id="order-list-table">
+          <thead>
+            <tr>
+              <th style="width: 42px;">Stt</th>
+              <th style="width: 70px;">Số đơn</th>
+              <th style="width: 18%;">Tên khách hàng</th>
+              <th style="width: 60px;">Số bàn</th>
+              <th style="width: 210px;">Mã NV</th>
+              <th style="width: 110px;">Tổng tiền</th>
+              <th style="width: 155px;">Xác nhận</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" style="text-align:center;color:#888;">Đang tải...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="bill-panel">
+        <div class="bill-header">
+          <label for="bill-order-code">Số phiếu</label>
+          <input id="bill-order-code" type="text" maxlength="8" autocomplete="off" placeholder="..." />
+          <button id="bill-search-btn" class="header-btn" title="Tìm kiếm"><i class="fa fa-search"></i><span class="d-none d-sm-inline">Tìm kiếm</span></button>
+          <button id="bill-print-btn" class="header-btn" disabled title="In bill"><i class="fa fa-print"></i><span class="d-none d-sm-inline">In Bill</span></button>
+          <button id="bill-reset-btn" class="header-btn" title="Xóa bill"><i class="fa fa-trash"></i></button>
+        </div>
+        <div id="bill-status-note"></div>
+        <div id="bill-print-area" class="bill-print-wrapper"></div>
+      </div>
+    </div>
+    <div id="footer-container">
+      <div>
+        &copy; 2025 <b>Coffee & Beer DJ GooDjn</b>. All rights reserved.<br>
+        63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
+      </div>
+    </div>
+  <script>
+    // Load navbar async, fail gracefully
+    fetch('navbar.html')
+      .then(r => r.ok ? r.text() : '')
+      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; })
+      .catch(()=>{});
+
+    // ========== BILL PANEL ==========
+    const inputOrderCode = document.getElementById('bill-order-code');
+    const btnSearch = document.getElementById('bill-search-btn');
+    const btnPrint = document.getElementById('bill-print-btn');
+    const btnReset = document.getElementById('bill-reset-btn');
+    const billStatusNote = document.getElementById('bill-status-note');
+    const billArea = document.getElementById('bill-print-area');
+
+    let currentBillData = null, currentOrderCode = null, isPaid = false;
+
+    btnSearch.onclick = async function() {
+      const code = inputOrderCode.value.trim();
+      if (!code) {
+        billStatusNote.innerHTML = '';
+        billArea.innerHTML = '';
+        btnPrint.disabled = true;
+        return;
+      }
+      billArea.innerHTML = '<div style="text-align:center;color:#219a50;margin:14px 0;">Đang lấy dữ liệu...</div>';
+      billStatusNote.innerHTML = '';
+      btnPrint.disabled = true;
+      currentBillData = null; currentOrderCode = null; isPaid = false;
+      try {
+        const resp = await fetch('/api/getbill?order=' + encodeURIComponent(code));
+        if (!resp.ok) throw new Error('Lỗi server');
+        const data = await resp.json();
+        if (!data || !data.bill || !Array.isArray(data.bill) || data.bill.length === 0) {
+          billArea.innerHTML = '<div style="color:red;text-align:center;margin:10px 0;">Không tìm thấy đơn hàng!</div>';
+          billStatusNote.innerHTML = '';
+          btnPrint.disabled = true;
+          return;
+        }
+        currentBillData = data; currentOrderCode = code;
+        isPaid = data.bill.some(row => (row.status && row.status.trim() === "Đã thanh toán"));
+        const unpaid = data.bill.some(row => !row.status || row.status.trim() === "");
+        if (isPaid) {
+          billStatusNote.innerHTML = `<span class="bill-status-paid"><i class="fa fa-check-circle"></i> Đã thanh toán</span>`;
+          btnPrint.disabled = true;
+        } else if (unpaid) {
+          billStatusNote.innerHTML = `<span class="bill-status-unpaid"><i class="fa fa-exclamation-triangle"></i> CHƯA thanh toán!</span>`;
+          btnPrint.disabled = false;
+        } else {
+          billStatusNote.innerHTML = '';
+          btnPrint.disabled = true;
+        }
+        renderBill(data);
+      } catch (e) {
+        billArea.innerHTML = '<div style="color:red;text-align:center;margin:10px 0;">Lỗi kết nối: ' + (e.message||e) + '</div>';
+        billStatusNote.innerHTML = '';
+        btnPrint.disabled = true;
+      }
+    };
+
+    btnPrint.onclick = function() {
+      if (!currentBillData || !currentOrderCode) return;
+      let printed = false;
+      const handleAfterPrint = async () => {
+        if (printed) return;
+        printed = true;
+        window.removeEventListener('afterprint', handleAfterPrint);
+        if (confirm('Bạn đã in hóa đơn thành công? Nhấn OK để xác nhận, hoặc Cancel để KHÔNG ghi nhận thanh toán.')) {
+          btnPrint.disabled = true;
+          try {
+            // Ghi nhận thanh toán (frintbill.js đồng bộ bustCache backend)
+            await fetch('/api/frintbill', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                order: currentOrderCode,
+                items: currentBillData.bill.map(row => ({ maNV: row.maNV, caLV: row.caLV }))
+              })
+            });
+            // Tự động reload danh sách đơn và bill để cập nhật trạng thái mới nhất
+            await loadOrderList();
+            await btnSearch.onclick();
+          } catch (e) {
+            alert('Lỗi cập nhật trạng thái thanh toán: ' + (e.message||e));
+          }
+        }
+      };
+      window.addEventListener('afterprint', handleAfterPrint);
+      window.print();
+    };
+    btnReset.onclick = function() {
+      inputOrderCode.value = '';
+      billStatusNote.innerHTML = '';
+      billArea.innerHTML = '';
+      btnPrint.disabled = true;
+      currentBillData = null; currentOrderCode = null; isPaid = false;
+    };
+    function renderBill(data) {
+      if (!data || !data.bill || data.bill.length === 0) { billArea.innerHTML = ''; return; }
+      const row = data.bill[0], orderDate = row.orderDate || "", orderCode = row.orderCode || "",
+            customer = row.customer || {}, performDate = data.now || "";
+      let tableRows = '', total = 0;
+      data.bill.forEach(item => {
+        if (+item.donGia > 0) {
+          tableRows += `<tr>
+            <td>${item.maNV||''}</td>
+            <td class="td-num">${item.caLV||''}</td>
+            <td class="td-price">${formatMoney(item.donGia)}</td>
+            <td class="td-total">${formatMoney(item.thanhTien)}</td>
+          </tr>`;
+          total += +item.thanhTien;
+        }
+      });
+      billArea.innerHTML = `
+        <div>
+          <div class="bill-logo-title">GooDjn DJ Coffee & Beer</div>
+          <div class="bill-addr">65 Đ. Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh</div>
+          <div class="bill-phone">SDT: 0902 926 636</div>
+          <div class="bill-title-main">BILL DỊCH VỤ NHÂN VIÊN</div>
+          <div class="bill-info-row"><span>Ngày đặt hàng</span><span>${orderDate}</span></div>
+          <div class="bill-info-row"><span>Số đơn đặt hàng</span><span>${orderCode}</span></div>
+          <div class="bill-info-row"><span>Ngày thực hiện</span><span>${performDate}</span></div>
+          <div class="bill-section-title">Thông tin khách hàng</div>
+          <div class="bill-info-row"><span>Tên khách hàng</span><span>${customer.name||""}</span></div>
+          <div class="bill-info-row"><span>Số điện thoại</span><span>${customer.phone||""}</span></div>
+          <div class="bill-info-row"><span>Email</span><span>${customer.email||""}</span></div>
+          <div class="bill-info-row"><span>Số bàn</span><span>${customer.tableNum||""}</span></div>
+          <div class="bill-section"></div>
+          <table class="bill-table">
+            <thead>
+              <tr><th style="min-width:50px">Mã NV</th><th style="min-width:30px">Ca LV</th><th style="min-width:60px">Đơn giá</th><th style="min-width:70px">Thành tiền</th></tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+            <tfoot>
+              <tr class="bill-total-row">
+                <td colspan="3" style="text-align:right;">TỔNG THU</td>
+                <td style="text-align:right;">${formatMoney(total)} đ</td>
+              </tr>
+            </tfoot>
+          </table>
+          <div class="bill-customer-thank">Cảm ơn Quý Khách đã chọn dịch vụ tại<br/>GooDjn DJ Coffee & Beer !</div>
+        </div>
+      `;
+    }
+    function formatMoney(val) {
+      try { return Number(val).toLocaleString('vi-VN'); } catch { return val; }
+    }
+    inputOrderCode.addEventListener('keyup', function(e) { if (e.key === 'Enter') btnSearch.click(); });
+
+    // ========== ORDER LIST + SEARCH + PAGINATION ==========
+    let ordersData = [], filteredOrders = [], orderTablePage = 1, orderEntriesPerPage = 10;
+    const orderEntriesSelect = document.getElementById('order-entries-select');
+    const orderPaginationDiv = document.getElementById('order-pagination');
+    const orderSearchInput = document.getElementById('order-search-input');
+    const orderSearchClear = document.getElementById('order-search-clear');
+
+    // Debounce tìm kiếm
+    let searchTimer = null;
+    function filterOrders(keyword) {
+      if (!keyword) return ordersData.slice();
+      const kw = keyword.toLowerCase();
+      return ordersData.filter(o =>
+        String(o.orderCode).toLowerCase().includes(kw) ||
+        (o.customerName && o.customerName.toLowerCase().includes(kw)) ||
+        (o.tableNum && String(o.tableNum).toLowerCase().includes(kw)) ||
+        (o.maNVs && o.maNVs.toLowerCase().includes(kw)) ||
+        (o.status && o.status.toLowerCase().includes(kw)) ||
+        (o.total && String(o.total).toLowerCase().includes(kw))
+      );
+    }
+    function doSearchOrderList() {
+      const keyword = orderSearchInput.value.trim();
+      filteredOrders = filterOrders(keyword);
+      orderTablePage = 1;
+      renderOrderTable();
+      renderOrderPagination();
+    }
+
+    orderSearchInput.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') doSearchOrderList();
+      else {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(doSearchOrderList, 340);
+      }
+    });
+    orderSearchInput.addEventListener('input', function() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(doSearchOrderList, 340);
+    });
+    orderSearchClear.addEventListener('click', function() {
+      orderSearchInput.value = '';
+      filteredOrders = ordersData.slice();
+      orderTablePage = 1;
+      renderOrderTable();
+      renderOrderPagination();
+      orderSearchInput.focus();
+    });
+    orderEntriesSelect.addEventListener('change', function() {
+      orderEntriesPerPage = Number(this.value);
+      orderTablePage = 1;
+      renderOrderTable();
+      renderOrderPagination();
+    });
+    function renderOrderTable() {
+      const table = document.querySelector('#order-list-table tbody');
+      const data = filteredOrders.length ? filteredOrders : [];
+      if (!data.length) {
+        table.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#888;">Không có đơn hàng.</td></tr>`;
+        return;
+      }
+      const startIdx = (orderTablePage - 1) * orderEntriesPerPage;
+      const endIdx = Math.min(startIdx + orderEntriesPerPage, data.length);
+      let html = '';
+      for (let i = startIdx; i < endIdx; ++i) {
+        const o = data[i];
+        html += `<tr>
+          <td>${i + 1}</td>
+          <td>${o.orderCode}</td>
+          <td style="text-align:left;">${o.customerName}</td>
+          <td>${o.tableNum}</td>
+          <td style="text-align:left;">${o.maNVs}</td>
+          <td style="text-align:right;">${Number(o.total).toLocaleString('vi-VN')}</td>
+          <td>${
+            o.status === 'Đã thanh toán'
+              ? `<span class="order-status-paid">Đã thanh toán</span>`
+              : `<button class="order-status-btn" data-order="${o.orderCode}">Chưa thanh toán</button>`
+          }</td>
+        </tr>`;
+      }
+      table.innerHTML = html;
+      Array.from(table.querySelectorAll('.order-status-btn')).forEach(btn => {
+        btn.addEventListener('click', function() {
+          const order = this.getAttribute('data-order');
+          if (order) {
+            inputOrderCode.value = order;
+            btnSearch.click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      });
+    }
+    function renderOrderPagination() {
+      const data = filteredOrders.length ? filteredOrders : [];
+      if (!data.length) { orderPaginationDiv.innerHTML = ''; return; }
+      const totalPages = Math.ceil(data.length / orderEntriesPerPage);
+      let html = '';
+      if (totalPages > 1) {
+        html += `<button ${orderTablePage === 1 ? 'disabled' : ''} onclick="gotoOrderPage(${orderTablePage - 1})">Previous</button>`;
+        let start = Math.max(1, orderTablePage - 2);
+        let end = Math.min(totalPages, orderTablePage + 2);
+        if (orderTablePage <= 3) end = Math.min(5, totalPages);
+        if (orderTablePage >= totalPages - 2) start = Math.max(1, totalPages - 4);
+        if (start > 1) html += `<button onclick="gotoOrderPage(1)">1</button>${start > 2 ? '<span>...</span>' : ''}`;
+        for (let i = start; i <= end; ++i) {
+          html += `<button class="${i === orderTablePage ? 'active' : ''}" onclick="gotoOrderPage(${i})">${i}</button>`;
+        }
+        if (end < totalPages) html += `${end < totalPages - 1 ? '<span>...</span>' : ''}<button onclick="gotoOrderPage(${totalPages})">${totalPages}</button>`;
+        html += `<button ${orderTablePage === totalPages ? 'disabled' : ''} onclick="gotoOrderPage(${orderTablePage + 1})">Next</button>`;
+      }
+      orderPaginationDiv.innerHTML = html;
+    }
+    window.gotoOrderPage = function(page) {
+      orderTablePage = page;
+      renderOrderTable();
+      renderOrderPagination();
+    };
+    async function loadOrderList() {
+      const table = document.querySelector('#order-list-table tbody');
+      table.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#888;">Đang tải...</td></tr>`;
+      try {
+        const resp = await fetch('/api/listorders');
+        if (!resp.ok) throw new Error('Không thể tải dữ liệu!');
+        const { orders } = await resp.json();
+        ordersData = Array.isArray(orders) ? orders : [];
+        filteredOrders = ordersData.slice();
+        orderTablePage = 1;
+        renderOrderTable();
+        renderOrderPagination();
+      } catch (e) {
+        ordersData = []; filteredOrders = [];
+        table.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#e53935;">Lỗi tải dữ liệu!</td></tr>`;
+        orderPaginationDiv.innerHTML = '';
+      }
+    }
+    loadOrderList();
+  </script>
+  </div>
+</body>
+</html>
