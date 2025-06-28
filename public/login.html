@@ -8,24 +8,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    /* Giữ nguyên phần CSS như trước */
     *, *::before, *::after { box-sizing: border-box; }
-    html, body {
-      margin: 0; padding: 0;
-      font-family: 'Roboto', Arial, sans-serif;
-      background: #f6f7fb;
-      color: #23272f;
-      min-height: 100vh;
-      height: 100%;
-    }
-    #navbar-container {
-      width: 100vw;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
-      z-index: 10000;
-      left: 0;
-      top: 0;
-      position: fixed;
-    }
+    html, body { margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; background: #f6f7fb; color: #23272f; min-height: 100vh; height: 100%; }
+    #navbar-container { width: 100vw; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.09); z-index: 10000; left: 0; top: 0; position: fixed; }
     .desktop-navbar { display: block !important; min-height:54px;}
     .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     @media (max-width: 768px) {
@@ -102,173 +88,40 @@
       }
       h2 { font-size: 1.18em; }
     }
-    /* --- MOBILE NAVBAR Style (đồng bộ với index.html) --- */
     @media (max-width: 768px) {
-      #navbar-container {
-        padding: 0;
-        min-height: 54px;
-        height: 54px;
-      }
-      .mobile-navbar {
-        position: relative;
-        display: flex !important;
-        align-items: center;
-        width: 100vw;
-        background: #228B22;
-        min-height: 54px;
-        height: 54px;
-        z-index: 10001;
-      }
-      .mobile-navbar .hamburger {
-        padding: 12px 12px 12px 7px;
-        font-size: 27px;
-        color: #fff;
-        background: none;
-        border: none;
-        outline: none;
-        margin-right: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .navbar-title {
-        flex: 1 1 70%;
-        display: flex;
-        flex-direction: column;
-        line-height: 1.1;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .mobile-navbar .navbar-title .brand-main {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 1.13em;
-        line-height: 1.1;
-        margin-bottom: 0;
-      }
-      .mobile-navbar .navbar-title .brand-sub {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 0.99em;
-        line-height: 1;
-        margin-top: 0;
-      }
-      .mobile-navbar .mobile-hotline {
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border-radius: 30px;
-        padding: 3px 16px 3px 11px;
-        box-shadow: 0 0 5px #1113;
-        height: 28px;
-        font-size: 0.98em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-decoration: none !important;
-      }
-      .mobile-navbar .mobile-hotline .hotline-number {
-        font-size: 1.07em;
-        margin-left: 3px;
-        font-weight: bold;
-        color: #0011ff;
-        letter-spacing: 0.5px;
-        text-decoration: none !important;
-      }
+      #navbar-container { padding: 0; min-height: 54px; height: 54px; }
+      .mobile-navbar { position: relative; display: flex !important; align-items: center; width: 100vw; background: #228B22; min-height: 54px; height: 54px; z-index: 10001; }
+      .mobile-navbar .hamburger { padding: 12px 12px 12px 7px; font-size: 27px; color: #fff; background: none; border: none; outline: none; margin-right: 6px; cursor: pointer; display: flex; align-items: center; }
+      .mobile-navbar .navbar-title { flex: 1 1 70%; display: flex; flex-direction: column; line-height: 1.1; min-width: 0; white-space: nowrap; overflow: hidden; }
+      .mobile-navbar .navbar-title .brand-main { color: #e1ba0a; font-weight: bold; font-size: 1.13em; line-height: 1.1; margin-bottom: 0; }
+      .mobile-navbar .navbar-title .brand-sub { color: #e1ba0a; font-weight: bold; font-size: 0.99em; line-height: 1; margin-top: 0; }
+      .mobile-navbar .mobile-hotline { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); display: flex; align-items: center; background: #fff; border-radius: 30px; padding: 3px 16px 3px 11px; box-shadow: 0 0 5px #1113; height: 28px; font-size: 0.98em; white-space: nowrap; overflow: hidden; text-decoration: none !important; }
+      .mobile-navbar .mobile-hotline .hotline-number { font-size: 1.07em; margin-left: 3px; font-weight: bold; color: #0011ff; letter-spacing: 0.5px; text-decoration: none !important; }
       .mobile-navbar .mobile-hotline:link,
       .mobile-navbar .mobile-hotline:visited,
       .mobile-navbar .mobile-hotline:hover,
-      .mobile-navbar .mobile-hotline:active {
-        text-decoration: none !important;
-      }
-      .mobile-navbar-menu {
-        display: none;
-        position: fixed;
-        top: 54px;
-        left: 0;
-        width: max-content;
-        min-width: 140px;
-        max-width: 70vw;
-        background: #228B22;
-        color: #fff;
-        z-index: 12000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
-        border-radius: 0 0 10px 0;
-        padding: 0 0 12px 0;
-        animation: slideInMenu 0.18s;
-      }
-      .mobile-navbar-menu.open {
-        display: block !important;
-      }
-      @keyframes slideInMenu {
-        from { transform: translateX(-90%); opacity: 0.5; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      .mobile-navbar-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 10px 0 0 0;
-      }
-      .mobile-navbar-menu li {
-        padding: 13px 0 9px 18px;
-        font-size: 1.12em;
-        cursor: pointer;
-        font-weight: bold;
-        border-bottom: 1px solid rgba(255,255,255,0.10);
-        transition: background 0.1s;
-      }
+      .mobile-navbar .mobile-hotline:active { text-decoration: none !important; }
+      .mobile-navbar-menu { display: none; position: fixed; top: 54px; left: 0; width: max-content; min-width: 140px; max-width: 70vw; background: #228B22; color: #fff; z-index: 12000; box-shadow: 2px 0 10px rgba(0,0,0,0.13); border-radius: 0 0 10px 0; padding: 0 0 12px 0; animation: slideInMenu 0.18s; }
+      .mobile-navbar-menu.open { display: block !important; }
+      @keyframes slideInMenu { from { transform: translateX(-90%); opacity: 0.5; } to { transform: translateX(0); opacity: 1; } }
+      .mobile-navbar-menu ul { list-style: none; margin: 0; padding: 10px 0 0 0; }
+      .mobile-navbar-menu li { padding: 13px 0 9px 18px; font-size: 1.12em; cursor: pointer; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.10); transition: background 0.1s; }
       .mobile-navbar-menu li:active,
-      .mobile-navbar-menu li:hover {
-        background: #1c6e1b;
-      }
+      .mobile-navbar-menu li:hover { background: #1c6e1b; }
       .mobile-navbar-menu li:last-child { border-bottom: none; }
     }
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
-    /* Footer */
-    #footer-container {
-      background: #228B22;
-      color: #fff;
-      width: 100vw;
-      min-height: 54px;
-      height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1em;
-      box-sizing: border-box;
-      text-align: center;
-      padding: 0 10px;
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      z-index: 999;
-    }
-    #footer-container div {
-      width: 100%;
-      text-align: center;
-      line-height: 1.15;
-      word-break: break-word;
-    }
+    #footer-container { background: #228B22; color: #fff; width: 100vw; min-height: 54px; height: 54px; display: flex; align-items: center; justify-content: center; font-size: 1em; box-sizing: border-box; text-align: center; padding: 0 10px; position: fixed; left: 0; bottom: 0; z-index: 999; }
+    #footer-container div { width: 100%; text-align: center; line-height: 1.15; word-break: break-word; }
     @media (max-width: 768px) {
-      #footer-container {
-        font-size: 0.96em;
-        padding: 0 3px;
-        min-height: 54px;
-        height: 54px;
-      }
+      #footer-container { font-size: 0.96em; padding: 0 3px; min-height: 54px; height: 54px; }
     }
   </style>
 </head>
 <body>
-   <!-- NAVBAR: Desktop & Mobile (bổ sung mobile-navbar) -->
   <div id="navbar-container">
-    <!-- Mobile Navbar (Ẩn trên desktop) -->
     <div class="mobile-navbar">
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
@@ -282,18 +135,15 @@
         <span class="hotline-number">0902 926 636</span>
       </a>
     </div>
-    <!-- Mobile Hamburger menu overlay -->
     <nav class="mobile-navbar-menu" id="mobileMenu">
       <ul>
         <li data-href="index.html">Đặt dịch vụ</li>
         <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
       </ul>
     </nav>
-    <!-- Desktop Navbar (giữ nguyên load từ navbar.html) -->
     <div class="desktop-navbar"></div>
   </div>
-  <!-- FORM ĐĂNG NHẬP -->
-  <form class="login-container" id="loginForm">
+  <form class="login-container" id="loginForm" autocomplete="off">
     <h2>Đăng nhập hệ thống</h2>
     <label for="loginRole" style="font-weight:600;margin-bottom:3px;display:block;">Chọn vai trò</label>
     <select id="loginRole">
@@ -303,146 +153,129 @@
     <input id="loginUser" type="text" placeholder="Tên đăng nhập" autocomplete="username">
     <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
     <div id="loginError"></div>
-    <button type="submit">Đăng nhập</button>
+    <button type="submit" id="loginBtn">Đăng nhập</button>
   </form>
-  <!-- FOOTER -->
   <div id="footer-container">
     <div>
       © 2025 <b>Coffee & Beer DJ GooDjn</b>. All rights reserved.<br>
       63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
     </div>
   </div>
-  <!-- SCRIPTS -->
   <script>
-  // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
-  fetch('navbar.html')
-    .then(response => response.text())
-    .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
 
-  // Mobile Hamburger menu JS
-  document.addEventListener('DOMContentLoaded', function(){
-    var hamburger = document.getElementById('hamburgerBtn');
-    var menu = document.getElementById('mobileMenu');
-    document.addEventListener('click', function(e){
-      if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
-        menu.classList.remove('open');
-      }
-    });
-    hamburger.onclick = function(e){
-      e.stopPropagation();
-      menu.classList.toggle('open');
-    };
-    menu.querySelectorAll('li').forEach(function(tab){
-      tab.onclick = function(){
-        menu.classList.remove('open');
-        window.location.href = tab.getAttribute('data-href');
+    document.addEventListener('DOMContentLoaded', function(){
+      var hamburger = document.getElementById('hamburgerBtn');
+      var menu = document.getElementById('mobileMenu');
+      document.addEventListener('click', function(e){
+        if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
+          menu.classList.remove('open');
+        }
+      });
+      hamburger.onclick = function(e){
+        e.stopPropagation();
+        menu.classList.toggle('open');
       };
-    });
+      menu.querySelectorAll('li').forEach(function(tab){
+        tab.onclick = function(){
+          menu.classList.remove('open');
+          window.location.href = tab.getAttribute('data-href');
+        };
+      });
 
-    // Submit form đăng nhập
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      doLogin();
-    });
-
-    // Bắt phím Enter ở mọi input, nếu đang không submit
-    var loginInputs = document.querySelectorAll('#loginForm input, #loginForm select');
-    loginInputs.forEach(function(inp){
-      inp.addEventListener('keydown', function(ev){
-        if(ev.key === 'Enter') {
-          ev.preventDefault();
-          doLogin();
-        }
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        doLogin();
       });
     });
-  });
 
-  // Đăng nhập
-  let isLoggingIn = false;
-  async function doLogin() {
-    if(isLoggingIn) return;
-    isLoggingIn = true;
+    let isLoggingIn = false;
 
-    var role = document.getElementById('loginRole').value.trim();
-    var user = document.getElementById('loginUser').value.trim();
-    var pass = document.getElementById('loginPass').value.trim();
-    var err = document.getElementById('loginError');
-    var btn = document.querySelector('.login-container button[type="submit"]');
-    var loginInputs = document.querySelectorAll('#loginForm input, #loginForm select');
-
-    err.style.display = 'none';
-    btn.disabled = true;
-    btn.innerText = "Đang đăng nhập...";
-    // Disable all input khi submit để tránh nháy focus lại
-    loginInputs.forEach(el => el.disabled = true);
-
-    // Ẩn footer để tránh bị tụt khi bàn phím ảo đóng lại
-    document.getElementById('footer-container').style.display = 'none';
-
-    if (!role || !user || !pass) {
-      err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
-      err.style.display = 'block';
-      btn.disabled = false;
-      btn.innerText = "Đăng nhập";
-      loginInputs.forEach(el => el.disabled = false);
-      document.getElementById('footer-container').style.display = '';
-      isLoggingIn = false;
-      return;
+    // Hàm fetch có timeout
+    function fetchWithTimeout(url, options, timeout = 10000) {
+      return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+      ]);
     }
-    try {
-      const resp = await fetch('/api/get-login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username: user, password: pass, role: role})
-      });
-      const data = await resp.json();
-      if (data.success) {
-        // Đăng nhập thành công: chuyển hướng đúng trang tuỳ role
-        if (role === 'Quản lý') {
-          localStorage.setItem('isAdmin', '1');
-          window.location.href = 'quanly.html';
-        } else if (role === 'Nhân viên') {
-          localStorage.removeItem('isAdmin');
-          window.location.href = 'inbill.html';
-        } else {
-          localStorage.removeItem('isAdmin');
-          window.location.href = 'index.html';
-        }
-      } else {
-        err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
+
+    async function doLogin() {
+      if (isLoggingIn) return;
+      isLoggingIn = true;
+      var role = document.getElementById('loginRole').value.trim();
+      var user = document.getElementById('loginUser').value.trim();
+      var pass = document.getElementById('loginPass').value.trim();
+      var err = document.getElementById('loginError');
+      var btn = document.getElementById('loginBtn');
+      var footer = document.getElementById('footer-container');
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = "Đang đăng nhập...";
+      if (window.innerWidth <= 768 && footer) footer.style.display = 'none';
+
+      if (!role || !user || !pass) {
+        err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = "Đăng nhập";
-        loginInputs.forEach(el => el.disabled = false);
-        document.getElementById('footer-container').style.display = '';
         isLoggingIn = false;
+        if (window.innerWidth <= 768 && footer) footer.style.display = '';
+        return;
       }
-    } catch (e) {
-      err.innerText = 'Lỗi máy chủ. Thử lại sau!';
-      err.style.display = 'block';
-      btn.disabled = false;
-      btn.innerText = "Đăng nhập";
-      loginInputs.forEach(el => el.disabled = false);
-      document.getElementById('footer-container').style.display = '';
-      isLoggingIn = false;
+      try {
+        const resp = await fetchWithTimeout('/api/get-login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({username: user, password: pass, role: role})
+        }, 10000);
+        let data = {};
+        try {
+          data = await resp.json();
+        } catch (jsonErr) {
+          data = {};
+        }
+        if (data && data.success) {
+          if (role === 'Quản lý') {
+            localStorage.setItem('isAdmin', '1');
+            window.location.href = 'quanly.html';
+          } else if (role === 'Nhân viên') {
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'inbill.html';
+          } else {
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'index.html';
+          }
+        } else {
+          let msg = '';
+          if (data && data.message) msg = data.message;
+          else if (resp.status === 401) msg = 'Sai tên đăng nhập hoặc mật khẩu!';
+          else if (resp.status >= 400) msg = 'Lỗi máy chủ!';
+          else msg = 'Sai thông tin đăng nhập hoặc vai trò!';
+          err.innerText = msg;
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.innerText = "Đăng nhập";
+          isLoggingIn = false;
+          if (window.innerWidth <= 768 && footer) footer.style.display = '';
+        }
+      } catch (e) {
+        let errMsg = (e && e.message === 'timeout') ? 'Máy chủ không phản hồi, thử lại sau!' : 'Lỗi mạng hoặc máy chủ!';
+        err.innerText = errMsg;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = "Đăng nhập";
+        isLoggingIn = false;
+        if (window.innerWidth <= 768 && footer) footer.style.display = '';
+      }
     }
-  }
-</script>
+  </script>
   <script>
     (function(){
-      // Chỉ thực hiện trên thiết bị di động
-      function isMobile() {
-        return window.innerWidth <= 768;
-      }
-      function hideFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = 'none';
-      }
-      function showFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = '';
-      }
-      // Tìm tất cả input, textarea để gán sự kiện focus/blur
+      function isMobile() { return window.innerWidth <= 768; }
+      function hideFooter() { if (window.isLoggingIn) return; var f = document.getElementById('footer-container'); if(f) f.style.display = 'none'; }
+      function showFooter() { if (window.isLoggingIn) return; var f = document.getElementById('footer-container'); if(f) f.style.display = ''; }
       document.addEventListener('DOMContentLoaded', function() {
         if(!isMobile()) return;
         var inputs = document.querySelectorAll('input, textarea, select');
@@ -450,7 +283,6 @@
           el.addEventListener('focus', hideFooter);
           el.addEventListener('blur', showFooter);
         });
-        // Nếu dùng thêm bàn phím ảo ngoài, có thể check thêm event resize
         var oldHeight = window.innerHeight;
         window.addEventListener('resize', function() {
           if(!isMobile()) return;
