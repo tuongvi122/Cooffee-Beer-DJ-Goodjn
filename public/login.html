@@ -115,7 +115,22 @@
       .mobile-navbar .mobile-hotline:visited,
       .mobile-navbar .mobile-hotline:hover,
       .mobile-navbar .mobile-hotline:active { text-decoration: none !important; }
-      .mobile-navbar-menu { display: none; position: fixed; top: 54px; left: 0; width: max-content; min-width: 140px; max-width: 70vw; background: #228B22; color: #fff; z-index: 12000; box-shadow: 2px 0 10px rgba(0,0,0,0.13); border-radius: 0 0 10px 0; padding: 0 0 12px 0; animation: slideInMenu 0.18s; }
+      .mobile-navbar-menu {
+  display: none;
+  position: fixed;
+  top: 54px;
+  left: 0;
+  min-width: 180px;
+  width: max-content;
+  max-width: 92vw;
+  background: #228B22;
+  color: #fff;
+  z-index: 12000;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+  border-radius: 0 0 10px 0;
+  padding: 0 0 16px 0;
+  animation: slideInMenu 0.18s;
+}      
       .mobile-navbar-menu.open { display: block !important; }
       @keyframes slideInMenu { from { transform: translateX(-90%); opacity: 0.5; } to { transform: translateX(0); opacity: 1; } }
       .mobile-navbar-menu ul { list-style: none; margin: 0; padding: 10px 0 0 0; }
