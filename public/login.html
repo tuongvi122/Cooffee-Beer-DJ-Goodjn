@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    /* ... giữ nguyên các CSS như đã tối ưu trước đó ... */
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
@@ -102,7 +103,7 @@
       }
       h2 { font-size: 1.18em; }
     }
-    /* --- MOBILE NAVBAR Style (đồng bộ với index.html) --- */
+    /* --- MOBILE NAVBAR Style ... giữ nguyên --- */
     @media (max-width: 768px) {
       #navbar-container {
         padding: 0;
@@ -347,7 +348,10 @@
     });
 
     // Đăng nhập (tối ưu trải nghiệm mobile)
+    let isLoggingIn = false;
     async function doLogin() {
+      if (isLoggingIn) return; // Ngăn double submit
+      isLoggingIn = true;
       var role = document.getElementById('loginRole').value.trim();
       var user = document.getElementById('loginUser').value.trim();
       var pass = document.getElementById('loginPass').value.trim();
@@ -365,6 +369,7 @@
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = "Đăng nhập";
+        isLoggingIn = false;
         if (window.innerWidth <= 768 && footer) footer.style.display = '';
         return;
       }
@@ -392,6 +397,7 @@
           err.style.display = 'block';
           btn.disabled = false;
           btn.innerText = "Đăng nhập";
+          isLoggingIn = false;
           if (window.innerWidth <= 768 && footer) footer.style.display = '';
         }
       } catch (e) {
@@ -399,6 +405,7 @@
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = "Đăng nhập";
+        isLoggingIn = false;
         if (window.innerWidth <= 768 && footer) footer.style.display = '';
       }
     }
@@ -410,10 +417,12 @@
         return window.innerWidth <= 768;
       }
       function hideFooter() {
+        if (window.isLoggingIn) return; // Không show/hide khi đang đăng nhập
         var f = document.getElementById('footer-container');
         if(f) f.style.display = 'none';
       }
       function showFooter() {
+        if (window.isLoggingIn) return;
         var f = document.getElementById('footer-container');
         if(f) f.style.display = '';
       }
