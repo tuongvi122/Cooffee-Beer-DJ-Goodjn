@@ -8,10 +8,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* Giữ nguyên phần CSS như trước */
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; background: #f6f7fb; color: #23272f; min-height: 100vh; height: 100%; }
-    #navbar-container { width: 100vw; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.09); z-index: 10000; left: 0; top: 0; position: fixed; }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #f6f7fb;
+      color: #23272f;
+      min-height: 100vh;
+      height: 100%;
+    }
+    #navbar-container {
+      width: 100vw;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      position: fixed;
+    }
     .desktop-navbar { display: block !important; min-height:54px;}
     .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     @media (max-width: 768px) {
@@ -162,10 +176,12 @@
     </div>
   </div>
   <script>
+    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
     fetch('navbar.html')
       .then(response => response.text())
       .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
 
+    // Hamburger menu
     document.addEventListener('DOMContentLoaded', function(){
       var hamburger = document.getElementById('hamburgerBtn');
       var menu = document.getElementById('mobileMenu');
@@ -184,87 +200,92 @@
           window.location.href = tab.getAttribute('data-href');
         };
       });
-
-      document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        doLogin();
-      });
     });
 
+    // Xử lý đăng nhập tối ưu mobile: touchend + blur + submit sau khi đóng bàn phím
     let isLoggingIn = false;
+    let blurTimeout = null;
 
-    // Hàm fetch có timeout
-    function fetchWithTimeout(url, options, timeout = 10000) {
-      return Promise.race([
-        fetch(url, options),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-      ]);
-    }
-async function doLogin() {
-  if (isLoggingIn) return;
-  isLoggingIn = true;
-  var err = document.getElementById('loginError');
-  var btn = document.getElementById('loginBtn');
-  var footer = document.getElementById('footer-container');
-
-  // Ép các input mất focus để cập nhật giá trị đúng trên mobile
-  document.activeElement && document.activeElement.blur();
-  // Đợi 1 chút cho giá trị input cập nhật
-  await new Promise(resolve => setTimeout(resolve, 100));
-
-  var role = document.getElementById('loginRole').value.trim();
-  var user = document.getElementById('loginUser').value.trim();
-  var pass = document.getElementById('loginPass').value.trim();
-
-  err.style.display = 'none';
-  btn.disabled = true;
-  btn.innerText = "Đang đăng nhập...";
-  if (window.innerWidth <= 768 && footer) footer.style.display = 'none';
-
-  if (!role || !user || !pass) {
-    err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.innerText = "Đăng nhập";
-    isLoggingIn = false;
-    if (window.innerWidth <= 768 && footer) footer.style.display = '';
-    return;
-  }
-  try {
-    const resp = await fetch('/api/get-login', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({username: user, password: pass, role: role})
-    });
-    const data = await resp.json();
-    if (data.success) {
-      if (role === 'Quản lý') {
-        localStorage.setItem('isAdmin', '1');
-        window.location.href = 'quanly.html';
-      } else if (role === 'Nhân viên') {
-        localStorage.removeItem('isAdmin');
-        window.location.href = 'inbill.html';
+    function handleLoginMobile(e) {
+      if (isLoggingIn) return;
+      // Nếu có input đang focus (bàn phím còn mở), blur nó rồi đợi 120ms mới login
+      if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT")) {
+        document.activeElement.blur();
+        clearTimeout(blurTimeout);
+        blurTimeout = setTimeout(doLogin, 120);
       } else {
-        localStorage.removeItem('isAdmin');
-        window.location.href = 'index.html';
+        doLogin();
       }
-    } else {
-      err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
-      err.style.display = 'block';
-      btn.disabled = false;
-      btn.innerText = "Đăng nhập";
-      isLoggingIn = false;
-      if (window.innerWidth <= 768 && footer) footer.style.display = '';
     }
-  } catch (e) {
-    err.innerText = 'Lỗi máy chủ. Thử lại sau!';
-    err.style.display = 'block';
-    btn.disabled = false;
-    btn.innerText = "Đăng nhập";
-    isLoggingIn = false;
-    if (window.innerWidth <= 768 && footer) footer.style.display = '';
-  }
-}
+
+    document.getElementById('loginBtn').addEventListener('touchend', function(e) {
+      e.preventDefault();
+      handleLoginMobile();
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleLoginMobile();
+    });
+
+    async function doLogin() {
+      if (isLoggingIn) return;
+      isLoggingIn = true;
+      var role = document.getElementById('loginRole').value.trim();
+      var user = document.getElementById('loginUser').value.trim();
+      var pass = document.getElementById('loginPass').value.trim();
+      var err = document.getElementById('loginError');
+      var btn = document.getElementById('loginBtn');
+      var footer = document.getElementById('footer-container');
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = "Đang đăng nhập...";
+      if (window.innerWidth <= 768 && footer) footer.style.display = 'none';
+
+      if (!role || !user || !pass) {
+        err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = "Đăng nhập";
+        isLoggingIn = false;
+        if (window.innerWidth <= 768 && footer) footer.style.display = '';
+        return;
+      }
+      try {
+        const resp = await fetch('/api/get-login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({username: user, password: pass, role: role})
+        });
+        const data = await resp.json();
+        if (data.success) {
+          if (role === 'Quản lý') {
+            localStorage.setItem('isAdmin', '1');
+            window.location.href = 'quanly.html';
+          } else if (role === 'Nhân viên') {
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'inbill.html';
+          } else {
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'index.html';
+          }
+        } else {
+          err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.innerText = "Đăng nhập";
+          isLoggingIn = false;
+          if (window.innerWidth <= 768 && footer) footer.style.display = '';
+        }
+      } catch (e) {
+        err.innerText = 'Lỗi máy chủ. Thử lại sau!';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = "Đăng nhập";
+        isLoggingIn = false;
+        if (window.innerWidth <= 768 && footer) footer.style.display = '';
+      }
+    }
   </script>
   <script>
     (function(){
