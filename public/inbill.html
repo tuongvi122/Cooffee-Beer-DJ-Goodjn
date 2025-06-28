@@ -1,31 +1,208 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
   <meta charset="utf-8">
   <title>In Bill | Coffee & Beer GooDjn</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    html, body { height: 100%; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #fafbfc;
+      color: #23272f;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
     body {
-      min-height: 100vh; display: flex; flex-direction: column;
-      font-family: 'Segoe UI', Arial, sans-serif; background-color: #f9f9f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #fafbfc;
     }
     #navbar-container {
-      position: fixed; top: 0; left: 0; width: 100vw; z-index: 10000;
-      background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 10000;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.09);
     }
     .site-content {
-      flex: 1 0 auto; display: flex; flex-direction: column;
-      padding-top: 28px; align-items: center;
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding-top: 70px;
+      padding-bottom: 0;
+      align-items: center;
     }
     #footer-container {
-      background: #228B22; color: #fff; width: 100vw; min-height: 54px; height: 54px;
-      display: flex; align-items: center; justify-content: center; font-size: 1em;
-      box-sizing: border-box; text-align: center; padding: 0 10px; position: fixed; left: 0; bottom: 0;
+      background: #228B22;
+      color: #fff;
+      width: 100vw;
+      min-height: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 0 10px;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 999;
     }
-    #footer-container div { width: 100%; text-align: center; line-height: 1.15; word-break: break-word; }
-
+    #footer-container div {
+      width: 100%;
+      text-align: center;
+      line-height: 1.15;
+      word-break: break-word;
+    }
+    @media (max-width: 600px) {
+      .mobile-navbar {
+        position: relative;
+        display: flex !important;
+        align-items: center;
+        width: 100vw;
+        background: #228B22;
+        min-height: 54px;
+        height: 54px;
+        z-index: 10001;
+      }
+      .mobile-navbar .hamburger {
+        padding: 12px 12px 12px 7px;
+        font-size: 27px;
+        color: #fff;
+        background: none;
+        border: none;
+        outline: none;
+        margin-right: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+      .mobile-navbar .navbar-title {
+        flex: 1 1 70%;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        padding-right: 0;
+      }
+      .mobile-navbar .navbar-title .brand-main {
+        color: #e1ba0a;
+        font-weight: bold;
+        font-size: 1.13em;
+        line-height: 1.1;
+        margin-bottom: 0;
+      }
+      .mobile-navbar .navbar-title .brand-sub {
+        color: #e1ba0a;
+        font-weight: bold;
+        font-size: 0.99em;
+        line-height: 1;
+        margin-top: 0;
+      }
+      .mobile-navbar .mobile-hotline {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 30px;
+        padding: 3px 16px 3px 11px;
+        box-shadow: 0 0 5px #1113;
+        height: 28px;
+        font-size: 0.98em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-decoration: none !important;
+      }
+      .mobile-navbar .mobile-hotline .hotline-number {
+        font-size: 1.07em;
+        margin-left: 3px;
+        font-weight: bold;
+        color: #0011ff;
+        letter-spacing: 0.5px;
+        text-decoration: none !important;
+      }
+      .mobile-navbar .mobile-hotline:link,
+      .mobile-navbar .mobile-hotline:visited,
+      .mobile-navbar .mobile-hotline:hover,
+      .mobile-navbar .mobile-hotline:active {
+        text-decoration: none !important;
+      }
+      .mobile-navbar-menu {
+        display: none;
+        position: fixed;
+        top: 54px;
+        left: 0;
+        min-width: 180px;
+        width: max-content;
+        max-width: 92vw;
+        background: #228B22;
+        color: #fff;
+        z-index: 12000;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+        border-radius: 0 0 10px 0;
+        padding: 0 0 16px 0;
+        animation: slideInMenu 0.18s;
+      }
+      .mobile-navbar-menu.open { display: block; }
+      @keyframes slideInMenu {
+        from { transform: translateX(-90%); opacity: 0.5; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      .mobile-navbar-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 10px 0 0 0;
+      }
+      .mobile-navbar-menu li {
+        padding: 13px 0 9px 18px;
+        font-size: 1.12em;
+        cursor: pointer;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255,255,255,0.10);
+        transition: background 0.1s;
+      }
+      .mobile-navbar-menu li:active,
+      .mobile-navbar-menu li:hover {
+        background: #1c6e1b;
+      }
+      .mobile-navbar-menu li:last-child { border-bottom: none; }
+      #footer-container {
+        min-height: 54px;
+        height: 54px;
+        font-size: 0.98em;
+        padding: 0 7px;
+        line-height: 1.15;
+      }
+      #footer-container div {
+        width: 100%;
+        text-align: center;
+        line-height: 1.15;
+        word-break: break-word;
+      }
+    }
+    @media (max-width: 768px) {
+      #navbar-container .desktop-navbar {
+        display: none !important;
+      }
+    }
+    @media (min-width: 769px) {
+      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
+    }
     .bill-panel {
       width: 100%; max-width: 410px; margin: 0 auto 80px auto; margin-top: 22px;
       background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
@@ -103,7 +280,6 @@
       .bill-panel { max-width: 99vw !important; }
       .bill-print-wrapper { max-width: 95vw !important; }
       .site-content { padding-bottom: 54px !important; }
-      #footer-container { min-height: 54px; font-size: 0.98em; padding: 0 7px; }
       .bill-header { font-size: 0.98em; }
       #bill-order-code { font-size: 0.97em; }
     }
@@ -111,7 +287,7 @@
       .bill-print-wrapper { padding: 6px 2px 10px 2px; }
       .bill-header { padding: 0 2px; }
     }
-       @media print {
+    @media print {
       body * { visibility: hidden !important; }
       .bill-print-wrapper, .bill-print-wrapper * { 
         visibility: visible !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
@@ -161,30 +337,29 @@
     .order-list-table tr:hover td { background: #a6f5e5; }
     .order-list-table td { font-size: 0.9em; max-height: 32px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .order-status-btn, .order-status-paid {
-  padding: 6px 16px;
-  min-width: 140px;
-  /* hoặc dùng width: 130px; nếu muốn cố định luôn */
-  font-size: 1em;
-  line-height: 1.2;
-  border: none;
-  border-radius: 8px;
-  display: inline-block;
-  text-align: center;
-  box-sizing: border-box;
-  font-weight: 500;
-  height: 30px;
-}
+      padding: 6px 16px;
+      min-width: 140px;
+      font-size: 1em;
+      line-height: 1.2;
+      border: none;
+      border-radius: 8px;
+      display: inline-block;
+      text-align: center;
+      box-sizing: border-box;
+      font-weight: 500;
+      height: 30px;
+    }
     .order-status-btn { background: #e20808; color: #fff; cursor: pointer; transition: background 0.15s; }
     .order-status-btn:hover { background: #9e2323; }
     .order-status-paid { background: #0cac11; color: #fff; cursor: default; }
     .order-pagination-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  position: relative;
-}
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: relative;
+    }
     .order-entries-select {
       font-size: 1em; padding: 2px 5px; border-radius: 4px; border: 1px solid #b5c8db;
     }
@@ -203,72 +378,66 @@
       .order-list-panel { min-width: unset; width: 99vw !important; max-width: none !important;}
       .order-list-table th, .order-list-table td { font-size: 0.96em; padding: 6px 2px;}
     }
-    /* Tối ưu input tìm kiếm */
-  .order-search-box {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  /* Đảm bảo nằm sát phải */
-}
-#order-search-input {
-  height: 26px;
-  min-width: 100px;
-  width: 140px;
-  font-size: 0.96em;
-  padding: 2px 7px;
-  border: 2px solid #2ecc40;
-  border-radius: 6px;
-  outline: none;
-  transition: border .16s;
-}
+    .order-search-box {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #order-search-input {
+      height: 26px;
+      min-width: 100px;
+      width: 140px;
+      font-size: 0.96em;
+      padding: 2px 7px;
+      border: 2px solid #2ecc40;
+      border-radius: 6px;
+      outline: none;
+      transition: border .16s;
+    }
     #order-search-input:focus { border-color: #1663b1;}
-.order-pagination-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  position: relative;
-}
-
-.order-search-box {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  /* Đảm bảo nằm sát phải */
-}
-
-#order-search-input {
-  height: 26px;
-  min-width: 100px;
-  width: 140px;
-  font-size: 0.96em;
-  padding: 2px 7px;
-  border: 2px solid #2ecc40;
-  border-radius: 6px;
-  outline: none;
-  transition: border .16s;
-}
-
-#order-search-clear {
-  height: 26px;
-  background: #e53935;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  font-size: 1em;
-  padding: 0 7px;
-  cursor: pointer;
-  transition: background 0.14s;
-  margin-left: 2px;
-}
-#order-search-clear:hover { background: #a72816; }
+    #order-search-clear {
+      height: 26px;
+      background: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      padding: 0 7px;
+      cursor: pointer;
+      transition: background 0.14s;
+      margin-left: 2px;
+    }
+    #order-search-clear:hover { background: #a72816; }
   </style>
 </head>
-body>
-  <div id="navbar-container"><div class="desktop-navbar"></div></div>
+<body>
+  <!-- NAVBAR -->
+  <div id="navbar-container">
+    <!-- Mobile Navbar -->
+    <div class="mobile-navbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
+        <i class="fa fa-bars"></i>
+      </button>
+      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
+        <span class="brand-main">Coffee & Beer</span>
+        <span class="brand-sub">DJ GooDjn</span>
+      </a>
+      <a class="mobile-hotline" href="tel:0902926636">
+        <i class="fa-solid fa-phone" style="color:#e53935"></i>
+        <span class="hotline-number">0902 926 636</span>
+      </a>
+    </div>
+    <nav class="mobile-navbar-menu" id="mobileMenu">
+      <ul>
+        <li data-href="index.html">Đặt dịch vụ</li>
+        <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
+        <li id="mobileLogoutTab" style="display:none;">Đăng xuất</li>
+      </ul>
+    </nav>
+    <!-- Desktop Navbar (tải động qua JS) -->
+    <div class="desktop-navbar"></div>
+  </div>
   <div class="site-content">
     <div class="main-flex-container">
       <div class="order-list-panel">
@@ -325,14 +494,97 @@ body>
         63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
       </div>
     </div>
+  </div>
   <script>
-    // Load navbar async, fail gracefully
-    fetch('navbar.html')
-      .then(r => r.ok ? r.text() : '')
-      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; })
-      .catch(()=>{});
+    // Kiểm tra đăng nhập, nếu chưa sẽ chuyển về login.html
+    if(!localStorage.getItem('isLoggedIn')) window.location.replace('login.html');
 
-    // ========== BILL PANEL ==========
+    // Hàm hiện/ẩn tab Đăng xuất cả desktop và mobile
+    function showLogoutTabIfLoggedIn() {
+      var logoutTab = document.getElementById('logoutTab');
+      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+      if(localStorage.getItem('isLoggedIn') === '1') {
+        if (logoutTab) logoutTab.style.display = '';
+        if (mobileLogoutTab) mobileLogoutTab.style.display = '';
+      } else {
+        if (logoutTab) logoutTab.style.display = 'none';
+        if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
+      }
+    }
+    // Hàm đăng xuất
+    function logout() {
+      localStorage.removeItem('isAdmin');
+      localStorage.removeItem('isLoggedIn');
+      window.location.replace('login.html');
+    }
+    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(html => {
+        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html;
+        showLogoutTabIfLoggedIn();
+        // Gắn sự kiện cho nút Đăng xuất desktop nếu chưa có
+        var logoutTab = document.getElementById('logoutTab');
+        if(logoutTab) logoutTab.onclick = logout;
+      });
+
+    // Xử lý menu mobile
+    document.addEventListener('DOMContentLoaded', function(){
+      var hamburger = document.getElementById('hamburgerBtn');
+      var menu = document.getElementById('mobileMenu');
+      document.addEventListener('click', function(e){
+        if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
+          menu.classList.remove('open');
+        }
+      });
+      hamburger.onclick = function(e){
+        e.stopPropagation();
+        menu.classList.toggle('open');
+      };
+      menu.querySelectorAll('li[data-href]').forEach(function(tab){
+        tab.onclick = function(){
+          menu.classList.remove('open');
+          window.location.href = tab.getAttribute('data-href');
+        };
+      });
+      // Gắn sự kiện cho nút Đăng xuất trên mobile
+      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
+      if(mobileLogoutTab) {
+        mobileLogoutTab.onclick = function() { logout(); };
+      }
+      showLogoutTabIfLoggedIn();
+    });
+
+    // Footer auto-hide on mobile input focus (bàn phím ảo)
+    (function(){
+      function isMobile() { return window.innerWidth <= 768; }
+      function hideFooter() {
+        var f = document.getElementById('footer-container');
+        if(f) f.style.display = 'none';
+      }
+      function showFooter() {
+        var f = document.getElementById('footer-container');
+        if(f) f.style.display = '';
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        if(!isMobile()) return;
+        var inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(function(el) {
+          el.addEventListener('focus', hideFooter);
+          el.addEventListener('blur', showFooter);
+        });
+        var oldHeight = window.innerHeight;
+        window.addEventListener('resize', function() {
+          if(!isMobile()) return;
+          if(window.innerHeight < oldHeight - 80) hideFooter();
+          else showFooter();
+          oldHeight = window.innerHeight;
+        });
+      });
+    })();
+  </script>
+  <!-- ========== BILL PANEL ========== -->
+  <script>
     const inputOrderCode = document.getElementById('bill-order-code');
     const btnSearch = document.getElementById('bill-search-btn');
     const btnPrint = document.getElementById('bill-print-btn');
@@ -395,7 +647,6 @@ body>
         if (confirm('Bạn đã in hóa đơn thành công? Nhấn OK để xác nhận, hoặc Cancel để KHÔNG ghi nhận thanh toán.')) {
           btnPrint.disabled = true;
           try {
-            // Ghi nhận thanh toán (frintbill.js đồng bộ bustCache backend)
             await fetch('/api/frintbill', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -404,7 +655,6 @@ body>
                 items: currentBillData.bill.map(row => ({ maNV: row.maNV, caLV: row.caLV }))
               })
             });
-            // Tự động reload danh sách đơn và bill để cập nhật trạng thái mới nhất
             await loadOrderList();
             await btnSearch.onclick();
           } catch (e) {
@@ -611,6 +861,5 @@ body>
     }
     loadOrderList();
   </script>
-  </div>
 </body>
 </html>
