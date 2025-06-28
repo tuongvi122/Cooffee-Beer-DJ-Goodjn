@@ -293,7 +293,7 @@
     <div class="desktop-navbar"></div>
   </div>
   <!-- FORM ĐĂNG NHẬP -->
-  <form class="login-container" id="loginForm">
+  <form class="login-container" id="loginForm" autocomplete="off">
     <h2>Đăng nhập hệ thống</h2>
     <label for="loginRole" style="font-weight:600;margin-bottom:3px;display:block;">Chọn vai trò</label>
     <select id="loginRole">
@@ -303,7 +303,7 @@
     <input id="loginUser" type="text" placeholder="Tên đăng nhập" autocomplete="username">
     <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
     <div id="loginError"></div>
-    <button type="submit">Đăng nhập</button>
+    <button type="submit" id="loginBtn">Đăng nhập</button>
   </form>
   <!-- FOOTER -->
   <div id="footer-container">
@@ -319,7 +319,7 @@
       .then(response => response.text())
       .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; });
 
-    // Mobile Hamburger menu JS
+    // Hamburger menu và submit form
     document.addEventListener('DOMContentLoaded', function(){
       var hamburger = document.getElementById('hamburgerBtn');
       var menu = document.getElementById('mobileMenu');
@@ -339,29 +339,33 @@
         };
       });
 
-      // Tối ưu submit form đăng nhập
+      // Submit form đăng nhập
       document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         doLogin();
       });
     });
 
-    // Đăng nhập
+    // Đăng nhập (tối ưu trải nghiệm mobile)
     async function doLogin() {
       var role = document.getElementById('loginRole').value.trim();
       var user = document.getElementById('loginUser').value.trim();
       var pass = document.getElementById('loginPass').value.trim();
       var err = document.getElementById('loginError');
-      var btn = document.querySelector('.login-container button[type="submit"]');
+      var btn = document.getElementById('loginBtn');
+      var footer = document.getElementById('footer-container');
       err.style.display = 'none';
       btn.disabled = true;
       btn.innerText = "Đang đăng nhập...";
+      // Ẩn footer khi bắt đầu đăng nhập (tránh shift layout)
+      if (window.innerWidth <= 768 && footer) footer.style.display = 'none';
 
       if (!role || !user || !pass) {
         err.innerText = 'Vui lòng chọn vai trò và nhập đầy đủ thông tin!';
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = "Đăng nhập";
+        if (window.innerWidth <= 768 && footer) footer.style.display = '';
         return;
       }
       try {
@@ -388,12 +392,14 @@
           err.style.display = 'block';
           btn.disabled = false;
           btn.innerText = "Đăng nhập";
+          if (window.innerWidth <= 768 && footer) footer.style.display = '';
         }
       } catch (e) {
         err.innerText = 'Lỗi máy chủ. Thử lại sau!';
         err.style.display = 'block';
         btn.disabled = false;
         btn.innerText = "Đăng nhập";
+        if (window.innerWidth <= 768 && footer) footer.style.display = '';
       }
     }
   </script>
@@ -411,7 +417,6 @@
         var f = document.getElementById('footer-container');
         if(f) f.style.display = '';
       }
-      // Tìm tất cả input, textarea để gán sự kiện focus/blur
       document.addEventListener('DOMContentLoaded', function() {
         if(!isMobile()) return;
         var inputs = document.querySelectorAll('input, textarea, select');
@@ -419,7 +424,6 @@
           el.addEventListener('focus', hideFooter);
           el.addEventListener('blur', showFooter);
         });
-        // Nếu dùng thêm bàn phím ảo ngoài, có thể check thêm event resize
         var oldHeight = window.innerHeight;
         window.addEventListener('resize', function() {
           if(!isMobile()) return;
