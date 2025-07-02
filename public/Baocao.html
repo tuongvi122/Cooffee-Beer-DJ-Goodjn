@@ -384,6 +384,26 @@
     margin-top: 3px !important;
     margin-bottom: 3px !important;
   }
+    .bc-input {
+    width: 160px !important;
+    min-width: 100px;
+    max-width: 100%;
+  }
+}
+.bc-table-total-right {
+  text-align: right;
+  font-weight: 500;           /* Cho nhỏ hơn, nhẹ hơn */
+  color: #1f1d1d;                /* Ví dụ: màu xám, bạn có thể đổi mã màu khác */
+  font-size: 0.97em;          /* Cho nhỏ lại so với mặc định */
+  margin-bottom: 2px;
+  margin-top: 3px;
+  width: 100%;
+  letter-spacing: 0.5px;
+}
+.bc-table-total-right span {
+  color: #0b0b0b;             /* Ví dụ: xanh lá nhạt hơn, bạn có thể đổi màu khác */
+  font-weight: 600;
+  font-size: 1em;             /* Giữ số nổi bật hơn chữ */
 }
   </style>
 </head>
@@ -474,6 +494,7 @@
           <option value="nam">BC năm</option>
         </select>
         <input id="bcInput" class="bc-input" placeholder="" style="display:inline-block;">
+        <select id="bcYearSelect" class="bc-input" style="display:none;"></select>
         <button class="bc-btn-search" id="bcSearchBtn">Search</button>
         <button class="bc-btn-reset" id="bcResetBtn">Xóa</button>
       </div>
