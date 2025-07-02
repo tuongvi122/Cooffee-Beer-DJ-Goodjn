@@ -770,20 +770,6 @@
   </style>
 </head>
 <body>
-  <script>
-  function logout() {
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('isLoggedIn');
-    window.location.replace('login.html');
-  }
-  window.addEventListener('pageshow', function(event) {
-    var navType = window.performance.getEntriesByType("navigation")[0]?.type;
-    if (event.persisted || navType === "back_forward") {
-      logout();
-    }
-  });
-  if (localStorage.getItem('isAdmin') !== '1') logout();
-</script>
   <!-- NAVBAR -->
   <div id="navbar-container">
     <!-- Mobile Navbar -->
