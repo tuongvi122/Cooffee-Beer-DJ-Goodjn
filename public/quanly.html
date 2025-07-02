@@ -949,6 +949,9 @@ function logout() {
       .then(html => {
         document.querySelector('#navbar-container .desktop-navbar').innerHTML = html;
         showLogoutTabIfLoggedIn();
+         // Chỉ hiện tab Báo cáo trên trang quản lý
+    var baocaoTab = document.querySelector('.tab-baocao');
+    if (baocaoTab) baocaoTab.style.display = '';
       });
 
     // Xử lý menu mobile
