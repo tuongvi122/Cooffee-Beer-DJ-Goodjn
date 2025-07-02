@@ -1,7 +1,8 @@
-// Xlbaocao.js – Xử lý báo cáo doanh thu cho Baocao.html
+// Xlbaocao.js – Xử lý báo cáo doanh thu cho Baocao.html (dropdown năm cho BC tháng)
 
 const bcType = document.getElementById('bcType');
 const bcInput = document.getElementById('bcInput');
+const bcYearSelect = document.getElementById('bcYearSelect');
 const bcSearchBtn = document.getElementById('bcSearchBtn');
 const bcResetBtn = document.getElementById('bcResetBtn');
 const bcNote = document.getElementById('bcNote');
@@ -20,6 +21,7 @@ function toInteger(str) {
 }
 
 // --- Hàm tách ngày/tháng/năm từ timestamp ---
+// Trả về "dd/MM/yyyy" từ chuỗi "dd/MM/yyyy HH:mm:ss"
 function getDay(str) {
   return (str || '').split(' ')[0];
 }
@@ -34,23 +36,48 @@ function getYear(str) {
 
 // Set input placeholder/type theo loại báo cáo
 function updateInputByType() {
-  if(bcType.value === 'ngay') {
-    bcInput.type = 'text';
-    bcInput.placeholder = '01/07/2025';
+  // Reset input về mặc định
+  bcInput.type = 'text';
+  bcInput.placeholder = '';
+  bcInput.value = '';
+  bcInput.style.display = '';
+  bcInput.removeAttribute('min');
+  bcInput.removeAttribute('max');
+  bcInput.removeAttribute('step');
+
+  // Ẩn dropdown năm mặc định
+  if (bcYearSelect) bcYearSelect.style.display = 'none';
+
+  if (bcType.value === 'ngay') {
+    bcInput.type = 'date';
     bcInput.value = '';
     bcInput.style.display = '';
-  } else if(bcType.value === 'thang') {
-    bcInput.type = 'number';
-    bcInput.placeholder = '2025';
-    bcInput.value = '';
-    bcInput.style.display = '';
-  } else if(bcType.value === 'nam') {
+    if (bcYearSelect) bcYearSelect.style.display = 'none';
+  } else if (bcType.value === 'thang') {
+    // Ẩn input thường, show dropdown
+    bcInput.style.display = 'none';
+    if (bcYearSelect) {
+      // Tạo danh sách năm từ 2025 đến hiện tại + 10
+      const thisYear = new Date().getFullYear();
+      const fromYear = 2025;
+      const toYear = thisYear + 10;
+      bcYearSelect.innerHTML = '<option value="">Chọn năm</option>';
+      for (let y = fromYear; y <= toYear; y++) {
+        bcYearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+      }
+      bcYearSelect.style.display = '';
+      bcYearSelect.value = '';
+    }
+  } else if (bcType.value === 'nam') {
     bcInput.value = '';
     bcInput.style.display = 'none';
+    if (bcYearSelect) bcYearSelect.style.display = 'none';
   } else {
+    bcInput.type = 'text';
+    bcInput.placeholder = '';
     bcInput.value = '';
     bcInput.style.display = '';
-    bcInput.placeholder = '';
+    if (bcYearSelect) bcYearSelect.style.display = 'none';
   }
   bcNote.textContent = '';
   bcTableWrap.innerHTML = '';
@@ -63,6 +90,7 @@ bcResetBtn.onclick = function() {
   bcInput.value = '';
   bcInput.placeholder = '';
   bcInput.style.display = '';
+  if (bcYearSelect) bcYearSelect.style.display = 'none';
   bcNote.textContent = '';
   bcTableWrap.innerHTML = '';
 };
@@ -83,18 +111,26 @@ bcSearchBtn.onclick = async function() {
   bcNote.textContent = '';
   bcTableWrap.innerHTML = '';
 
-  // Nếu chưa lấy dữ liệu thì lấy
   if(!rawTHONGKE.length) await fetchThongke();
 
   // ----------------- BÁO CÁO NGÀY -----------------
-  if(bcType.value === 'ngay') {
-    const dayStr = (bcInput.value||'').trim();
-    if(!/^\d{2}\/\d{2}\/\d{4}$/.test(dayStr)) {
-      bcNote.textContent = 'Vui lòng nhập ngày đúng định dạng dd/MM/yyyy';
+  if (bcType.value === 'ngay') {
+    let dateStr = (bcInput.value || '').trim();
+    // Kiểm tra định dạng yyyy-mm-dd (giá trị từ input type="date")
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      bcNote.textContent = 'Vui lòng chọn ngày!';
       return;
     }
-    // Lọc các dòng có ngày trùng và cột O là "Đã thanh toán"
-    const rows = rawTHONGKE.filter(r => getDay(r[0]) === dayStr && (r[14]||'').trim() === "Đã thanh toán");
+    // Chuyển từ yyyy-mm-dd thành dd/MM/yyyy để so sánh với sheet
+    let [yyyy, mm, dd] = dateStr.split('-');
+    let dayStr = `${dd}/${mm}/${yyyy}`;
+
+    // Lọc đúng chuỗi ngày trong cột A (bỏ phần giờ phút giây)
+    const rows = rawTHONGKE.filter(r => {
+      let rawDate = getDay(r[0]); // chỉ lấy phần "dd/MM/yyyy"
+      return rawDate === dayStr && (r[14]||'').trim() === "Đã thanh toán";
+    });
+
     // Lấy mỗi đơn hàng dòng đầu tiên theo Mã ĐH (cột B)
     let map = {};
     rows.forEach(r => {
@@ -107,6 +143,7 @@ bcSearchBtn.onclick = async function() {
     }
     // Tổng thành tiền (cột J)
     let total = arr.reduce((t, r) => t + toInteger(r[9]), 0);
+
     // Hiển thị bảng
     let html = `
       <div class="bc-report-title">BÁO CÁO DOANH THU NGÀY</div>
@@ -136,11 +173,13 @@ bcSearchBtn.onclick = async function() {
     `;
     bcTableWrap.innerHTML = html;
   }
+
   // ----------------- BÁO CÁO THÁNG -----------------
   else if(bcType.value === 'thang') {
-    const yearStr = (bcInput.value||'').trim();
+    // Lấy năm từ dropdown
+    const yearStr = bcYearSelect && bcYearSelect.value ? bcYearSelect.value.trim() : '';
     if(!/^\d{4}$/.test(yearStr)) {
-      bcNote.textContent = 'Vui lòng nhập năm hợp lệ (vd: 2025)';
+      bcNote.textContent = 'Vui lòng chọn năm!';
       return;
     }
     // Lọc các dòng thuộc năm nhập vào, cột O là "Đã thanh toán"
@@ -193,6 +232,7 @@ bcSearchBtn.onclick = async function() {
     `;
     bcTableWrap.innerHTML = html;
   }
+
   // ----------------- BÁO CÁO NĂM -----------------
   else if(bcType.value === 'nam') {
     // Lấy toàn bộ dòng có cột O là "Đã thanh toán"
@@ -245,6 +285,7 @@ bcSearchBtn.onclick = async function() {
     `;
     bcTableWrap.innerHTML = html;
   }
+
   // ----------------- Lựa chọn chưa hợp lệ -----------------
   else {
     bcNote.textContent = "Vui lòng chọn loại báo cáo.";
