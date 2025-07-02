@@ -150,6 +150,20 @@
   </style>
 </head>
 <body>
+<script>
+window.addEventListener('pageshow', function(event) {
+  // Luôn reset form đăng nhập khi load lại trang login.html (kể cả từ cache/back)
+  var userInput = document.getElementById('loginUser');
+  var passInput = document.getElementById('loginPass');
+  var roleInput = document.getElementById('loginRole');
+  if (userInput) userInput.value = '';
+  if (passInput) passInput.value = '';
+  if (roleInput) roleInput.selectedIndex = 0; // hoặc chọn lại vai trò mặc định
+  // Ngoài ra có thể reset thông báo lỗi, nút trạng thái nếu cần
+  var err = document.getElementById('loginError');
+  if (err) err.style.display = 'none';
+});
+</script>
   <div id="navbar-container">
     <div class="mobile-navbar">
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
