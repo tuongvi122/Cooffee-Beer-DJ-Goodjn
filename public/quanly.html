@@ -785,7 +785,91 @@
   justify-content: center;
   border-radius: 10px;
 }
-
+#deleteStaffModal.modal {
+  display: none;
+  position: fixed;
+  z-index: 13000 !important;
+  left: 0; top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(60,70,80,0.18);
+  /* Chỉ căn giữa khi có class show */
+}
+#deleteStaffModal.show {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.delete-staff-modal-dialog {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.delete-staff-modal-content {
+  background: #f8fafc;
+  border-radius: 10px;
+  box-shadow: 0 7px 28px rgba(34,60,80,0.16);
+  border: 1.5px solid #cfe2e8;
+  padding: 21px 20px 16px 20px;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.delete-staff-modal-title {
+  font-size: 1.08em;
+  font-weight: 500;
+  color: #091379;
+  text-align: center;
+  margin-bottom: 18px;
+  line-height: 1.3;
+}
+.delete-staff-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+.delete-staff-btn-confirm,
+.delete-staff-btn-cancel {
+  padding: 6px 20px;
+  min-width: 0;
+  font-size: 1em;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  box-shadow: none;
+  outline: none;
+  /* Giảm chiều cao và chiều dài nút */
+  min-width: 54px;
+}
+.delete-staff-btn-confirm {
+  background: #0cac14;
+  color: #fff;
+}
+.delete-staff-btn-confirm:hover {
+  background: #189b11;
+}
+.delete-staff-btn-cancel {
+  background: #e91b0d;
+  color: #ffffff;
+}
+.delete-staff-btn-cancel:hover {
+  background: #c50909;
+  color: #ffffff;
+}
+@media (max-width: 520px) {
+  .delete-staff-modal-content {
+    padding: 14px 7px 12px 7px;
+    max-width: 98vw;
+  }
+}
   </style>
 </head>
 <body>
@@ -928,6 +1012,20 @@
         </div>
       </div>
     </div>
+  <!-- Popup xác nhận xóa nhân viên -->
+  <div class="modal" id="deleteStaffModal" tabindex="-1" aria-hidden="true">
+  <div class="delete-staff-modal-dialog">
+    <div class="delete-staff-modal-content">
+      <div class="delete-staff-modal-title">
+        Bạn có chắc muốn xóa nhân viên này không?
+      </div>
+      <div class="delete-staff-modal-actions">
+        <button id="confirmDeleteStaffBtn" class="delete-staff-btn-confirm" type="button">Có</button>
+        <button id="cancelDeleteStaffBtn" class="delete-staff-btn-cancel" type="button">Không</button>
+      </div>
+    </div>
+  </div>
+</div>
     <!-- Popup cảm ơn -->
     <div class="modal fade" id="thankModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
@@ -1368,17 +1466,31 @@ function renderModalStaffTable() {
       });
       renderModalStaffTable();
     }
-    function modalXoaNhanVien(index) {
-      if(modalStaffs[index].isOriginal) {
-        alert('Không thể xóa nhân viên gốc!');
-        return;
-      }
-      modalHasNewStaff = true;
-      if(confirm('Bạn có chắc muốn xóa nhân viên này?')) {
-        modalStaffs.splice(index, 1);
-        renderModalStaffTable();
-      }
-    }
+    
+let pendingDeleteStaffIndex = null;
+function modalXoaNhanVien(index) {
+  if(modalStaffs[index].isOriginal) {
+    alert('Không thể xóa nhân viên gốc!');
+    return;
+  }
+  modalHasNewStaff = true;
+  pendingDeleteStaffIndex = index;
+  document.getElementById('deleteStaffModal').classList.add('show');
+}
+
+document.getElementById('confirmDeleteStaffBtn').onclick = function() {
+  if(pendingDeleteStaffIndex !== null) {
+    modalStaffs.splice(pendingDeleteStaffIndex, 1);
+    renderModalStaffTable();
+    pendingDeleteStaffIndex = null;
+  }
+  document.getElementById('deleteStaffModal').classList.remove('show');
+};
+
+document.getElementById('cancelDeleteStaffBtn').onclick = function() {
+  pendingDeleteStaffIndex = null;
+  document.getElementById('deleteStaffModal').classList.remove('show');
+};
     // ================== QUAN TRỌNG: HÀM SUBMIT XÁC NHẬN ĐƠN HÀNG ======================
 async function modalSubmitXacNhan() {
   if (modalOrderIndex < 0) return;
