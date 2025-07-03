@@ -696,6 +696,17 @@
     #phone-suggest-list div:hover {
       background: #e9f5ec;
     }
+.modal-content { position: relative; }
+#popupLoading {
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.77);
+  z-index: 15000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+}
   </style>
 </head>
 <body>
@@ -798,6 +809,12 @@
     <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
       <div class="modal-dialog mt-4">
         <div class="modal-content">
+        <div id="popupLoading" style="display:none; position:absolute; left:0; top:0; right:0; bottom:0; background:rgba(255,255,255,0.77); z-index:15000; align-items:center; justify-content:center; border-radius:13px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+        <i class="fa fa-spinner fa-spin" style="font-size:2.2em;color:#1976d2;"></i>
+        <span style="font-size:1.13em; color:#1976d2; font-weight:bold;">Đang gửi...</span>
+        </div>
+        </div>
           <div class="modal-header">
             <h5 class="modal-title" id="reviewModalLabel">Form đánh giá dịch vụ</h5>
             <button type="button" class="close" onclick="closePopup()" aria-label="Close">
@@ -1153,30 +1170,50 @@ function updateSuggestHighlight() {
       document.getElementById('reviewModal').classList.remove('show');
       document.getElementById('reviewModal').style.display = 'none';
     };
+// Chỉnh JS cho hiệu ứng và disable nút
+  document.getElementById('reviewForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const idx = +e.target.dataset.idx, o = ordersData[idx];
 
-    document.getElementById('reviewForm').addEventListener('submit',async e=>{
-      e.preventDefault();
-      const idx = +e.target.dataset.idx, o=ordersData[idx];
-      const staffReviews = o.staffList.map(nv=>({code:nv.code,shift:nv.shift,stars:nv.stars||0}));
-      const serviceStars = o.serviceStars||0;
-      const speed = document.querySelector('input[name="speed"]:checked').value;
-      const comment = document.getElementById('popupComment').value.trim();
-      if(!comment){ alert('Nhận xét không được để trống!'); return; }
-      try{
-        await fetch('/api/submitReview',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({order:o,staffReviews,serviceStars,speed,comment})
-        });
-        o.reviewed=true; o.point=10;
-        renderTable(); closePopup();
-        document.getElementById('thankModal').classList.add('show');
-        document.getElementById('thankModal').style.display = 'block';
-      }catch(err){
-        console.error(err);
-        alert('Gửi thất bại!');
-      }
+  const staffReviews = o.staffList.map(nv => ({ code: nv.code, shift: nv.shift, stars: nv.stars || 0 }));
+  const serviceStars = o.serviceStars || 0;
+  const speed = document.querySelector('input[name="speed"]:checked').value;
+  const comment = document.getElementById('popupComment').value.trim();
+
+  if (!comment) {
+    alert('Nhận xét không được để trống!');
+    return;
+  }
+
+  // LẤY 2 NÚT (NÚT GỬI PHIẾU & ĐÓNG) VÀ POPUP LOADING
+  const btnSend = document.querySelector('#reviewForm .send');
+  const btnClose = document.querySelector('#reviewForm .close');
+  const popupLoading = document.getElementById('popupLoading');
+  btnSend.disabled = true;
+  btnClose.disabled = true;
+  popupLoading.style.display = 'flex';
+
+  try {
+    await fetch('/api/submitReview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order: o, staffReviews, serviceStars, speed, comment })
     });
+    o.reviewed = true; o.point = 10;
+    renderTable(); closePopup();
+    document.getElementById('thankModal').classList.add('show');
+    document.getElementById('thankModal').style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    alert('Gửi thất bại!');
+    // Enable lại nút khi lỗi
+    btnSend.disabled = false;
+    btnClose.disabled = false;
+  } finally {
+    // Tắt popup loading trong mọi trường hợp
+    popupLoading.style.display = 'none';
+  }
+});
 
     window.closeThankPopup = ()=>{
       document.getElementById('thankModal').classList.remove('show');
