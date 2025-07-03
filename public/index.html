@@ -503,6 +503,37 @@
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
+  #popupLoading {
+  display: none;
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.8);
+  z-index: 12000;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.13em;
+}
+.popupLoadingInner {
+  text-align: center;
+  color: #117b26;
+  font-size: 1.08em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.popupLoadingSpinner {
+  width: 34px; height: 34px;
+  border: 4px solid #b6ebc3;
+  border-top: 4px solid #16c924;
+  border-radius: 50%;
+  animation: spinLoading 1s linear infinite;
+}
+@keyframes spinLoading {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
   </style>
 </head>
 <body>
@@ -563,18 +594,18 @@
     <div id="products"></div>
     <!-- Modal đặt hàng - POPUP GIỎ HÀNG -->
     <div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-labelledby="modalOrderLabel" aria-hidden="true">
-      <div class="modal-dialog mt-4">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalOrderLabel">ĐẶT DỊCH VỤ</h5>
-            <button type="button" class="close" onclick="closeCartModal()" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-danger" role="alert" id="alert_order"></div>
-            <div class="alert alert-success" role="alert" id="alert_order_sucess"></div>
-            <table id="tbl_carts" style="table-layout: fixed; width: 100%;">
+  <div class="modal-dialog mt-4">
+    <div class="modal-content" style="position:relative;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalOrderLabel">ĐẶT DỊCH VỤ</h5>
+        <button type="button" class="close" onclick="closeCartModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert" id="alert_order"></div>
+        <div class="alert alert-success" role="alert" id="alert_order_sucess"></div>
+        <table id="tbl_carts" style="table-layout: fixed; width: 100%;">
             <thead>
               <tr>
               <th style="width: 20%;">Mã NV</th>
@@ -586,21 +617,28 @@
             </thead>
               <tbody>
               </tbody>
-            </table>
-            <div id="order-total" style="text-align:right; font-weight:bold; margin-bottom:10px;"></div>
-            <input placeholder="Họ và tên" id="name"><br>
-            <input placeholder="Số điện thoại" id="phone" name="phone" type="tel" pattern="[0-9]{10,11}" maxlength="11" inputmode="numeric" autocomplete="tel" oninput="validatePhoneInput(this)"><br>
-            <input placeholder="Email" id="contact"><br>
-            <input placeholder="Bàn số 1-50" id="table-number" type="number" min="1" max="50"><br>
-            <textarea placeholder="Ghi chú" id="note" name="note"></textarea><br><br>
-            <div class="form-buttons">
-              <button class="confirm-btn" onclick="submitOrder()">Đặt dịch vụ</button>
-              <button class="close-btn" onclick="closeCartModal()">Đóng</button>
-            </div>
-          </div>
+        </table>
+        <div id="order-total" style="text-align:right; font-weight:bold; margin-bottom:10px;"></div>
+        <input placeholder="Họ và tên" id="name"><br>
+        <input placeholder="Số điện thoại" id="phone" name="phone" type="tel" pattern="[0-9]{10,11}" maxlength="11" inputmode="numeric" autocomplete="tel" oninput="validatePhoneInput(this)"><br>
+        <input placeholder="Email" id="contact"><br>
+        <input placeholder="Bàn số 1-50" id="table-number" type="number" min="1" max="50"><br>
+        <textarea placeholder="Ghi chú" id="note" name="note"></textarea><br><br>
+        <div class="form-buttons">
+          <button class="confirm-btn" onclick="submitOrder()">Đặt dịch vụ</button>
+          <button class="close-btn" onclick="closeCartModal()">Đóng</button>
+        </div>
+      </div>
+      <!-- Đặt overlay loading ngay cuối modal-content -->
+      <div id="popupLoading">
+        <div class="popupLoadingInner">
+          <div class="popupLoadingSpinner"></div>
+          <span>Đang gửi...</span>
         </div>
       </div>
     </div>
+  </div>
+</div>
     <button id="floating-cart" onclick="showCartModal()">Cart <span id="cart-count-floating">0</span> 🛒</button>
     <button id="scrollToTopBtn" onclick="scrollToTop()">⬆</button>
     <div id="search-bar-area">
@@ -649,25 +687,35 @@
       </div>
     </div>
   </div>
-  <!-- Popup cảm ơn đặt dịch vụ -->
-  <div class="modal fade" id="thankOrderModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog mt-4">
-      <div class="modal-content" style="max-width:370px;margin:auto;text-align:center;">
-        <div class="modal-header" style="justify-content:center;">
-          <h5 class="modal-title" style="width:100%;color:#28a745;font-size:1.18em;font-weight:700;">Cảm ơn quý khách!</h5>
-        </div>
-        <div class="modal-body" style="padding:22px 16px 14px 16px;">
-          <div style="font-size:1.06em;line-height:1.6;">
-            Cảm ơn quý khách đã đặt dịch vụ tại<br>
-            <b>Coffee & Beer DJ GooDjn</b>.<br>
-            Chúng tôi sẽ xác nhận đơn hàng và trả kết quả về Email của bạn.<br>
-            <span style="color:#1976d2;font-size:0.98em;display:block;margin-top:8px;">Mọi thắc mắc vui lòng liên hệ hotline: <b>0902 926 636</b></span>
+ <!-- Popup cảm ơn đặt dịch vụ -->
+<div class="modal fade" id="thankOrderModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog mt-4">
+    <div class="modal-content" style="max-width:370px;margin:auto;text-align:center;">
+      <div class="modal-header" style="justify-content:center;">
+        <h5 class="modal-title" style="width:100%;color:#28a745;font-size:1.18em;font-weight:700;">
+          Cảm ơn quý khách!
+        </h5>
+      </div>
+      <div class="modal-body" style="padding:22px 16px 14px 16px;">
+        <div style="font-size:1.06em;line-height:1.6;">
+          Cảm ơn quý khách đã đặt dịch vụ tại<br>
+          <b>Coffee & Beer DJ GooDjn</b>.<br>
+          Chúng tôi sẽ xác nhận đơn hàng và trả kết quả về Email của bạn.<br>
+          <span style="color:#1976d2;font-size:0.98em;display:block;margin-top:8px;">
+            Mọi thắc mắc vui lòng liên hệ hotline:
+          </span>
+          <div style="color:#1976d2; font-size:1.18em; font-weight:bold; text-align:center; margin:2px 0 0 0;">
+            <a href="tel:0902926636" style="color:#1976d2; text-decoration:none;"><b>0902 926 636</b></a>
           </div>
-          <button class="confirm-btn" onclick="closeThankOrderModal()" style="margin-top:18px;min-width:110px;">Đóng</button>
         </div>
+        <button class="confirm-btn" onclick="closeThankOrderModal()" style="margin-top:18px;min-width:110px;">
+          Đóng
+        </button>
       </div>
     </div>
   </div>
+</div>
+
   <script>
     // Khóa cuộn trang chính, popup cuộn body như trang chính
     let _bodyScrollY = 0;
@@ -945,71 +993,88 @@
       document.getElementById('thankOrderModal').style.display = 'none';
     }
     async function handleOrderConfirm(yes) {
-      if (!yes) {
-        closeConfirmOrderModal();
-        return;
-      }
-      document.querySelector('.confirm-btn[onclick="submitOrder()"]').disabled = true;
-      document.querySelector('.close-btn[onclick="closeCartModal()"]').disabled = true;
+  if (!yes) {
+    closeConfirmOrderModal();
+    return;
+  }
+  // Disable nút trong popup đặt dịch vụ
+  document.querySelector('.confirm-btn[onclick="submitOrder()"]').disabled = true;
+  document.querySelector('.close-btn[onclick="closeCartModal()"]').disabled = true;
+
+  // Show loading overlay (phủ lên form)
+  document.getElementById('popupLoading').style.display = 'flex';
+
+  closeConfirmOrderModal();
+
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const contact = document.getElementById('contact').value.trim();
+  const note = document.getElementById('note').value.trim();
+  const tableNum = document.getElementById('table-number').value.trim();
+  const alertOrder = document.getElementById('alert_order');
+  const alertSuccess = document.getElementById('alert_order_sucess');
+
+  alertOrder.style.display = 'none';
+  alertSuccess.style.display = 'none';
+
+  if (!name || !phone || !contact || !tableNum) {
+    alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số bàn, Ghi chú";
+    alertOrder.style.display = 'block';
+    enableOrderButtons();
+    document.getElementById('popupLoading').style.display = 'none'; // Hide overlay
+    return;
+  }
+  if (!/^[0-9]{10,11}$/.test(phone)) {
+    alertOrder.innerText = "Số điện thoại phải gồm 10 hoặc 11 số.";
+    alertOrder.style.display = 'block';
+    enableOrderButtons();
+    document.getElementById('popupLoading').style.display = 'none'; // Hide overlay
+    return;
+  }
+  if (cart.length === 0) {
+    alertOrder.innerText = "Giỏ hàng trống chưa có sản phẩm!";
+    alertOrder.style.display = 'block';
+    enableOrderButtons();
+    document.getElementById('popupLoading').style.display = 'none'; // Hide overlay
+    return;
+  }
+  const order = { name, phone, contact, tableNum, note, items: cart };
+  try {
+    const result = await fetch('/api/submitOrder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order)
+    }).then(r => r.json());
+
+    if (result && result.success) {
+      localStorage.setItem("customerInfo", JSON.stringify({ name, phone, contact }));
+      cart = [];
+      document.getElementById('cart-count-floating').innerText = '0';
+      renderProducts(currentEmployeeMap);
+      refreshProductDetailIfOpen();
+
+      // ĐÓNG FORM GIỎ HÀNG trước khi mở cảm ơn
       closeCartModal();
-      closeConfirmOrderModal();
 
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const contact = document.getElementById('contact').value.trim();
-      const note = document.getElementById('note').value.trim();
-      const tableNum = document.getElementById('table-number').value.trim();
-      const alertOrder = document.getElementById('alert_order');
-      const alertSuccess = document.getElementById('alert_order_sucess');
-
-      alertOrder.style.display = 'none';
-      alertSuccess.style.display = 'none';
-
-      if (!name || !phone || !contact || !tableNum) {
-        alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số bàn, Ghi chú";
-        alertOrder.style.display = 'block';
-        enableOrderButtons();
-        return;
-      }
-      if (!/^[0-9]{10,11}$/.test(phone)) {
-        alertOrder.innerText = "Số điện thoại phải gồm 10 hoặc 11 số.";
-        alertOrder.style.display = 'block';
-        enableOrderButtons();
-        return;
-      }
-      if (cart.length === 0) {
-        alertOrder.innerText = "Giỏ hàng trống chưa có sản phẩm!";
-        alertOrder.style.display = 'block';
-        enableOrderButtons();
-        return;
-      }
-      const order = { name, phone, contact, tableNum, note, items: cart };
-      try {
-        const result = await fetch('/api/submitOrder', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(order)
-        }).then(r => r.json());
-
-        if (result && result.success) {
-          localStorage.setItem("customerInfo", JSON.stringify({ name, phone, contact }));
-          cart = [];
-          document.getElementById('cart-count-floating').innerText = '0';
-          renderProducts(currentEmployeeMap);
-          refreshProductDetailIfOpen();
-          showThankOrderModal();
-          enableOrderButtons();
-        } else {
-          alertOrder.innerText = "Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại.";
-          alertOrder.style.display = 'block';
-          enableOrderButtons();
-        }
-      } catch (e) {
-        alertOrder.innerText = "Lỗi kết nối: " + e;
-        alertOrder.style.display = 'block';
-        enableOrderButtons();
-      }
+      // ẨN LOADING rồi hiện popup cảm ơn
+      setTimeout(function() {
+        document.getElementById('popupLoading').style.display = 'none';
+        showThankOrderModal();
+      }, 300); // 300ms để hiệu ứng mượt, có thể chỉnh thành 0 nếu muốn
+    } else {
+      alertOrder.innerText = "Có lỗi xảy ra khi gửi đơn hàng. Vui lòng thử lại.";
+      alertOrder.style.display = 'block';
+      enableOrderButtons();
+      document.getElementById('popupLoading').style.display = 'none';
     }
+  } catch (e) {
+    alertOrder.innerText = "Lỗi kết nối: " + e;
+    alertOrder.style.display = 'block';
+    enableOrderButtons();
+    document.getElementById('popupLoading').style.display = 'none';
+  }
+}
+
     function enableOrderButtons() {
       document.querySelector('.confirm-btn[onclick="submitOrder()"]').disabled = false;
       document.querySelector('.close-btn[onclick="closeCartModal()"]').disabled = false;
