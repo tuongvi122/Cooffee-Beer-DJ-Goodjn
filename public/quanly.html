@@ -767,6 +767,17 @@
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
+  #popupLoading {
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.77);
+  z-index: 15000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
   </style>
 </head>
 <body>
@@ -842,6 +853,12 @@
     <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
       <div class="modal-dialog mt-4">
         <div class="modal-content">
+        <div id="popupLoading" style="display:none; position:absolute; left:0; top:0; right:0; bottom:0; background:rgba(255,255,255,0.77); z-index:15000; align-items:center; justify-content:center; border-radius:10px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+        <i class="fa fa-spinner fa-spin" style="font-size:2.1em;color:#1976d2;"></i>
+        <span style="font-size:1.12em; color:#1976d2; font-weight:bold;">Đang gửi...</span>
+        </div>
+        </div>
           <div class="modal-header">
             <h5 class="modal-title" id="orderModalLabel">THÔNG TIN ĐƠN HÀNG</h5>
             <button type="button" class="close" onclick="closeOrderModal()" aria-label="Close">
@@ -1355,9 +1372,16 @@ function renderModalStaffTable() {
       }
     }
     // ================== QUAN TRỌNG: HÀM SUBMIT XÁC NHẬN ĐƠN HÀNG ======================
-    async function modalSubmitXacNhan() {
-      if(modalOrderIndex<0) return;
-      try {
+async function modalSubmitXacNhan() {
+  if (modalOrderIndex < 0) return;
+  // LẤY NÚT
+  const btnXacNhan = document.querySelector('.btn-popup-xacnhan');
+  const btnClose = document.querySelector('.btn-popup-close');
+  const popupLoading = document.getElementById('popupLoading');
+  btnXacNhan.disabled = true;
+  btnClose.disabled = true;
+  popupLoading.style.display = 'flex';
+  try {
         let tongcong = 0;
         let staffListSend = [];
         // Đảm bảo luôn có trạng thái cho tất cả nhân viên (nếu rỗng thì mặc định "Đồng ý")
@@ -1386,21 +1410,27 @@ function renderModalStaffTable() {
           table: document.getElementById("modalTable").value.trim(),
           note: modalOrder.note // Nếu muốn cho phép sửa ghi chú khách, hãy thêm input và lấy value tại đây
         };
-        const response = await fetch('/api/orderquanly', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(data)
-        });
-        if (!response.ok) throw new Error('API call failed');
-        closeOrderModal();
-        await fetchOrders();
-        FILTERED = ORDERS.map((v,i)=>({...v,_index:i}));
-        renderTable();
-        openThankPopup(modalStatus==="huydon"?"Hủy đơn thành công!":"Xác nhận đơn hàng thành công!");
-      } catch (error) {
-        alert('Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.');
-      }
-    }
+   const response = await fetch('/api/orderquanly', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('API call failed');
+    closeOrderModal();
+    await fetchOrders();
+    FILTERED = ORDERS.map((v,i)=>({...v,_index:i}));
+    renderTable();
+    openThankPopup(modalStatus === "huydon" ? "Hủy đơn thành công!" : "Xác nhận đơn hàng thành công!");
+  } catch (error) {
+    alert('Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.');
+    // Nếu lỗi thì enable lại 2 nút
+    btnXacNhan.disabled = false;
+    btnClose.disabled = false;
+  } finally {
+    // Tắt loading dù thành công hay lỗi
+    popupLoading.style.display = 'none';
+  }
+}
     // ================== END SUBMIT ======================
 
     function openThankPopup(msg) {
