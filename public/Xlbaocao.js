@@ -38,9 +38,11 @@ style.textContent = `
   display: flex;
   align-items: center;
   gap: 5px;
-  justify-content: flex-start;
-  margin-bottom: 8px;
   font-size: 1em;
+  white-space: nowrap;
+  margin-bottom: 0;          /* Bỏ margin dưới */
+  margin-top: 0;             /* Nếu có, bỏ luôn */
+  padding-bottom: 0;         /* Nếu có, bỏ luôn */
 }
 .report-entries-container select {
   font-size: 1em;
@@ -48,6 +50,26 @@ style.textContent = `
   border-radius: 6px;
   border: 1.2px solid #b5c8db;
   outline: none;
+}
+
+/* Thêm style cho tổng cộng bên phải cùng dòng */
+.bc-table-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;          /* Bỏ margin dưới */
+  margin-top: 0;             /* Nếu có, bỏ luôn */
+  padding-bottom: 0;         /* Nếu có, bỏ luôn */
+}
+.bc-table-total-right {
+  font-weight: bold;
+  color: #1976d2;
+  font-size: 1.08em;
+  white-space: nowrap;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-bottom: 0;
 }
 `;
 document.head.appendChild(style);
@@ -93,21 +115,27 @@ let bcDayCurrentPage = 1;
 let bcDayData = []; // mảng chứa các dòng sau khi lọc theo ngày
 
 // Thêm HTML cho chọn số entries và phân trang, gọi lại sau khi render bảng
-function renderDayReportControls(totalEntries) {
-  let entriesHtml = `
-    <div class="report-entries-container">
-      Hiển thị 
-      <select id="bcDayEntriesSelect">
-        <option value="10"${bcDayEntriesPerPage===10?' selected':''}>10</option>
-        <option value="20"${bcDayEntriesPerPage===20?' selected':''}>20</option>
-        <option value="50"${bcDayEntriesPerPage===50?' selected':''}>50</option>
-        <option value="100"${bcDayEntriesPerPage===100?' selected':''}>100</option>
-      </select>
-      đơn hàng
+function renderDayReportControls(totalEntries, totalAmount) {
+  // Thêm tổng cộng bên phải và hiển thị...đơn hàng bên trái trong 1 container flex
+  let controlsHtml = `
+    <div class="bc-table-controls">
+      <div class="report-entries-container">
+        Hiển thị 
+        <select id="bcDayEntriesSelect">
+          <option value="10"${bcDayEntriesPerPage===10?' selected':''}>10</option>
+          <option value="20"${bcDayEntriesPerPage===20?' selected':''}>20</option>
+          <option value="50"${bcDayEntriesPerPage===50?' selected':''}>50</option>
+          <option value="100"${bcDayEntriesPerPage===100?' selected':''}>100</option>
+        </select>
+        đơn hàng
+      </div>
+      <div class="bc-table-total-right">
+        Tổng cộng: <span>${formatCurrency(totalAmount)}</span>
+      </div>
     </div>
   `;
   let paginationHtml = `<div id="bcDayPagination" class="order-pagination"></div>`;
-  return { entriesHtml, paginationHtml };
+  return { controlsHtml, paginationHtml };
 }
 
 // Render phân trang
@@ -258,11 +286,15 @@ bcSearchBtn.onclick = async function() {
       return rawDate === dayStr && (r[14]||'').trim() === "Đã thanh toán";
     });
 
-    let map = {};
+    // Lấy mỗi đơn hàng dòng đầu tiên theo Mã ĐH (cột B), giữ đúng thứ tự xuất hiện
+    let seen = {};
+    let arr = [];
     rows.forEach(r => {
-      if(!map[r[1]]) map[r[1]] = r;
+      if(!seen[r[1]]) {
+        seen[r[1]] = 1;
+        arr.push(r);
+      }
     });
-    let arr = Object.values(map);
     bcDayData = arr;
     bcDayCurrentPage = 1;
 
@@ -272,14 +304,12 @@ bcSearchBtn.onclick = async function() {
     }
     let total = arr.reduce((t, r) => t + toInteger(r[9]), 0);
 
-    let { entriesHtml, paginationHtml } = renderDayReportControls(arr.length);
+    // SỬA TẠI ĐÂY: renderDayReportControls trả về controlsHtml, paginationHtml
+    let { controlsHtml, paginationHtml } = renderDayReportControls(arr.length, total);
 
     let html = `
       <div class="bc-report-title">BÁO CÁO DOANH THU NGÀY</div>
-      <div class="bc-table-total-right">
-        Tổng cộng: <span>${formatCurrency(total)}</span>
-      </div>
-      ${entriesHtml}
+      ${controlsHtml}
       <div class="bc-table-wrap">
         <table class="bc-table">
           <thead>
