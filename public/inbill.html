@@ -417,8 +417,13 @@
     }
     #order-search-clear:hover { background: #a72816; }
 /* Popup modal nút xác nhận in bill */
-#customModal { position:fixed; left:0; top:0; width:100vw; height:100vh; z-index:11111; display:flex; align-items:center; justify-content:center; }
-.custom-modal-backdrop { position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18);}
+#customModal { 
+  position:fixed; left:0; top:0; width:100vw; height:100vh; z-index:11111;
+  display:flex; align-items:center; justify-content:center;
+}
+.custom-modal-backdrop {
+  position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18);
+}
 .custom-modal-box {
   position:relative; z-index:2;
   background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.15);
@@ -427,18 +432,41 @@
   animation: popFadeIn .23s;
 }
 @keyframes popFadeIn { from { opacity:0; transform:scale(0.96);} to { opacity:1; transform:scale(1);} }
-#customModal button { font-size:1em; padding:8px 22px; border-radius:8px; border:none; color:#fff; font-weight:600; cursor:pointer; transition:background .15s; }
+
+#customModal button {
+  font-size:1em; padding:8px 22px; border-radius:8px; border:none;
+  color:#fff; font-weight:600; cursor:pointer; transition:background .15s;
+  margin: 0 10px;
+}
+/* Nút OK xanh lá */
 #customModal .btn-ok {
-  background: #29b858 !important;   /* xanh lá cây */
+  background-color: #29b858 !important;
 }
-#customModal .btn-ok:hover {
-  background: #179b40 !important;
+#customModal .btn-ok:hover:enabled {
+  background-color: #179b40 !important;
 }
+/* Nút Cancel xanh nước biển */
 #customModal .btn-cancel {
-  background: #2696f8 !important;   /* xanh nước biển */
+  background-color: #2696f8 !important;
 }
-#customModal .btn-cancel:hover {
-  background: #156baf !important;
+#customModal .btn-cancel:hover:enabled {
+  background-color: #156baf !important;
+}
+/* Trạng thái disabled: màu nền vẫn đúng, chữ vẫn trắng, hiệu ứng nhạt màu */
+#customModal button:disabled, 
+#customModal .btn-ok:disabled, 
+#customModal .btn-cancel:disabled {
+  opacity: 0.62;
+  color: #fff !important;
+  background-color: inherit !important;
+  cursor: not-allowed;
+  filter: grayscale(0.18) brightness(1.08);
+}
+#customModal .btn-ok:disabled {
+  background-color: #29b858 !important;
+}
+#customModal .btn-cancel:disabled {
+  background-color: #2696f8 !important;
 }
   </style>
 </head>
