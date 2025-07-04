@@ -2,6 +2,29 @@
 
 const style = document.createElement('style');
 style.textContent = `
+@media (max-width: 600px) {
+  .bc-table {
+    font-size: 0.95em;
+    margin-left: 0px;
+    margin-right: 4px;
+    width: calc(100% - 4px);
+    min-width: unset !important;
+  }
+  .bc-table-wrap {
+    overflow-x: auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .bc-table th, .bc-table td {
+    padding-left: 3px;
+    padding-right: 3px;
+    font-size: 1em;
+    white-space: nowrap;
+  }
+  .bc-table-total-right {
+  font-size: 0.8em; /* hoặc 0.95em, 14px tùy bạn muốn nhỏ cỡ nào */
+  }
+}
 .order-pagination {
   display: flex;
   gap: 2px;
