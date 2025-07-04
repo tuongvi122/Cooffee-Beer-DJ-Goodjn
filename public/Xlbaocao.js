@@ -22,7 +22,20 @@ style.textContent = `
     white-space: nowrap;
   }
   .bc-table-total-right {
-  font-size: 0.8em; /* hoặc 0.95em, 14px tùy bạn muốn nhỏ cỡ nào */
+    font-size: 0.93em !important;
+    line-height: 1.2 !important;
+    color: #1976d2 !important;
+    font-weight: bold !important;
+    margin-right: 7px !important;
+    padding: 0 !important;
+  }
+  .bc-table-total-right span {
+    font-size: 1em !important;
+    font-weight: bold !important;
+    color: #111 !important;
+  }
+  .report-entries-container {
+    font-size: 0.85em !important;
   }
 }
 .order-pagination {
