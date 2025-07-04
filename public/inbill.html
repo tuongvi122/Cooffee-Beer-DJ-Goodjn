@@ -416,6 +416,30 @@
       margin-left: 2px;
     }
     #order-search-clear:hover { background: #a72816; }
+/* Popup modal nút xác nhận in bill */
+#customModal { position:fixed; left:0; top:0; width:100vw; height:100vh; z-index:11111; display:flex; align-items:center; justify-content:center; }
+.custom-modal-backdrop { position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18);}
+.custom-modal-box {
+  position:relative; z-index:2;
+  background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.15);
+  max-width:88vw; width:360px; padding:32px 22px 20px 22px;
+  text-align:center; font-size:1.13em; color:#133;
+  animation: popFadeIn .23s;
+}
+@keyframes popFadeIn { from { opacity:0; transform:scale(0.96);} to { opacity:1; transform:scale(1);} }
+#customModal button { font-size:1em; padding:8px 22px; border-radius:8px; border:none; color:#fff; font-weight:600; cursor:pointer; transition:background .15s; }
+#customModal .btn-ok {
+  background: #29b858 !important;   /* xanh lá cây */
+}
+#customModal .btn-ok:hover {
+  background: #179b40 !important;
+}
+#customModal .btn-cancel {
+  background: #2696f8 !important;   /* xanh nước biển */
+}
+#customModal .btn-cancel:hover {
+  background: #156baf !important;
+}
   </style>
 </head>
 <body>
@@ -643,35 +667,40 @@
         btnPrint.disabled = true;
       }
     };
-
-    btnPrint.onclick = function() {
-      if (!currentBillData || !currentOrderCode) return;
-      let printed = false;
-      const handleAfterPrint = async () => {
-        if (printed) return;
-        printed = true;
-        window.removeEventListener('afterprint', handleAfterPrint);
-        if (confirm('Bạn đã in hóa đơn thành công? Nhấn OK để xác nhận, hoặc Cancel để KHÔNG ghi nhận thanh toán.')) {
-          btnPrint.disabled = true;
-          try {
-            await fetch('/api/frintbill', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                order: currentOrderCode,
-                items: currentBillData.bill.map(row => ({ maNV: row.maNV, caLV: row.caLV }))
-              })
-            });
-            await loadOrderList();
-            await btnSearch.onclick();
-          } catch (e) {
-            alert('Lỗi cập nhật trạng thái thanh toán: ' + (e.message||e));
-          }
+  btnPrint.onclick = function() {
+  if (!currentBillData || !currentOrderCode) return;
+  let printed = false;
+  const handleAfterPrint = async () => {
+    if (printed) return;
+    printed = true;
+    window.removeEventListener('afterprint', handleAfterPrint);
+    showCustomModal(
+      'Bạn đã in hóa đơn thành công?<br><small>Nhấn OK để xác nhận, hoặc Cancel để KHÔNG ghi nhận thanh toán.</small>',
+      async function() {
+        btnPrint.disabled = true;
+        try {
+          await fetch('/api/frintbill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              order: currentOrderCode,
+              items: currentBillData.bill.map(row => ({ maNV: row.maNV, caLV: row.caLV }))
+            })
+          });
+          await loadOrderList();
+          await btnSearch.onclick();
+          showCustomModal('Đã ghi nhận thanh toán thành công!', null);
+        } catch (e) {
+          showCustomModal('Lỗi cập nhật trạng thái thanh toán:<br>' + (e.message||e));
         }
-      };
-      window.addEventListener('afterprint', handleAfterPrint);
-      window.print();
-    };
+      },
+      function() {}
+    );
+  };
+  window.addEventListener('afterprint', handleAfterPrint);
+  window.print();
+};
+
     btnReset.onclick = function() {
       inputOrderCode.value = '';
       billStatusNote.innerHTML = '';
@@ -868,5 +897,51 @@
     }
     loadOrderList();
   </script>
+  <!-- Popup thông báo ở giữa màn hình -->
+<div id="customModal" style="display:none;">
+  <div class="custom-modal-backdrop"></div>
+  <div class="custom-modal-box">
+    <div id="customModalMsg">Nội dung thông báo</div>
+    <div style="text-align:center; margin-top:20px;">
+      <button id="customModalBtnOK" style="margin:0 10px;">OK</button>
+      <button id="customModalBtnCancel" style="margin:0 10px; display:none;">Cancel</button>
+    </div>
+  </div>
+</div>
+<script>
+/**
+ * Hiện popup xác nhận, thay cho confirm
+ * @param {string} msg - Nội dung thông báo
+ * @param {function} onOK - Hàm khi bấm OK
+ * @param {function} [onCancel] - Hàm khi bấm Cancel (không truyền thì chỉ hiện nút OK)
+ */
+function showCustomModal(msg, onOK, onCancel) {
+  var modal = document.getElementById('customModal');
+  var msgBox = document.getElementById('customModalMsg');
+  var btnOK = document.getElementById('customModalBtnOK');
+  var btnCancel = document.getElementById('customModalBtnCancel');
+  msgBox.innerHTML = msg || '';
+  modal.style.display = 'flex';
+  btnCancel.style.display = onCancel ? '' : 'none';
+  // Remove old events
+  btnOK.onclick = btnCancel.onclick = null;
+  btnOK.onclick = function() {
+    modal.style.display = 'none';
+    if (onOK) onOK();
+  };
+  btnCancel.onclick = function() {
+    modal.style.display = 'none';
+    if (onCancel) onCancel();
+  };
+  // Đóng popup khi nhấn phím ESC
+  document.onkeydown = function(e) {
+    if (e.key === 'Escape') {
+      modal.style.display = 'none';
+      document.onkeydown = null;
+      if (onCancel) onCancel();
+    }
+  };
+}
+</script>
 </body>
 </html>
