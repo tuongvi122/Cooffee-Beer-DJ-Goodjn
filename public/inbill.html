@@ -417,57 +417,88 @@
     }
     #order-search-clear:hover { background: #a72816; }
 /* Popup modal nút xác nhận in bill */
-#customModal { 
-  position:fixed; left:0; top:0; width:100vw; height:100vh; z-index:11111;
-  display:flex; align-items:center; justify-content:center;
-}
-.custom-modal-backdrop {
-  position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18);
-}
-.custom-modal-box {
-  position:relative; z-index:2;
-  background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.15);
-  max-width:88vw; width:360px; padding:32px 22px 20px 22px;
-  text-align:center; font-size:1.13em; color:#133;
-  animation: popFadeIn .23s;
-}
-@keyframes popFadeIn { from { opacity:0; transform:scale(0.96);} to { opacity:1; transform:scale(1);} }
+   /* --- Popup modal sửa lại cho chuẩn mọi trình duyệt --- */
+    #customModal { 
+      position:fixed; left:0; top:0; width:100vw; height:100vh; z-index:11111;
+      display:flex; align-items:center; justify-content:center;
+      background: transparent;
+    }
+    .custom-modal-backdrop {
+      position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18);
+      z-index: 1;
+    }
+    .custom-modal-box {
+      position:relative; z-index:2;
+      background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.15);
+      max-width:88vw; width:360px; padding:32px 22px 20px 22px;
+      text-align:center; font-size:1.13em; color:#133;
+      animation: popFadeIn .23s;
+    }
+    @keyframes popFadeIn { from { opacity:0; transform:scale(0.96);} to { opacity:1; transform:scale(1);} }
 
-#customModal button {
-  font-size:1em; padding:8px 22px; border-radius:8px; border:none;
-  color:#fff; font-weight:600; cursor:pointer; transition:background .15s;
-  margin: 0 10px;
-}
-/* Nút OK xanh lá */
-#customModal .btn-ok {
-  background-color: #29b858 !important;
-}
-#customModal .btn-ok:hover:enabled {
-  background-color: #179b40 !important;
-}
-/* Nút Cancel xanh nước biển */
-#customModal .btn-cancel {
-  background-color: #2696f8 !important;
-}
-#customModal .btn-cancel:hover:enabled {
-  background-color: #156baf !important;
-}
-/* Trạng thái disabled: màu nền vẫn đúng, chữ vẫn trắng, hiệu ứng nhạt màu */
-#customModal button:disabled, 
-#customModal .btn-ok:disabled, 
-#customModal .btn-cancel:disabled {
-  opacity: 0.62;
-  color: #fff !important;
-  background-color: inherit !important;
-  cursor: not-allowed;
-  filter: grayscale(0.18) brightness(1.08);
-}
-#customModal .btn-ok:disabled {
-  background-color: #29b858 !important;
-}
-#customModal .btn-cancel:disabled {
-  background-color: #2696f8 !important;
-}
+    #customModal button {
+      font-size:1em; padding:8px 22px; border-radius:8px; border:none;
+      font-weight:600;
+      color: #fff !important;
+      cursor:pointer; transition:background .15s, filter .13s;
+      margin: 0 10px;
+      background: #888 !important; /* default, sẽ override bên dưới */
+      background-color: #888 !important;
+      box-shadow: none !important;
+      outline: none;
+    }
+    /* Nút OK xanh lá */
+    #customModal .btn-ok {
+      background: #29b858 !important;
+      background-color: #29b858 !important;
+      color: #fff !important;
+    }
+    #customModal .btn-ok:hover:enabled, #customModal .btn-ok:focus:enabled {
+      background: #179b40 !important;
+      background-color: #179b40 !important;
+      color: #fff !important;
+      filter: brightness(1.04);
+    }
+    /* Nút Cancel xanh nước biển */
+    #customModal .btn-cancel {
+      background: #2696f8 !important;
+      background-color: #2696f8 !important;
+      color: #fff !important;
+    }
+    #customModal .btn-cancel:hover:enabled, #customModal .btn-cancel:focus:enabled {
+      background: #156baf !important;
+      background-color: #156baf !important;
+      color: #fff !important;
+      filter: brightness(1.04);
+    }
+    /* Trạng thái disabled: màu nền vẫn đúng, chữ vẫn trắng, hiệu ứng nhạt màu */
+    #customModal button:disabled, 
+    #customModal .btn-ok:disabled, 
+    #customModal .btn-cancel:disabled {
+      opacity: 0.5 !important;
+      color: #fff !important;
+      background: inherit !important;
+      box-shadow: none !important;
+      cursor: not-allowed !important;
+      filter: grayscale(0.18) brightness(1.04);
+    }
+    #customModal .btn-ok:disabled {
+      background: #29b858 !important;
+      background-color: #29b858 !important;
+    }
+    #customModal .btn-cancel:disabled {
+      background: #2696f8 !important;
+      background-color: #2696f8 !important;
+    }
+    /* Đảm bảo không bị ảnh hưởng bởi media print */
+    @media print {
+      #customModal, #customModal * {
+        visibility: visible !important;
+        color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
   </style>
 </head>
 <body>
