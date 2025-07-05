@@ -870,6 +870,20 @@
     max-width: 98vw;
   }
 }
+/* Thêm style cho note đỏ */
+    .orders-empty-note {
+      color: #e53935;
+      background: #fff6f6;
+      border: 1px solid #e53935;
+      padding: 8px 14px;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 1.08em;
+      font-weight: 600;
+      margin: 0 auto 12px auto;
+      max-width: 290px;
+      box-shadow: 0 1px 5px rgba(229,57,53,0.08);
+    }
   </style>
 </head>
 <body>
@@ -904,6 +918,7 @@
   <div class="site-content">
     <div class="container">
       <h2>DANH SÁCH ĐƠN HÀNG TRONG 24H</h2>
+      <div id="ordersEmptyNote" style="display:none;"></div>
       <div class="table-actions">
         <div style="display:flex;align-items:center;gap:4px;">
           <label for="entriesSelect" style="font-size:14px;">Show</label>
@@ -1581,6 +1596,31 @@ async function modalSubmitXacNhan() {
         updateDropdownColor(e.target);
       }
     });
+  </script>
+    <script>
+    // Hàm gọi API và hiển thị note nếu trống
+    async function checkOrdersEmptyNote() {
+      try {
+        // Gọi API lấy danh sách đơn hàng (giữ đúng endpoint code backend)
+        const res = await fetch('/api/orderquanly', { method: 'GET' });
+        const data = await res.json();
+        const orders = Array.isArray(data.orders) ? data.orders : [];
+        const ordersEmptyNote = document.getElementById('ordersEmptyNote');
+        if (orders.length === 0) {
+          ordersEmptyNote.style.display = 'block';
+          ordersEmptyNote.innerHTML = 'Danh sách trống, không có đơn hàng';
+          ordersEmptyNote.className = 'orders-empty-note';
+        } else {
+          ordersEmptyNote.style.display = 'none';
+          ordersEmptyNote.innerHTML = '';
+        }
+      } catch (e) {
+        // Nếu lỗi vẫn không hiện note
+        document.getElementById('ordersEmptyNote').style.display = 'none';
+      }
+    }
+    // Gọi khi page load
+    window.addEventListener('DOMContentLoaded', checkOrdersEmptyNote);
   </script>
 </body>
 </html>
