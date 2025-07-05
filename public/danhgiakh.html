@@ -934,9 +934,6 @@
     </div>
   </div>
   <script>
-    document.getElementById('currentMonth').innerText =
-      new Date().toLocaleString('vi-VN',{month:'numeric',year:'numeric'});
-
     // Xử lý autocomplete không dùng datalist, chỉ dùng JS & localStorage
     const phoneInput = document.getElementById('phoneInput');
     const phoneSuggest = document.getElementById('phone-suggest');
@@ -1078,14 +1075,12 @@ function updateSuggestHighlight() {
           handleFail();
           ordersData = [];
           renderTable();
-          document.getElementById('totalPointBox').innerText = 0;
           return;
         } else if (data.message === 'not_found') {
           noteBox.textContent = "Bạn chưa đặt dịch vụ hoặc sai số điện thoại";
           handleFail();
           ordersData = [];
           renderTable();
-          document.getElementById('totalPointBox').innerText = 0;
           return;
         }
         // Thành công, xóa thông báo và reset đếm lỗi
@@ -1093,14 +1088,12 @@ function updateSuggestHighlight() {
         resetFail();
         savePhoneHistory(phone);
         ordersData = data.orders||[];
-        document.getElementById('totalPointBox').innerText = data.totalPoint||0;
         renderTable();
       } catch(e){
         noteBox.textContent = "Lỗi tìm đơn, thử lại sau!";
         handleFail();
         ordersData = [];
         renderTable();
-        document.getElementById('totalPointBox').innerText = 0;
       }
     }
 
