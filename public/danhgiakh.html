@@ -375,6 +375,18 @@
         padding: 0 10px;
         margin-left: 0;
       }
+      .search-row button#searchBtn {
+      min-width: 65px;
+      max-width: 90px;
+      padding-left: 8px;
+      padding-right: 8px;
+      }
+     .search-row button#clearBtn {
+      min-width: 65px;
+      max-width: 90px;
+      padding-left: 8px;
+      padding-right: 8px;
+      }
       h2 {
         font-size: 1.09em;
         text-align: center !important;
@@ -426,13 +438,13 @@
         background: #25b324;
         font-weight: bold;
         color: #fff;
-        border: 2px solid #217c1a;
+        border: none;    /* <-- sửa lại thành none */
       }
       .btn-eval.red {
         background: #e53935;
         font-weight: bold;
         color: #fff;
-        border: 2px solid #b71c1c;
+        border: none;    /* <-- sửa lại thành none */
       }
       #ordersTable thead tr th:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
       #ordersTable tbody tr td:not(:nth-child(4)):not(:nth-child(5)):not(:nth-child(6)):not(:nth-child(7)),
@@ -714,6 +726,27 @@
   justify-content: center;
   border-radius: 13px;
 }
+.search-row button#clearBtn {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1.05em;
+  cursor: pointer;
+  transition: background .2s;
+  height: 38px;
+  margin: 0 0 0 2px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+.search-row button#clearBtn:hover {
+  background: #b71c1c;
+}
   </style>
 </head>
 <body>
@@ -780,8 +813,7 @@
     <div id="phone-suggest"></div>
   </div>
   <button id="searchBtn" type="button">Tìm kiếm</button>
-  <span class="label-point">Tổng điểm tích lũy trong 24h <span id="currentMonth"></span>:</span>
-  <span class="point-box" id="totalPointBox">0</span>
+  <button id="clearBtn" type="button">Xóa</button>
 </div>
 
       <div id="noteBox"></div>
@@ -909,6 +941,7 @@
     const phoneInput = document.getElementById('phoneInput');
     const phoneSuggest = document.getElementById('phone-suggest');
     const noteBox = document.getElementById('noteBox');
+    let ordersData = [];
 
     // Lưu số điện thoại vào localStorage (nếu mới)
     function savePhoneHistory(phone) {
@@ -1030,9 +1063,6 @@ function updateSuggestHighlight() {
       }
       fetchOrders(phone);
     }
-
-    let ordersData = [];
-
     async function fetchOrders(phone) {
       try {
         const res = await fetch('/api/searchOrders',{
@@ -1241,8 +1271,24 @@ function updateSuggestHighlight() {
         var f = document.getElementById('footer-container');
         if(f) f.style.display = '';
       }
-      // Tìm tất cả input, textarea để gán sự kiện focus/blur
-      document.addEventListener('DOMContentLoaded', function() {
+  // Tìm tất cả input, textarea để gán sự kiện focus/blur
+  document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('clearBtn').addEventListener('click', function() {
+    // Reset dữ liệu đơn hàng
+    ordersData = [];
+    renderTable();
+    // Reset tổng tiền, tổng điểm
+    document.getElementById('sumTotal').innerText = '';
+    document.getElementById('sumPoint').innerText = '';
+    // Xóa SĐT
+    document.getElementById('phoneInput').value = '';
+    // Xóa note nếu có
+    document.getElementById('noteBox').innerText = '';
+    // Focus lại vào ô SĐT
+    document.getElementById('phoneInput').focus();
+    // Xóa gợi ý autocomplete
+    document.getElementById('phone-suggest').innerHTML = '';
+  });
         if(!isMobile()) return;
         var inputs = document.querySelectorAll('input, textarea, select');
         inputs.forEach(function(el) {
