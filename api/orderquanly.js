@@ -187,9 +187,6 @@ function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table
     box-shadow:0 2px 8px rgba(0,0,0,0.09);
     padding: 22px 18px 18px 18px;
   ">
-    <div class="logo" style="text-align:left;margin-bottom:10px;">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Logo_Vietcombank.png" alt="Logo" style="height:34px;" />
-    </div>
     <div class="receipt-title" style="text-align:center;font-size:20px;font-weight:bold;margin-bottom:5px;color:#168d49;">Biên nhận đặt dịch vụ</div>
     <div class="order-code" style="text-align:center;font-size:16px;font-weight:bold;color:#d63384;margin-bottom:14px;padding:7px 0;background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;">Mã đơn hàng: ${orderCode}</div>
     <table class="details-table" style="width:100%;border-collapse:collapse;margin-bottom:18px;">
@@ -236,9 +233,6 @@ function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table
         <td style="font-weight:bold;background:#fff;text-align:center;color:#111;font-size:16px;border:1px solid #e6ecf2;">${formatCurrency(total)}</td>
       </tr>
     </table>
-    <div class="thankyou" style="text-align:center;color:#168d49;font-size:16px;margin-top:12px;font-weight:600;">
-      Cảm ơn Quý khách đã đặt dịch vụ tại GooDjn DJ Coffee & Beer!
-    </div>
   </div>`;
 }
 
@@ -283,7 +277,7 @@ async function sendMailAndDiscord({staffList, orderId, name, phone, email, table
   try {
     await sendEmail(
       email,
-      `Đơn đặt dịch vụ từ GooDjn DJ Coffee & Beer`,
+      `Đơn đặt dịch vụ - Mã đơn ${orderId}`,
       htmlOrderConfirmEmailV2({
         orderId,
         timeVNStr,
@@ -303,9 +297,9 @@ async function sendMailAndDiscord({staffList, orderId, name, phone, email, table
   // Email hủy đơn vẫn giữ như cũ (gửi cho khách)
   if (allCancel) {
     try {
-      await sendEmail(email, "Hủy đơn hàng từ Coffee & Beer DJ GooDjn", `
+      await sendEmail(email, "Hủy đơn hàng", `
         <div style="background:#e3f2fd;border:1px solid #2196f3;padding:22px 16px 14px 16px;border-radius:7px;text-align:center;">
-          <div style="font-size:18px;font-weight:bold;color:#1565c0;padding-bottom:8px;">Hủy đơn hàng từ Coffee & Beer DJ GooDjn</div>
+          <div style="font-size:18px;font-weight:bold;color:#1565c0;padding-bottom:8px;">Hủy đơn hàng</div>
           <div style="font-size:16px;color:#c62828;padding-bottom:4px;">Đơn hàng số ${orderId} của quý khách được chấp nhận <b>Hủy</b> thành công.</div>
           <div style="color:#1976d2;font-size:15px;">Hẹn quý khách đặt dịch vụ lần sau, xin cảm ơn!</div>
         </div>
