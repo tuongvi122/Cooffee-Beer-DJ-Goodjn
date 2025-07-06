@@ -1177,31 +1177,45 @@ function updateSuggestHighlight() {
         ordersData[idx].serviceStars = v;
       }
     };
+// === Tối ưu: Định nghĩa các biến DOM dùng nhiều lần ===
+const reviewModal = document.getElementById('reviewModal');
+const reviewForm = document.getElementById('reviewForm');
+const btnSend = reviewForm.querySelector('.send');
+const btnClose = reviewForm.querySelector('.close');
+const popupLoading = document.getElementById('popupLoading');
 
-    window.openPopup = idx=>{
-      const o=ordersData[idx];
-      document.getElementById('reviewModal').classList.add('show');
-      document.getElementById('reviewModal').style.display = 'block';
-      document.getElementById('reviewForm').dataset.idx=idx;
-      document.getElementById('popupOrderId').textContent = `Mã đơn hàng: ${o.orderId}`;
-      ['Name','Phone','Email','Table','Total'].forEach(k=>{
-        const el=document.getElementById('popup'+k);
-        el.value = k==='Total' ? o.total.toLocaleString() : o[k.toLowerCase()];
-      });
-      o.staffList.forEach(nv=>nv.stars=0);
-      o.serviceStars=0;
-      renderStaffList(idx);
-      document.getElementById('popupServiceStars').innerHTML = renderStars('service',0,0);
-      document.querySelectorAll('input[name="speed"]').forEach(r=>r.checked=(r.value==='Nhanh'));
-      document.getElementById('popupComment').value='';
-    };
+// === Tối ưu: Reset trạng thái form mỗi lần mở popup ===
+window.openPopup = idx => {
+  const o = ordersData[idx];
 
-    window.closePopup = ()=>{
-      document.getElementById('reviewModal').classList.remove('show');
-      document.getElementById('reviewModal').style.display = 'none';
-    };
-// Chỉnh JS cho hiệu ứng và disable nút
-  document.getElementById('reviewForm').addEventListener('submit', async e => {
+  // Reset trạng thái nút và loading
+  btnSend.disabled = false;
+  btnClose.disabled = false;
+  popupLoading.style.display = 'none';
+
+  reviewModal.classList.add('show');
+  reviewModal.style.display = 'block';
+  reviewForm.dataset.idx = idx;
+  document.getElementById('popupOrderId').textContent = `Mã đơn hàng: ${o.orderId}`;
+  ['Name','Phone','Email','Table','Total'].forEach(k => {
+    const el = document.getElementById('popup' + k);
+    el.value = k === 'Total' ? o.total.toLocaleString() : o[k.toLowerCase()];
+  });
+  o.staffList.forEach(nv => nv.stars = 0);
+  o.serviceStars = 0;
+  renderStaffList(idx);
+  document.getElementById('popupServiceStars').innerHTML = renderStars('service', 0, 0);
+  document.querySelectorAll('input[name="speed"]').forEach(r => r.checked = (r.value === 'Nhanh'));
+  document.getElementById('popupComment').value = '';
+};
+
+window.closePopup = () => {
+  reviewModal.classList.remove('show');
+  reviewModal.style.display = 'none';
+};
+
+// Xử lý gửi đánh giá
+reviewForm.addEventListener('submit', async e => {
   e.preventDefault();
   const idx = +e.target.dataset.idx, o = ordersData[idx];
 
@@ -1215,12 +1229,9 @@ function updateSuggestHighlight() {
     return;
   }
 
-  // LẤY 2 NÚT (NÚT GỬI PHIẾU & ĐÓNG) VÀ POPUP LOADING
-  const btnSend = document.querySelector('#reviewForm .send');
-  const btnClose = document.querySelector('#reviewForm .close');
-  const popupLoading = document.getElementById('popupLoading');
+  // Chỉ disable nút gửi để luôn cho phép đóng form
   btnSend.disabled = true;
-  btnClose.disabled = true;
+  // btnClose.disabled = true; // KHÔNG disable nút đóng
   popupLoading.style.display = 'flex';
 
   try {
@@ -1236,15 +1247,13 @@ function updateSuggestHighlight() {
   } catch (err) {
     console.error(err);
     alert('Gửi thất bại!');
-    // Enable lại nút khi lỗi
     btnSend.disabled = false;
-    btnClose.disabled = false;
+    // btnClose.disabled = false;
   } finally {
-    // Tắt popup loading trong mọi trường hợp
     popupLoading.style.display = 'none';
   }
 });
-
+    
     window.closeThankPopup = ()=>{
       document.getElementById('thankModal').classList.remove('show');
       document.getElementById('thankModal').style.display = 'none';
