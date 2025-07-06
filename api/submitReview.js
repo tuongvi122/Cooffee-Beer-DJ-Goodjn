@@ -5,7 +5,6 @@ const nodemailer = require('nodemailer');
 // Helper: Lấy thời gian VN định dạng DD/MM/YYYY HH:mm:ss
 function getVNTimeForSheet() {
   const now = new Date();
-  // Chuyển về múi giờ Việt Nam
   const vnTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
 
   const day = String(vnTime.getDate()).padStart(2, '0');
@@ -68,7 +67,7 @@ module.exports = async (req, res) => {
   // Đọc toàn bộ sheet Orders để xác định vị trí cần update
   const ordersResult = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `'Orders'!A1:Q`
+    range: `'Orders'!A1:T` // Đảm bảo đủ tới cột S
   });
   const orderRows = ordersResult.data.values || [];
 
@@ -76,35 +75,31 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Orders sheet empty' });
   }
 
-  // Xác định vị trí cột: P (15) cho trạng thái đánh giá, Q (16) cho điểm thưởng
-  const colP = 'P'; // Trạng thái đánh giá
-  const colQ = 'Q'; // Điểm thưởng
+  // Xác định vị trí cột: R (17) cho trạng thái đánh giá, S (18) cho điểm thưởng
+  const colR = 'R'; // Trạng thái đánh giá
+  const colS = 'S'; // Điểm thưởng
 
-  // orderRows[0] là tiêu đề, dữ liệu bắt đầu từ orderRows[1] (dòng 2 trên Google Sheet)
   let firstReviewRow = -1;
   for (let i = 1; i < orderRows.length; i++) {
     const row = orderRows[i];
-    // Cột B là index 1 (MÃ ĐH), đổi sang so sánh chuỗi
     if (row[1] && row[1].toString().trim() === order.orderId.toString().trim()) {
-      // Cập nhật trạng thái đánh giá ở cột P (15)
+      // Cập nhật trạng thái đánh giá ở cột R (17)
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
-        range: `'Orders'!${colP}${i + 1}`,
+        range: `'Orders'!${colR}${i + 1}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: [['Đã đánh giá']] }
       });
-      // Đánh dấu dòng đầu tiên để cập nhật điểm thưởng
       if (firstReviewRow === -1) {
         firstReviewRow = i;
       }
     }
   }
-
   // Chỉ cập nhật điểm thưởng ở dòng đầu tiên
   if (firstReviewRow !== -1) {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: `'Orders'!${colQ}${firstReviewRow + 1}`,
+      range: `'Orders'!${colS}${firstReviewRow + 1}`,
       valueInputOption: 'USER_ENTERED',
       requestBody: { values: [[order.point || 10]] }
     });
