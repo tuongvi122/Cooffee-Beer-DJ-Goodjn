@@ -1291,6 +1291,8 @@ function renderMobileOrdersTable() {
   }).join('');
   document.getElementById("mobileOrdersTableWrap").innerHTML = `<div class="mobile-orders-table">${head}${rows}</div>`;
   document.getElementById("mobileOrdersTableWrap").style.display = "";
+    // THÊM DÒNG NÀY:
+  renderPagination();
 }
     // Phân trang tối ưu: chỉ hiển thị đúng số nút cần thiết
   function renderPagination() {
