@@ -1680,6 +1680,15 @@ document.getElementById('cancelDeleteStaffBtn').onclick = function() {
         updateDropdownColor(e.target);
       }
     });
+    // ================== AUTO REFRESH ======================
+// Chỉ tự động refresh nếu đang ở trang quản lý đơn hàng
+    if (window.location.pathname.includes("quanly")) {
+  setInterval(async function(){
+    await fetchOrders();
+    FILTERED = ORDERS.slice();
+    renderCurrentTable();
+  }, 0.5 * 60 * 1000);
+}
   </script>
     <script>
     // Hàm gọi API và hiển thị note nếu trống
