@@ -58,26 +58,31 @@ const auth = new google.auth.JWT(
 );
 const sheets = google.sheets({version: 'v4', auth});
 
-// Sheet and columns mapping
+// Sheet and columns mapping (UPDATED for new columns)
 const ORDERS_SHEET = "Orders";
 const PRODUCTS_SHEET = "Products";
 const COLS = {
-  A: 0,  // Timestamp
-  B: 1,  // MÃ DH (orderId)
-  C: 2,  // TÊN KHÁCH HÀNG
-  D: 3,  // SĐT
-  E: 4,  // EMAIL
-  F: 5,  // MÃ NV
-  G: 6,  // CA LV
-  H: 7,  // ĐƠN GIÁ
-  I: 8,  // THÀNH TIỀN
-  J: 9,  // TỔNG CỘNG (dòng đầu)
-  K: 10, // SỐ BÀN
-  L: 11, // GHI CHÚ DH
-  M: 12, // KH ĐÃ ĐẶT ĐƠN
-  N: 13, // QUẢN LÝ XÁC NHẬN DH
-  O: 14, // TÌNH TRẠNG THANH TOÁN
-  R: 17  // GHI CHÚ CỦA QUẢN LÝ
+  A: 0,   // Timestamp
+  B: 1,   // MÃ DH (orderId)
+  C: 2,   // TÊN KHÁCH HÀNG
+  D: 3,   // SĐT
+  E: 4,   // EMAIL
+  F: 5,   // MÃ NV
+  G: 6,   // CA LV
+  H: 7,   // ĐƠN GIÁ
+  I: 8,   // THÀNH TIỀN
+  J: 9,   // TỔNG CỘNG (dòng đầu)
+  K: 10,  // GIẢM GIÁ (mới)
+  L: 11,  // TỔNG THU (mới)
+  M: 12,  // SỐ BÀN (đã dịch)
+  N: 13,  // GHI CHÚ DH (đã dịch)
+  O: 14,  // KH ĐÃ ĐẶT ĐƠN (đã dịch)
+  P: 15,  // QUẢN LÝ XÁC NHẬN DH (đã dịch)
+  Q: 16,  // TÌNH TRẠNG THANH TOÁN (đã dịch)
+  R: 17,  // ĐÁNH GIÁ KHÁCH HÀNG
+  S: 18,  // ĐIỂM ĐÁNH GIÁ
+  T: 19,  // GHI CHÚ (quản lý ghi chú - cuối, đã dịch)
+  U: 20   // TRẠNG THÁI IN BILL (nếu cần)
 };
 
 // Get Orders sheetId dynamically
@@ -235,7 +240,6 @@ function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table
     </table>
   </div>`;
 }
-
 // Gửi Email/Discord sau khi lưu đơn (Email chỉ NV "Đồng ý")
 async function sendMailAndDiscord({staffList, orderId, name, phone, email, table, note, ghiChu, tongcong}) {
   let allCancel = staffList.every(s => (s.trangThai === "Hủy đơn"));
@@ -337,6 +341,28 @@ export default async function handler(req, res) {
       return res.status(500).json({products: [], error: error.message});
     }
   }
+  // Endpoint: /api/orderquanly?productsAll=1 -> trả về tất cả nhân viên, không filter điều kiện nào cả
+if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
+  try {
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: PRODUCTS_SHEET
+    });
+    const rows = result.data.values;
+    if (!rows || rows.length < 2) return res.status(200).json({products: []});
+    const products = rows.slice(1)
+      .map(row => ({
+        maNV: row[1],
+        caLV: row[2],
+        donGia: cleanNumber(row[3]),
+        status: row[5],
+        lockStatus: row[6],
+      }));
+    return res.status(200).json({products});
+  } catch (error) {
+    return res.status(500).json({products: [], error: error.message});
+  }
+}
 
   // --- POST: Lưu/cập nhật đơn hàng, gửi mail và Discord ---
   if (req.method === 'POST') {
@@ -390,19 +416,19 @@ export default async function handler(req, res) {
         let values = [];
         staffList.forEach((s, idx) => {
           let state = s.trangThai || "Đồng ý";
-          let colM = "", colN = "", colO = "", colI = 0;
+          let colO = "", colP = "", colQ = "", colI = 0;
           if (state === "Đồng ý") {
-            colM = colN = "V";
+            colO = colP = "V";
             colI = cleanNumber(s.donGia);
-            colO = "";
+            colQ = "";
           } else if (state === "Không tham gia") {
-            colM = colN = "Không tham gia";
+            colO = colP = "Không tham gia";
             colI = 0;
-            colO = "Hủy đơn hàng";
+            colQ = "Hủy đơn hàng";
           } else if (state === "Hủy đơn") {
-            colM = colN = "X";
+            colO = colP = "X";
             colI = 0;
-            colO = "Hủy đơn hàng";
+            colQ = "Hủy đơn hàng";
           }
           let row = [];
           row[COLS.A] = nowStr;
@@ -415,12 +441,15 @@ export default async function handler(req, res) {
           row[COLS.H] = cleanNumber(s.donGia);
           row[COLS.I] = colI;
           row[COLS.J] = (idx === 0) ? cleanNumber(tongcong) : "";
-          row[COLS.K] = cleanNumber(table);
-          row[COLS.L] = cleanText(note);
-          row[COLS.M] = colM;
-          row[COLS.N] = colN;
-          row[COLS.O] = colO;
-          row[COLS.R] = cleanText(ghiChu);
+          row[COLS.K] = ""; // GIẢM GIÁ (bổ sung nếu có, còn lại để trống)
+          row[COLS.L] = ""; // TỔNG THU (bổ sung nếu có, còn lại để trống)
+          row[COLS.M] = cleanNumber(table); // SỐ BÀN (đã cập nhật lại)
+          row[COLS.N] = cleanText(note);
+          row[COLS.O] = colO; // KH ĐÃ ĐẶT ĐƠN
+          row[COLS.P] = colP; // QL XÁC NHẬN
+          row[COLS.Q] = colQ; // TÌNH TRẠNG THANH TOÁN
+          // Các cột R, S, T, U nếu cần có thể bổ sung ở đây (ghi chú QL thì T)
+          row[COLS.T] = cleanText(ghiChu); // GHI CHÚ QL
           values.push(row);
         });
         await sheets.spreadsheets.values.append({
@@ -444,37 +473,41 @@ export default async function handler(req, res) {
           let staff = staffList.find(s => String(s.maNV) === String(rows[i][COLS.F]) && String(s.caLV) === String(rows[i][COLS.G]));
           if (staff) {
             let state = staff.trangThai || "Đồng ý";
-            let colM = "", colN = "", colO = "", colI = 0;
+            let colO = "", colP = "", colQ = "", colI = 0;
             if (state === "Đồng ý") {
-              colM = colN = "V";
+              colO = colP = "V";
               colI = cleanNumber(staff.donGia);
-              colO = "";
+              colQ = "";
             } else if (state === "Không tham gia") {
-              colM = colN = "Không tham gia";
+              colO = colP = "Không tham gia";
               colI = 0;
-              colO = "Hủy đơn hàng";
+              colQ = "Hủy đơn hàng";
             } else if (state === "Hủy đơn") {
-              colM = colN = "X";
+              colO = colP = "X";
               colI = 0;
-              colO = "Hủy đơn hàng";
+              colQ = "Hủy đơn hàng";
             }
             rows[i][COLS.H] = cleanNumber(staff.donGia);
             rows[i][COLS.I] = colI;
             if (i === existingRows[0]) rows[i][COLS.J] = cleanNumber(tongcong);
-            rows[i][COLS.K] = cleanNumber(table); // <--- BỔ SUNG DÒNG NÀY
-            rows[i][COLS.M] = colM;
-            rows[i][COLS.N] = colN;
-            rows[i][COLS.O] = colO;
-            rows[i][COLS.R] = cleanText(ghiChu);
+            // Giảm giá, tổng thu nếu có thay đổi thì cập nhật ở COLS.K, COLS.L
+            rows[i][COLS.M] = cleanNumber(table); // SỐ BÀN
+            rows[i][COLS.N] = cleanText(note); // GHI CHÚ ĐH
+            rows[i][COLS.O] = colO; // KH ĐÃ ĐẶT ĐƠN
+            rows[i][COLS.P] = colP; // QL XÁC NHẬN
+            rows[i][COLS.Q] = colQ; // TÌNH TRẠNG THANH TOÁN
+            rows[i][COLS.T] = cleanText(ghiChu); // GHI CHÚ QL
           }
         }
       }
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: sheetId,
-        range: ORDERS_SHEET + "!A2:Z" + rows.length,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values: rows.slice(1) }
-      });
+for (const i of existingRows) {
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${ORDERS_SHEET}!A${i + 1}:T${i + 1}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [rows[i].slice(0, 20)] }
+  });
+}
 
       // Gửi Email + Discord khi xác nhận đơn hàng
       await sendMailAndDiscord({
@@ -491,10 +524,10 @@ export default async function handler(req, res) {
   // --- GET: Trả về dữ liệu Orders đã lọc và SẮP XẾP, xác định trạng thái nút xác nhận ---
   if (req.method === 'GET') {
     try {
-      const result = await sheets.spreadsheets.values.get({
-        spreadsheetId: sheetId,
-        range: ORDERS_SHEET
-      });
+  const result = await sheets.spreadsheets.values.get({
+  spreadsheetId: sheetId,
+  range: ORDERS_SHEET + '!A2:T'
+});
       const rows = result.data.values;
       if (!rows || rows.length < 2) return res.status(200).json({orders: []});
       let ordersMap = {};
@@ -512,26 +545,28 @@ export default async function handler(req, res) {
       for (let orderId in ordersMap) {
         let orderRows = ordersMap[orderId];
 
-        if (orderRows.some(r => (r[COLS.O] || "").trim() === "Đã thanh toán")) continue;
+        if (orderRows.some(r => (r[COLS.Q] || "").trim() === "Đã thanh toán")) continue;
+        // 2. BỎ QUA ĐƠN KHÔNG DÒNG NÀO Ở CỘT O ("KH ĐÃ ĐẶT ĐƠN") KHÁC RỖNG
+        if (!orderRows.some(r => (r[COLS.O] || "").toString().trim() !== "")) continue;
 
-        let allM_V = orderRows.every(r => (r[COLS.M] || "").trim() === "V");
-        let allN_empty = orderRows.every(r => !r[COLS.N] || (r[COLS.N] || "").trim() === "");
-        let allO_empty = orderRows.every(r => !r[COLS.O] || (r[COLS.O] || "").trim() === "");
+        let allO_V = orderRows.every(r => (r[COLS.O] || "").trim() === "V");
+        let allP_empty = orderRows.every(r => !r[COLS.P] || (r[COLS.P] || "").trim() === "");
+        let allQ_empty = orderRows.every(r => !r[COLS.Q] || (r[COLS.Q] || "").trim() === "");
 
-        let allM_X = orderRows.every(r => (r[COLS.M] || "").trim() === "X");
-        let allN_X = orderRows.every(r => (r[COLS.N] || "").trim() === "X");
-        let allO_Huy = orderRows.every(r => (r[COLS.O] || "").trim() === "Hủy đơn hàng");
+        let allO_X = orderRows.every(r => (r[COLS.O] || "").trim() === "X");
+        let allP_X = orderRows.every(r => (r[COLS.P] || "").trim() === "X");
+        let allQ_Huy = orderRows.every(r => (r[COLS.Q] || "").trim() === "Hủy đơn hàng");
 
-        let has_MNO_V_X_KhongThamGia = orderRows.some(r => {
-          let m = (r[COLS.M] || "").trim();
-          let n = (r[COLS.N] || "").trim();
-          return ["V", "X", "Không tham gia"].includes(m) || ["V", "X", "Không tham gia"].includes(n);
+        let has_OPQ_V_X_KhongThamGia = orderRows.some(r => {
+          let o = (r[COLS.O] || "").trim();
+          let p = (r[COLS.P] || "").trim();
+          return ["V", "X", "Không tham gia"].includes(o) || ["V", "X", "Không tham gia"].includes(p);
         });
 
         let confirmStatus = "chuaxacnhan";
-        if (allM_V && allN_empty && allO_empty) confirmStatus = "chuaxacnhan";
-        else if (allM_X && allN_X && allO_Huy) confirmStatus = "huydon";
-        else if (has_MNO_V_X_KhongThamGia) confirmStatus = "daxacnhan";
+        if (allO_V && allP_empty && allQ_empty) confirmStatus = "chuaxacnhan";
+        else if (allO_X && allP_X && allQ_Huy) confirmStatus = "huydon";
+        else if (has_OPQ_V_X_KhongThamGia) confirmStatus = "daxacnhan";
 
         let row = orderRows[0];
         let staffList = orderRows.map(r => ({
@@ -539,9 +574,9 @@ export default async function handler(req, res) {
           caLV: r[COLS.G],
           donGia: cleanNumber(r[COLS.H]),
           trangThai:
-            (r[COLS.N] === "V") ? "Đồng ý" :
-            (r[COLS.N] === "Không tham gia") ? "Không tham gia" :
-            (r[COLS.N] === "X") ? "Hủy đơn" : ""
+            (r[COLS.P] === "V") ? "Đồng ý" :
+            (r[COLS.P] === "Không tham gia") ? "Không tham gia" :
+            (r[COLS.P] === "X") ? "Hủy đơn" : ""
         }));
 
         ordersArr.push({
@@ -550,13 +585,13 @@ export default async function handler(req, res) {
           name: row[COLS.C],
           phone: row[COLS.D],
           email: row[COLS.E],
-          note: row[COLS.L],
-          table: row[COLS.K],
+          note: row[COLS.N],
+          table: row[COLS.M],
           staffList,
           total: cleanNumber(row[COLS.J]).toLocaleString('vi-VN'),
           confirmStatus,
-          payStatus: (row[COLS.O] || "").trim(),
-          qlNote: row[COLS.R] || ""
+          payStatus: (row[COLS.Q] || "").trim(),
+          qlNote: row[COLS.T] || ""
         });
       }
       ordersArr.sort((a, b) => {
