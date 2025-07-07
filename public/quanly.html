@@ -884,6 +884,11 @@
       max-width: 290px;
       box-shadow: 0 1px 5px rgba(229,57,53,0.08);
     }
+    @media (min-width: 601px) {
+  #mobileOrdersTableWrap, .mobile-orders-table {
+    display: none !important;
+  }
+}
   </style>
 </head>
 <body>
@@ -914,7 +919,6 @@
     <!-- Desktop Navbar (tải động qua JS) -->
     <div class="desktop-navbar"></div>
   </div>
-
   <div class="site-content">
     <div class="container">
       <h2>DANH SÁCH ĐƠN HÀNG TRONG 24H</h2>
@@ -1027,20 +1031,20 @@
         </div>
       </div>
     </div>
-  <!-- Popup xác nhận xóa nhân viên -->
-  <div class="modal" id="deleteStaffModal" tabindex="-1" aria-hidden="true">
-  <div class="delete-staff-modal-dialog">
-    <div class="delete-staff-modal-content">
-      <div class="delete-staff-modal-title">
-        Bạn có chắc muốn xóa nhân viên này không?
-      </div>
-      <div class="delete-staff-modal-actions">
-        <button id="confirmDeleteStaffBtn" class="delete-staff-btn-confirm" type="button">Có</button>
-        <button id="cancelDeleteStaffBtn" class="delete-staff-btn-cancel" type="button">Không</button>
+    <!-- Popup xác nhận xóa nhân viên -->
+    <div class="modal" id="deleteStaffModal" tabindex="-1" aria-hidden="true">
+      <div class="delete-staff-modal-dialog">
+        <div class="delete-staff-modal-content">
+          <div class="delete-staff-modal-title">
+            Bạn có chắc muốn xóa nhân viên này không?
+          </div>
+          <div class="delete-staff-modal-actions">
+            <button id="confirmDeleteStaffBtn" class="delete-staff-btn-confirm" type="button">Có</button>
+            <button id="cancelDeleteStaffBtn" class="delete-staff-btn-cancel" type="button">Không</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
     <!-- Popup cảm ơn -->
     <div class="modal fade" id="thankModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
@@ -1122,7 +1126,6 @@ function logout() {
 
     // Footer auto-hide on mobile input focus (bàn phím ảo)
     (function(){
-      function isMobile() { return window.innerWidth <= 768; }
       function hideFooter() {
         var f = document.getElementById('footer-container');
         if(f) f.style.display = 'none';
@@ -1149,164 +1152,203 @@ function logout() {
     })();
   </script>
   <script>
+        // ========== MAIN LOGIC ========== 
     let PRODUCT_STAFFS = [];
+    let PRODUCT_STAFFS_ALL = [];
     const ENTRIES_OPTIONS = [10,20,50,100];
     let ORDERS = [];
     let FILTERED = [];
     let page = 1, entries = 10, totalPages = 1;
     let modalOrder = null, modalOrderIndex = -1, modalStaffs = [], modalStatus = '';
     let modalHasNewStaff = false;
+    // ==== BỔ SUNG NGAY SAU ĐÂY ====
+function isMobile() {
+  return window.innerWidth <= 600;
+}
 
+function renderCurrentTable() {
+  if (isMobile()) {
+    renderMobileOrdersTable();
+  } else {
+    renderTable();
+  }
+}
     async function fetchProductStaffs() {
-      try {
-        const res = await fetch('/api/orderquanly?products=1');
-        const data = await res.json();
-        PRODUCT_STAFFS = data.products || [];
-      } catch (error) {
-        PRODUCT_STAFFS = [];
-      }
-    }
+  try {
+    const res = await fetch('/api/orderquanly?products=1');
+    const data = await res.json();
+    PRODUCT_STAFFS = data.products || [];
+    // Thêm dòng này để lấy TẤT CẢ không lọc
+    PRODUCT_STAFFS_ALL = (data.products_all || PRODUCT_STAFFS); // sửa API nếu muốn trả về đầy đủ
+  } catch (error) {
+    PRODUCT_STAFFS = [];
+    PRODUCT_STAFFS_ALL = [];
+  }
+}
+    async function fetchProductStaffsAll() {
+  try {
+    const res = await fetch('/api/orderquanly?productsAll=1');
+    const data = await res.json();
+    PRODUCT_STAFFS_ALL = data.products || [];
+  } catch (error) {
+    PRODUCT_STAFFS_ALL = [];
+  }
+}
+
     async function fetchOrders() {
       try {
         const res = await fetch('/api/orderquanly');
         const data = await res.json();
-        ORDERS = data.orders || [];
+        ORDERS = (data.orders || []).map((o, idx) => ({ ...o, _index: idx }));
       } catch (error) {
         ORDERS = [];
       }
     }
+    // Phân trang và filter tối ưu
+function filterTable() {
+  const kw = document.getElementById("filterInput").value.trim().toLowerCase();
+  FILTERED = ORDERS.filter(o =>
+    o.time.toLowerCase().includes(kw) ||
+    o.orderId.toLowerCase().includes(kw) ||
+    o.name.toLowerCase().includes(kw) ||
+    o.phone.toLowerCase().includes(kw) ||
+    o.email.toLowerCase().includes(kw) ||
+    o.note.toLowerCase().includes(kw) ||
+    o.table.toLowerCase().includes(kw) ||
+    o.staffList.map(s => s.maNV).join(", ").toLowerCase().includes(kw) ||
+    o.total.toLowerCase().includes(kw) ||
+    (o.qlNote || "").toLowerCase().includes(kw)
+  );
+  page = 1;
+  renderCurrentTable();
+}
 
-    // --- RENDER TABLES ---
-    function renderTable() {
-      let html = "";
-      const start = (page-1)*entries, end = start+entries;
-      const paged = FILTERED.slice(start, end);
-      paged.forEach((o,i)=>{
-        let maNVs = o.staffList.map(s=>s.maNV).join(", ");
-        let btn = "";
-        let payStatus = o.payStatus || "";
-        if(o.confirmStatus==="chuaxacnhan") btn = `<button class="btn-confirm" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
-        else if(o.confirmStatus==="daxacnhan") btn = `<button class="btn-daxacnhan" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
-        else if(o.confirmStatus==="huydon") btn = `<button class="btn-huy" disabled>Hủy đơn</button>`;
-        html += `<tr>
-          <td>${o.time}</td>
-          <td>${o.orderId}</td>
-          <td>${o.name}</td>
-          <td>${o.phone}</td>
-          <td>${o.email}</td>
-          <td>${o.note}</td>
-          <td>${o.table}</td>
-          <td>${maNVs}</td>
-          <td>${o.total}</td>
-          <td>${btn}</td>
-          <td class="ql-ghichu-box">${o.qlNote||""}</td>
-        </tr>`;
-      });
-      document.getElementById("ordersTableBody").innerHTML = html;
-      renderPagination();
-      renderMobileOrdersTable(); // update mobile view always!
-    }
+function renderTable() {
+  // Chỉ render đúng số dòng trên trang hiện tại (desktop)
+  const start = (page - 1) * entries;
+  const end = start + entries;
+  const paged = FILTERED.slice(start, end);
 
-    // --- RENDER MOBILE TABLE ONLY (when mobile) ---
-    function renderMobileOrdersTable() {
-      if(window.innerWidth > 600) {
-        document.getElementById("mobileOrdersTableWrap").style.display = "none";
-        return;
-      }
-      // Show table head
-      let head = `<div class="mobile-orders-table-head">
-        <div class="col col-khach">Tên khách hàng</div>
-        <div class="col col-ban">Số bàn</div>
-        <div class="col col-mnv">Mã NV</div>
-        <div class="col col-tong">Tổng tiền</div>
-        <div class="col col-xacnhan">Xác nhận<br>đơn hàng</div>
-      </div>`;
-      // Show rows
-      const start = (page-1)*entries, end = start+entries;
-      const paged = FILTERED.slice(start, end);
-      let rows = paged.map((o,i)=>{
-        let maNVs = o.staffList.map(s=>s.maNV).join(", ");
-        let btn = '';
-        if(o.confirmStatus==="chuaxacnhan")
-          btn = `<button class="btn-confirm" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
-        else if(o.confirmStatus==="daxacnhan")
-          btn = `<button class="btn-daxacnhan" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
-        else if(o.confirmStatus==="huydon")
-          btn = `<button class="btn-huy" style="width:72px;min-width:62px;" disabled>Hủy đơn</button>`;
-        return `<div class="mobile-orders-table-row">
-          <div class="col col-khach">${o.name}</div>
-          <div class="col col-ban">${o.table}</div>
-          <div class="col col-mnv">${maNVs}</div>
-          <div class="col col-tong">${parseInt(o.total||0).toLocaleString('vi-VN')}</div>
-          <div class="col col-xacnhan">${btn}</div>
-        </div>`;
-      }).join('');
-      document.getElementById("mobileOrdersTableWrap").innerHTML = `<div class="mobile-orders-table">${head}${rows}</div>`;
-      document.getElementById("mobileOrdersTableWrap").style.display = "";
-    }
+  let html = paged.map(o => {
+    let maNVs = o.staffList.map(s => s.maNV).join(", ");
+    let btn = "";
+    if (o.confirmStatus === "chuaxacnhan") btn = `<button class="btn-confirm" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
+    else if (o.confirmStatus === "daxacnhan") btn = `<button class="btn-daxacnhan" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
+    else if (o.confirmStatus === "huydon") btn = `<button class="btn-huy" disabled>Hủy đơn</button>`;
+    return `<tr>
+      <td>${o.time}</td>
+      <td>${o.orderId}</td>
+      <td>${o.name}</td>
+      <td>${o.phone}</td>
+      <td>${o.email}</td>
+      <td>${o.note}</td>
+      <td>${o.table}</td>
+      <td>${maNVs}</td>
+      <td>${o.total}</td>
+      <td>${btn}</td>
+      <td class="ql-ghichu-box">${o.qlNote || ""}</td>
+    </tr>`;
+  }).join("");
 
-    function renderPagination() {
-      if(FILTERED.length===0) { document.getElementById("tablePagination").innerHTML = ""; return; }
-      totalPages = Math.ceil(FILTERED.length/entries);
-      let html = "";
-      html += `<button ${page==1?"disabled":""} onclick="gotoPage(${Math.max(1,page-1)})">Previous</button>`;
-      let start = Math.max(1, page-2), end = Math.min(totalPages, page+2);
-      if(start>1) html += `<button onclick="gotoPage(1)">1</button><span>...</span>`;
-      for(let p=start;p<=end;p++) html += `<button ${p==page?"class='active' disabled":""} onclick="gotoPage(${p})">${p}</button>`;
-      if(end<totalPages) html += `<span>...</span><button onclick="gotoPage(${totalPages})">${totalPages}</button>`;
-      html += `<button ${page==totalPages?"disabled":""} onclick="gotoPage(${Math.min(totalPages,page+1)})">Next</button>`;
-      document.getElementById("tablePagination").innerHTML = html;
-    }
-    function gotoPage(p) { page=Math.max(1,Math.min(totalPages,p)); renderTable(); }
-    function filterTable() {
-      const kw = document.getElementById("filterInput").value.trim().toLowerCase();
-      FILTERED = ORDERS.filter(o =>
-        o.time.toLowerCase().includes(kw) ||
-        o.orderId.toLowerCase().includes(kw) ||
-        o.name.toLowerCase().includes(kw) ||
-        o.phone.toLowerCase().includes(kw) ||
-        o.email.toLowerCase().includes(kw) ||
-        o.note.toLowerCase().includes(kw) ||
-        o.table.toLowerCase().includes(kw) ||
-        o.staffList.map(s=>s.maNV).join(", ").toLowerCase().includes(kw) ||
-        o.total.toLowerCase().includes(kw) ||
-        (o.qlNote||"").toLowerCase().includes(kw)
-      );
-      FILTERED.forEach((o,i)=>o._index=ORDERS.findIndex(orig=>orig.orderId===o.orderId));
-      page=1; renderTable();
-    }
-    document.addEventListener("DOMContentLoaded", async ()=>{
-      await fetchProductStaffs();
-      await fetchOrders();
-      FILTERED = ORDERS.map((v,i)=>({...v,_index:i}));
-      document.getElementById("entriesSelect").addEventListener("change", function(){
-        entries = parseInt(this.value)||10;
-        page = 1;
-        renderTable();
-      });
-      document.getElementById("filterInput").addEventListener("input", filterTable);
-      renderTable();
-      setInterval(async ()=>{
-        await fetchOrders();
-        filterTable();
-      }, 30000);
+  document.getElementById("ordersTableBody").innerHTML = html;
+  renderPagination();
+}
+// // Mobile table: vẫn chỉ render số dòng trên trang hiện tại
+function renderMobileOrdersTable() {
+  // Chỉ render bảng mobile nếu là mobile
+  if (!isMobile()) {
+    document.getElementById("mobileOrdersTableWrap").style.display = "none";
+    return;
+  }
+  let head = `<div class="mobile-orders-table-head">
+    <div class="col col-khach">Tên khách hàng</div>
+    <div class="col col-ban">Số bàn</div>
+    <div class="col col-mnv">Mã NV</div>
+    <div class="col col-tong">Tổng tiền</div>
+    <div class="col col-xacnhan">Xác nhận<br>đơn hàng</div>
+  </div>`;
+  const start = (page - 1) * entries, end = start + entries;
+  const paged = FILTERED.slice(start, end);
+  let rows = paged.map(o => {
+    let maNVs = o.staffList.map(s => s.maNV).join(", ");
+    let btn = "";
+    if (o.confirmStatus === "chuaxacnhan")
+      btn = `<button class="btn-confirm" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Xác nhận</button>`;
+    else if (o.confirmStatus === "daxacnhan")
+      btn = `<button class="btn-daxacnhan" style="width:72px;min-width:62px;" onclick="openOrderModal(${o._index})">Đã xác nhận</button>`;
+    else if (o.confirmStatus === "huydon")
+      btn = `<button class="btn-huy" style="width:72px;min-width:62px;" disabled>Hủy đơn</button>`;
+    return `<div class="mobile-orders-table-row">
+      <div class="col col-khach">${o.name}</div>
+      <div class="col col-ban">${o.table}</div>
+      <div class="col col-mnv">${maNVs}</div>
+      <div class="col col-tong">${parseInt(o.total || 0).toLocaleString('vi-VN')}</div>
+      <div class="col col-xacnhan">${btn}</div>
+    </div>`;
+  }).join('');
+  document.getElementById("mobileOrdersTableWrap").innerHTML = `<div class="mobile-orders-table">${head}${rows}</div>`;
+  document.getElementById("mobileOrdersTableWrap").style.display = "";
+}
+    // Phân trang tối ưu: chỉ hiển thị đúng số nút cần thiết
+  function renderPagination() {
+  if (FILTERED.length === 0) {
+    document.getElementById("tablePagination").innerHTML = "";
+    return;
+  }
+  totalPages = Math.ceil(FILTERED.length / entries);
+  let html = "";
 
-      // Listen to resize for mobile table
-      window.addEventListener('resize', renderMobileOrdersTable);
-    });
+  html += `<button ${page === 1 ? "disabled" : ""} onclick="gotoPage(${Math.max(1, page - 1)})">Previous</button>`;
+  let startPage = Math.max(1, page - 2);
+  let endPage = Math.min(totalPages, page + 2);
+  if (startPage > 1) html += `<button onclick="gotoPage(1)">1</button><span>...</span>`;
+  for (let p = startPage; p <= endPage; p++) {
+    html += `<button ${p === page ? "class='active' disabled" : ""} onclick="gotoPage(${p})">${p}</button>`;
+  }
+  if (endPage < totalPages) html += `<span>...</span><button onclick="gotoPage(${totalPages})">${totalPages}</button>`;
+  html += `<button ${page === totalPages ? "disabled" : ""} onclick="gotoPage(${Math.min(totalPages, page + 1)})">Next</button>`;
 
-    // Popup & Staff Table
+  document.getElementById("tablePagination").innerHTML = html;
+}
+
+function gotoPage(p) {
+  page = Math.max(1, Math.min(totalPages, p));
+  renderCurrentTable();
+}
+
+    // ========== UI EVENTS ==========
+  // Khởi tạo: chỉ sort 1 lần sau khi fetch, KHÔNG sort lại mỗi lần render/filter
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchProductStaffs();
+  await fetchProductStaffsAll();
+  await fetchOrders();
+  ORDERS.sort((a, b) => new Date(b.time) - new Date(a.time));
+  FILTERED = ORDERS.slice();
+  document.getElementById("entriesSelect").addEventListener("change", function () {
+    entries = parseInt(this.value) || 10;
+    page = 1;
+    renderCurrentTable();
+  });
+  document.getElementById("filterInput").addEventListener("input", filterTable);
+  renderCurrentTable();
+  window.addEventListener('resize', renderCurrentTable);
+});
+    // ========== POPUP/FORM LOGIC ==========
     function openOrderModal(idx) {
+      // Reset lại trạng thái enabled cho nút "Xác nhận" và "Đóng"
+      document.querySelector('.btn-popup-xacnhan').disabled = false;
+      document.querySelector('.btn-popup-close').disabled = false;
       modalOrderIndex = idx;
       modalOrder = {...ORDERS[idx]};
-      // Đảm bảo trạng thái luôn là "Đồng ý" cho nhân viên gốc nếu thiếu
       modalStaffs = modalOrder.staffList.map(s=>({
-        ...s,
-        isOriginal: true,
-        donGia: parseInt(s.donGia||0),
-        donGiaOrigin: parseInt(s.donGia||0),
-        trangThai: s.trangThai || "Đồng ý"
-      }));
+  ...s,
+  isOriginal: true,
+  donGia: parseInt(s.donGia||0),
+  donGiaOrigin: parseInt(s.donGia||0),
+  trangThai: s.trangThai || "Đồng ý",
+  trangThaiOrigin: s.trangThai || "Đồng ý" // Thêm dòng này
+}));
+
       modalStatus = "chuaxacnhan";
       modalHasNewStaff = false;
       document.getElementById("modalOrderId").textContent = modalOrder.orderId;
@@ -1325,6 +1367,7 @@ function logout() {
       document.getElementById("orderModal").classList.remove("show");
       document.getElementById("orderModal").style.display = "none";
     }
+    
 function renderModalStaffTable() {
   let html = "";
   let total = 0;
@@ -1431,29 +1474,70 @@ function renderModalStaffTable() {
     }
 
     // === CẬP NHẬT ĐƠN GIÁ KHI ĐỔI TRẠNG THÁI NHÂN VIÊN ===
-    function modalStaffChange(i,sel) {
-      let staff = modalStaffs[i];
-      staff.trangThai = sel.value;
-      if (sel.value === "Hủy đơn" || sel.value === "Không tham gia") {
-        staff.donGia = 0;
-      } else if (sel.value === "Đồng ý") {
-        // Lấy lại đơn giá gốc từ PRODUCTS, loại bỏ dấu cách và so sánh kiểu chuỗi
-        let found = PRODUCT_STAFFS.find(x=>
+function modalStaffChange(i, sel) {
+  let staff = modalStaffs[i];
+  staff.trangThai = sel.value;
+
+  if (sel.value === "Hủy đơn" || sel.value === "Không tham gia") {
+    staff.donGia = 0;
+  } else if (sel.value === "Đồng ý") {
+    if (staff.isOriginal) {
+      // Nếu trạng thái gốc là “Không tham gia” hoặc “Hủy đơn” thì lấy giá từ Products (ALL), còn lại giữ đơn giá gốc
+      if (staff.trangThaiOrigin === "Không tham gia" || staff.trangThaiOrigin === "Hủy đơn") {
+        // Lấy đơn giá từ Products sheet KHÔNG filter điều kiện gì ngoài mã NV và ca LV
+        let found = PRODUCT_STAFFS_ALL.find(x =>
           String(x.maNV).trim() === String(staff.maNV).trim() &&
           String(x.caLV).trim() === String(staff.caLV).trim()
         );
-        staff.donGia = found ? parseInt(found.donGia||0) : (staff.donGiaOrigin||0);
+        staff.donGia = found ? parseInt(found.donGia || 0) : 0;
+      } else {
+        // Trạng thái gốc là Đồng ý, lấy lại giá gốc từ đơn Orders
+        staff.donGia = staff.donGiaOrigin;
       }
-      renderModalStaffTable();
+    } else {
+      // Nhân viên mới vẫn giữ nguyên điều kiện filter như trước
+      let found = PRODUCT_STAFFS.find(x =>
+        String(x.maNV).trim() === String(staff.maNV).trim() &&
+        String(x.caLV).trim() === String(staff.caLV).trim() &&
+        String(x.status).trim() === "Làm việc" &&
+        (!x.lockStatus || String(x.lockStatus).trim() === "")
+      );
+      staff.donGia = found ? parseInt(found.donGia || 0) : 0;
     }
-    function modalTatCaDongY() {
-      modalStaffs.forEach(s=>{
-        s.trangThai="Đồng ý";
-        let found = PRODUCT_STAFFS.find(x=>x.maNV===s.maNV && String(x.caLV)===String(s.caLV));
-        s.donGia = found ? parseInt(found.donGia||0) : (s.donGiaOrigin||0);
-      });
-      renderModalStaffTable();
+  }
+  renderModalStaffTable();
+}
+  function modalTatCaDongY() {
+  modalStaffs.forEach((s, i) => {
+    const prevTrangThai = s.trangThai;
+    s.trangThai = "Đồng ý";
+    if (s.isOriginal) {
+      // Nếu trước đó là Không tham gia/Hủy đơn, lấy đơn giá từ Products ALL (không lọc điều kiện gì)
+      if (prevTrangThai === "Không tham gia" || prevTrangThai === "Hủy đơn") {
+        let found = PRODUCT_STAFFS_ALL.find(x =>
+          String(x.maNV).trim() === String(s.maNV).trim() &&
+          String(x.caLV).trim() === String(s.caLV).trim()
+        );
+        s.donGia = found ? parseInt(found.donGia || 0) : 0;
+      } else {
+        // Nếu trạng thái cũ đã là Đồng ý, giữ nguyên đơn giá cũ trong Orders
+        // hoặc nếu muốn, có thể set về đơn giá cũ gốc trong Orders:
+        s.donGia = s.donGiaOrigin;
+      }
+    } else {
+      // Nhân viên mới vẫn giữ nguyên điều kiện (Làm việc & không khóa)
+      let found = PRODUCT_STAFFS.find(x =>
+        String(x.maNV).trim() === String(s.maNV).trim() &&
+        String(x.caLV).trim() === String(s.caLV).trim() &&
+        String(x.status).trim() === "Làm việc" &&
+        (!x.lockStatus || String(x.lockStatus).trim() === "")
+      );
+      s.donGia = found ? parseInt(found.donGia || 0) : 0;
     }
+  });
+  renderModalStaffTable();
+}
+
     function modalHuyDon() {
       modalStatus = "huydon";
       modalStaffs.forEach(s=>{
@@ -1507,9 +1591,8 @@ document.getElementById('cancelDeleteStaffBtn').onclick = function() {
   document.getElementById('deleteStaffModal').classList.remove('show');
 };
     // ================== QUAN TRỌNG: HÀM SUBMIT XÁC NHẬN ĐƠN HÀNG ======================
-async function modalSubmitXacNhan() {
+  async function modalSubmitXacNhan() {
   if (modalOrderIndex < 0) return;
-  // LẤY NÚT
   const btnXacNhan = document.querySelector('.btn-popup-xacnhan');
   const btnClose = document.querySelector('.btn-popup-close');
   const popupLoading = document.getElementById('popupLoading');
@@ -1519,7 +1602,6 @@ async function modalSubmitXacNhan() {
   try {
         let tongcong = 0;
         let staffListSend = [];
-        // Đảm bảo luôn có trạng thái cho tất cả nhân viên (nếu rỗng thì mặc định "Đồng ý")
         modalStaffs.forEach(s=>{
           let trangThai = s.trangThai || "Đồng ý";
           let donGia = (trangThai==="Đồng ý") ? (parseInt(s.donGia)||0) : 0;
@@ -1538,12 +1620,11 @@ async function modalSubmitXacNhan() {
           ghiChu: document.getElementById("modalGhiChu").value.trim(),
           huydon: modalStatus==="huydon",
           tongcong: tongcong,
-          // === LẤY GIÁ TRỊ TỪ INPUT, KHÔNG LẤY TỪ modalOrder ===
           name: document.getElementById("modalTenKH").value.trim(),
           phone: document.getElementById("modalSDT").value.trim(),
           email: document.getElementById("modalEmail").value.trim(),
           table: document.getElementById("modalTable").value.trim(),
-          note: modalOrder.note // Nếu muốn cho phép sửa ghi chú khách, hãy thêm input và lấy value tại đây
+          note: modalOrder.note
         };
    const response = await fetch('/api/orderquanly', {
       method: 'POST',
@@ -1553,21 +1634,18 @@ async function modalSubmitXacNhan() {
     if (!response.ok) throw new Error('API call failed');
     closeOrderModal();
     await fetchOrders();
-    FILTERED = ORDERS.map((v,i)=>({...v,_index:i}));
+    filterTable();
     renderTable();
     openThankPopup(modalStatus === "huydon" ? "Hủy đơn thành công!" : "Xác nhận đơn hàng thành công!");
   } catch (error) {
     alert('Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.');
-    // Nếu lỗi thì enable lại 2 nút
     btnXacNhan.disabled = false;
     btnClose.disabled = false;
   } finally {
-    // Tắt loading dù thành công hay lỗi
     popupLoading.style.display = 'none';
   }
 }
     // ================== END SUBMIT ======================
-
     function openThankPopup(msg) {
       document.getElementById("thankMsg").textContent = msg;
       document.getElementById("thankModal").classList.add("show");
@@ -1576,7 +1654,8 @@ async function modalSubmitXacNhan() {
     function closeThankPopup() {
       document.getElementById("thankModal").classList.remove("show");
       document.getElementById("thankModal").style.display = "none";
-    }
+    }  
+
     // ĐỔI MÀU CHỮ DROPDOWN THEO GIÁ TRỊ
     function updateDropdownColor(sel) {
       if (!sel) return;
