@@ -799,22 +799,22 @@
       if (reloadProductsInterval) clearInterval(reloadProductsInterval);
       reloadProductsInterval = setInterval(loadProducts, 60000);
     }
-
     async function loadProducts() {
-      try {
-        productsList = await fetch('/api/getProducts').then(r=>r.json());
-        // Xử lý trường hợp API trả về lỗi
-        if (!Array.isArray(productsList) || productsList.length === 0) {
-          document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Không lấy được dữ liệu sản phẩm! Hãy kiểm tra API hoặc dữ liệu Google Sheets!</div>';
-          return;
-        }
-        employeeMap = groupByEmployee(productsList);
-        currentEmployeeMap = employeeMap;
-        renderProducts(currentEmployeeMap);
-      } catch (e) {
-        document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Lỗi lấy dữ liệu sản phẩm: ' + e + '</div>';
-      }
+  try {
+    const { products, availableTables: tables } = await fetch('/api/getProducts').then(r => r.json());
+    productsList = products;
+    availableTables = Array.isArray(tables) ? tables : [];
+    if (!Array.isArray(productsList) || productsList.length === 0) {
+      document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Không lấy được dữ liệu sản phẩm! Hãy kiểm tra API hoặc dữ liệu Google Sheets!</div>';
+      return;
     }
+    employeeMap = groupByEmployee(productsList);
+    currentEmployeeMap = employeeMap;
+    renderProducts(currentEmployeeMap);
+  } catch (e) {
+    document.getElementById('products').innerHTML = '<div style="color:red;text-align:center;width:100%;">Lỗi lấy dữ liệu sản phẩm: ' + e + '</div>';
+  }
+}
 
     // Gom nhóm sản phẩm theo mã NV
     function groupByEmployee(products) {
@@ -1241,17 +1241,10 @@ const TABLES_PER_PAGE = 10;
 
 // Lấy bàn khả dụng và reset lọc
 async function renderTableNumberOptionsVirtual() {
-  const totalTables = 150;
-try {
-  const res = await fetch('/api/getAvailableTables');
-  const data = await res.json();
-  availableTables = Array.isArray(data.availableTables) ? data.availableTables : [];
-} catch(e) {
-  availableTables = [];
-}
-filteredTables = [...availableTables];
-tableDropdownPage = 0;
-renderTableDropdownPage();
+  // availableTables đã được cập nhật khi gọi loadProducts, không cần fetch lại từ API
+  filteredTables = [...availableTables];
+  tableDropdownPage = 0;
+  renderTableDropdownPage();
 }
 
 // Khi focus hoặc click vào input
