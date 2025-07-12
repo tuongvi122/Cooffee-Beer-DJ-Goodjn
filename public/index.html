@@ -11,6 +11,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
     body {
       min-height: 100vh;
@@ -20,12 +21,13 @@
       padding: 0;
       margin: 0;
       background-color: #f9f9f9;
+      overflow-x: hidden; /* Thêm dòng này */
     }
     #navbar-container {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
+      width: 100%; /* Thay 100vw */
       z-index: 10000;
       background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.09);
@@ -35,7 +37,7 @@
       display: flex;
       flex-direction: column;
       padding-top: 64px;
-      padding-bottom: 0;
+      padding-bottom: 50px;  /* hoặc 60px nếu cần rộng hơn, tùy chiều cao footer */
     }
   #footer-container {
   background: #228B22;
@@ -254,6 +256,7 @@
       width: 100%;
       overflow: hidden;
       background: transparent;
+      margin-top: 40px; /* hoặc padding-top: 40px; */
       margin: 10px 0 15px 0;
       height: 2.2em;
       position: relative;
@@ -327,6 +330,7 @@
     /* THÊM DÒNG DƯỚI ĐÂY */
     max-height: calc(100vh - 34px) !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important; /* Thêm để ngăn tràn ngang */
   }
       .ca-item-row { flex-wrap: wrap; }
       .ca-remove-btn2 { margin-top: 4px; }
@@ -534,6 +538,26 @@
   0% { transform: rotate(0deg);}
   100% { transform: rotate(360deg);}
 }
+#table-dropdown::-webkit-scrollbar { width: 6px; }
+#table-dropdown::-webkit-scrollbar-thumb { background: #eee; border-radius: 5px; }
+.table-dropdown-item { font-size: 15px; }
+#note {
+  width: 100%;
+  margin-top: 7px;
+  margin-bottom: 18px;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  resize: vertical;
+}
+.form-buttons {
+  margin-bottom: 18px !important;
+}
+#table-number-error {
+  margin-bottom: 2px;
+  display: block;
+}
   </style>
 </head>
 <body>
@@ -593,7 +617,7 @@
     </div>
     <div id="products"></div>
     <!-- Modal đặt hàng - POPUP GIỎ HÀNG -->
-    <div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-labelledby="modalOrderLabel" aria-hidden="true">
+<div class="modal fade" id="modalOrder" tabindex="-1" role="dialog" aria-labelledby="modalOrderLabel" aria-hidden="true">
   <div class="modal-dialog mt-4">
     <div class="modal-content" style="position:relative;">
       <div class="modal-header">
@@ -622,12 +646,29 @@
         <input placeholder="Họ và tên" id="name"><br>
         <input placeholder="Số điện thoại" id="phone" name="phone" type="tel" pattern="[0-9]{10,11}" maxlength="11" inputmode="numeric" autocomplete="tel" oninput="validatePhoneInput(this)"><br>
         <input placeholder="Email" id="contact"><br>
-        <input placeholder="Bàn số 1-50" id="table-number" type="number" min="1" max="50"><br>
-        <textarea placeholder="Ghi chú" id="note" name="note"></textarea><br><br>
-        <div class="form-buttons">
-          <button class="confirm-btn" onclick="submitOrder()">Đặt dịch vụ</button>
-          <button class="close-btn" onclick="closeCartModal()">Đóng</button>
-        </div>
+        <div style="position:relative;">
+  <input id="table-number"
+         autocomplete="off"
+         placeholder="Chọn hoặc nhập số bàn..."
+         style="width:100%;margin:5px 0 0 0;padding:8px;border-radius:5px;border:1px solid #ccc;cursor:pointer;"
+         onfocus="showTableDropdown()"
+         oninput="handleTableInput()"
+         onkeydown="handleTableKeyDown(event)">
+  <div id="table-dropdown"
+       style="display:none;position:absolute;z-index:999;width:100%;max-height:220px;overflow-y:auto;background:#fff;border:1px solid #aaa;border-radius:5px;box-shadow:0 2px 8px #0002;">
+    <!-- Option sẽ được render ở đây -->
+  </div>
+  <span id="table-number-error" style="display:none;color:#d32f2f;font-size:13px;margin-bottom:2px;display:block;"></span>
+</div>
+
+<!-- Đặt textarea sát ngay dưới input số bàn, đồng bộ chiều rộng, margin-top nhỏ -->
+<textarea placeholder="Ghi chú" id="note" name="note"
+  style="width:100%;margin-top:7px;margin-bottom:18px;padding:8px;border-radius:5px;border:1px solid #ccc;box-sizing:border-box;resize:vertical;"></textarea>
+
+<div class="form-buttons" style="margin-bottom:18px;">
+  <button class="confirm-btn" onclick="submitOrder()">Đặt dịch vụ</button>
+  <button class="close-btn" onclick="closeCartModal()">Đóng</button>
+</div>
       </div>
       <!-- Đặt overlay loading ngay cuối modal-content -->
       <div id="popupLoading">
@@ -639,6 +680,7 @@
     </div>
   </div>
 </div>
+
     <button id="floating-cart" onclick="showCartModal()">Cart <span id="cart-count-floating">0</span> 🛒</button>
     <button id="scrollToTopBtn" onclick="scrollToTop()">⬆</button>
     <div id="search-bar-area">
@@ -687,7 +729,7 @@
       </div>
     </div>
   </div>
- <!-- Popup cảm ơn đặt dịch vụ -->
+  <!-- Popup cảm ơn đặt dịch vụ -->
 <div class="modal fade" id="thankOrderModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog mt-4">
     <div class="modal-content" style="max-width:370px;margin:auto;text-align:center;">
@@ -715,7 +757,6 @@
     </div>
   </div>
 </div>
-
   <script>
     // Khóa cuộn trang chính, popup cuộn body như trang chính
     let _bodyScrollY = 0;
@@ -798,7 +839,7 @@
     let cardClass = isFull ? "product-card disabled" : "product-card";
     html += `
       <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
-        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm">
+        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm" loading="lazy">
         <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
         ${isFull ? `<div class="full-note">Đã full</div>` : ""}
       </div>
@@ -936,13 +977,11 @@
       document.getElementById('order-total').innerHTML = "Tổng cộng: " + formatCurrency(total);
     }
 
-    function showCartModal() {
+  async function showCartModal() {
   loadProducts();
   renderCartTable();
   document.getElementById('alert_order').style.display = 'none';
   document.getElementById('alert_order_sucess').style.display = 'none';
-  // XÓA dòng này vì đã bỏ order-thankyou khỏi form:
-  // document.getElementById('order-thankyou').style.display = 'none';
   document.getElementById('modalOrder').classList.add('show');
   document.getElementById('modalOrder').style.display = 'block';
   document.getElementById('floating-cart').style.display = 'none';
@@ -951,13 +990,21 @@
   let info = localStorage.getItem("customerInfo");
   if (info) {
     try {
-      const { name, phone, contact, tableNum } = JSON.parse(info);
+      const { name, phone, contact } = JSON.parse(info);
       if(name) document.getElementById('name').value = name;
       if(phone) document.getElementById('phone').value = phone;
       if(contact) document.getElementById('contact').value = contact;
     } catch(e) {}
   }
   closeSearchBar();
+  // Reset các trường "Số bàn" và "Ghi chú" về rỗng mỗi lần mở form:
+  await renderTableNumberOptionsVirtual();
+  resetTableInput();
+  document.getElementById('note').value = '';
+  document.getElementById('table-number').value = '';
+  // ---- Enable lại nút ----
+  document.querySelector('#modalOrder .confirm-btn').disabled = false;
+  document.querySelector('#modalOrder .close-btn').disabled = false;
 }
     function closeCartModal() {
       document.getElementById('modalOrder').classList.remove('show');
@@ -977,6 +1024,7 @@
     }
     // Đoạn xử lý xác nhận đặt dịch vụ và cảm ơn
     function submitOrder() {
+      if (!validateTableNumber()) return;
       document.getElementById('confirmOrderModal').classList.add('show');
       document.getElementById('confirmOrderModal').style.display = 'block';
     }
@@ -992,7 +1040,7 @@
       document.getElementById('thankOrderModal').classList.remove('show');
       document.getElementById('thankOrderModal').style.display = 'none';
     }
-    async function handleOrderConfirm(yes) {
+async function handleOrderConfirm(yes) {
   if (!yes) {
     closeConfirmOrderModal();
     return;
@@ -1018,7 +1066,7 @@
   alertSuccess.style.display = 'none';
 
   if (!name || !phone || !contact || !tableNum) {
-    alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số bàn, Ghi chú";
+    alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số bàn";
     alertOrder.style.display = 'block';
     enableOrderButtons();
     document.getElementById('popupLoading').style.display = 'none'; // Hide overlay
@@ -1075,12 +1123,12 @@
   }
 }
 
-    function enableOrderButtons() {
-      document.querySelector('.confirm-btn[onclick="submitOrder()"]').disabled = false;
-      document.querySelector('.close-btn[onclick="closeCartModal()"]').disabled = false;
-      const yesBtn = document.getElementById('confirmOrderYesBtn');
-      if(yesBtn) yesBtn.disabled = false;
-    }
+function enableOrderButtons() {
+  document.querySelector('.confirm-btn[onclick="submitOrder()"]').disabled = false;
+  document.querySelector('.close-btn[onclick="closeCartModal()"]').disabled = false;
+  const yesBtn = document.getElementById('confirmOrderYesBtn');
+  if (yesBtn) yesBtn.disabled = false;
+}
 
     window.onscroll = function () {
       const btn = document.getElementById("scrollToTopBtn");
@@ -1186,6 +1234,144 @@
         }
       }
     });
+  let availableTables = [];
+let filteredTables = [];
+let tableDropdownPage = 0;
+const TABLES_PER_PAGE = 10;
+
+// Lấy bàn khả dụng và reset lọc
+async function renderTableNumberOptionsVirtual() {
+  const totalTables = 150;
+try {
+  const res = await fetch('/api/getAvailableTables');
+  const data = await res.json();
+  availableTables = Array.isArray(data.availableTables) ? data.availableTables : [];
+} catch(e) {
+  availableTables = [];
+}
+filteredTables = [...availableTables];
+tableDropdownPage = 0;
+renderTableDropdownPage();
+}
+
+// Khi focus hoặc click vào input
+function showTableDropdown() {
+  const dropdown = document.getElementById('table-dropdown');
+  dropdown.style.display = 'block';
+  if (dropdown.innerHTML === '') {
+    tableDropdownPage = 0;
+    renderTableDropdownPage();
+  }
+  dropdown.onscroll = function() {
+    if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 30) {
+      if ((tableDropdownPage + 1) * TABLES_PER_PAGE < filteredTables.length) {
+        tableDropdownPage += 1;
+        renderTableDropdownPage();
+      }
+    }
+  };
+  document.addEventListener('mousedown', hideDropdownIfClickedOutside);
+}
+
+// Khi nhập input số bàn
+function handleTableInput() {
+  const value = document.getElementById('table-number').value.trim();
+  if (value) {
+    filteredTables = availableTables.filter(t => t.toString().includes(value));
+  } else {
+    filteredTables = [...availableTables];
+  }
+  tableDropdownPage = 0;
+  renderTableDropdownPage();
+  validateTableNumber();
+}
+
+// Khi nhấn Enter
+function handleTableKeyDown(event) {
+  if (event.key === "Enter") {
+    const input = document.getElementById('table-number');
+    const value = Number(input.value.trim());
+    if (filteredTables.includes(value)) {
+      input.value = value;
+      document.getElementById('table-dropdown').style.display = 'none';
+      validateTableNumber();
+    } else {
+      // Nếu nhập số không hợp lệ, vẫn đóng dropdown nhưng sẽ báo lỗi
+      document.getElementById('table-dropdown').style.display = 'none';
+      validateTableNumber();
+    }
+  }
+}
+
+// Render 10 bàn/lần
+function renderTableDropdownPage() {
+  const dropdown = document.getElementById('table-dropdown');
+  if (!dropdown) return;
+  const start = tableDropdownPage * TABLES_PER_PAGE;
+  const end = Math.min(start + TABLES_PER_PAGE, filteredTables.length);
+  let html = '';
+  for (let i = start; i < end; ++i) {
+    html += `<div class="table-dropdown-item"
+      data-table="${filteredTables[i]}"
+      style="padding:8px 16px;cursor:pointer;">
+    Bàn số ${filteredTables[i]}
+    </div>`;
+  }
+  if (tableDropdownPage === 0) dropdown.innerHTML = html;
+  else dropdown.innerHTML += html;
+
+  // Gán sự kiện click
+  dropdown.querySelectorAll('.table-dropdown-item').forEach(opt => {
+    opt.onclick = () => {
+      const tableInput = document.getElementById('table-number');
+      tableInput.value = opt.getAttribute('data-table');
+      dropdown.style.display = 'none';
+      validateTableNumber();
+    };
+    opt.onmouseover = () => { opt.style.background = "#f5f5f5"; };
+    opt.onmouseout = () => { opt.style.background = "#fff"; };
+  });
+}
+
+// Đóng dropdown khi click ngoài input/dropdown
+function hideDropdownIfClickedOutside(e) {
+  const dropdown = document.getElementById('table-dropdown');
+  const input = document.getElementById('table-number');
+  if (!dropdown.contains(e.target) && e.target !== input) {
+    dropdown.style.display = 'none';
+    document.removeEventListener('mousedown', hideDropdownIfClickedOutside);
+  }
+}
+
+// Validate như trước
+function validateTableNumber() {
+  const input = document.getElementById('table-number');
+  const error = document.getElementById('table-number-error');
+  const value = input.value;
+  if (!value) {
+    error.style.display = 'none';
+    return true;
+  }
+  const numVal = Number(value);
+  if (!Number.isInteger(numVal) || numVal < 1 || numVal > 150) {
+    error.innerText = `Vui lòng nhập số bàn từ 1 đến 150 hoặc chọn trong danh sách`;
+    error.style.display = 'block';
+    return false;
+  }
+  if (!availableTables.includes(numVal)) {
+    error.innerText = `Bàn số ${value} đang có khách vui lòng chọn số bàn có trong list`;
+    error.style.display = 'block';
+    return false;
+  }
+  error.style.display = 'none';
+  return true;
+}
+
+// Reset input khi mở form mới
+function resetTableInput() {
+  document.getElementById('table-number').value = '';
+  document.getElementById('table-number-error').style.display = 'none';
+}
   </script>
  <div id="footer-container"></div>
   <script>
