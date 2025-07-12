@@ -495,11 +495,14 @@
           <option value="nam">BC năm</option>
         </select>
         <input id="bcInput" class="bc-input" placeholder="" style="display:inline-block;">
-        <span id="dateHelp" style="display:none; color:#888; font-size:0.95em; margin-left:4px;">Hãy chọn ngày trong ô</span>
         <select id="bcYearSelect" class="bc-input" style="display:none;"></select>
         <button class="bc-btn-search" id="bcSearchBtn">Search</button>
         <button class="bc-btn-reset" id="bcResetBtn">Xóa</button>
       </div>
+      <!-- Đặt span ở dòng riêng bên dưới .bc-control-bar -->
+<div style="width:100%; display:flex;">
+  <span id="dateHelp" style="display:none; color:#d32f2f; font-size:1.07em; font-weight:600; margin:6px 0 2px 2px;">Hãy chọn ngày trong ô</span>
+</div>
       <div class="bc-note" id="bcNote"></div>
       <div class="bc-table-wrap" id="bcTableWrap"></div>
     </div>
