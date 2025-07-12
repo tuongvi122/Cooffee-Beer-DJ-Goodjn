@@ -492,22 +492,23 @@ function renderReport(type, rows, dayStr, yearStr) {
     bcTableWrap.innerHTML = html;
     return;
   }
-
   // Nếu không hợp lệ
   bcNote.textContent = "Vui lòng chọn loại báo cáo.";
-  document.addEventListener('DOMContentLoaded', function() {
+}
+// Hàm ẩn họn ngày trong ô dòng chữ" Hãy chọn ngày trong ô" sẽ tự động ẩn đi.
+
+document.addEventListener('DOMContentLoaded', function() {
   var bcInput = document.getElementById('bcInput');
   var dateHelp = document.getElementById('dateHelp');
   var bcType = document.getElementById('bcType');
-  
-  if(bcInput && dateHelp && bcType) {
-    // Ẩn dòng hướng dẫn khi nhập/chọn ngày
+  if (bcInput && dateHelp && bcType) {
     bcInput.addEventListener('input', function() {
       if (bcType.value === 'ngay' && bcInput.value) {
         dateHelp.style.display = 'none';
+      } else if (bcType.value === 'ngay' && !bcInput.value) {
+        dateHelp.style.display = '';
       }
     });
-    // Nếu xoá ngày, hiện lại dòng hướng dẫn (tùy nhu cầu)
     bcInput.addEventListener('change', function() {
       if (bcType.value === 'ngay' && !bcInput.value) {
         dateHelp.style.display = '';
@@ -515,4 +516,3 @@ function renderReport(type, rows, dayStr, yearStr) {
     });
   }
 });
-}
