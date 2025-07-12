@@ -239,12 +239,17 @@ function updateInputByType() {
 
   if (bcYearSelect) bcYearSelect.style.display = 'none';
 
+ // Ẩn hướng dẫn mặc định
+  var dateHelp = document.getElementById('dateHelp');
+  if (dateHelp) dateHelp.style.display = 'none';
+
   if (bcType.value === 'ngay') {
     bcInput.type = 'date';
     bcInput.value = '';
     bcInput.style.display = '';
+    // HIỆN hướng dẫn khi chọn BC ngày
+    if (dateHelp) dateHelp.style.display = '';
     if (bcYearSelect) bcYearSelect.style.display = 'none';
-    bcInput.placeholder = 'dd/mm/yyyy';
   } else if (bcType.value === 'thang') {
     bcInput.style.display = 'none';
     if (bcYearSelect) {
