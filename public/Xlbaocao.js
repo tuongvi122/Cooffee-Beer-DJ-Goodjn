@@ -244,6 +244,7 @@ function updateInputByType() {
     bcInput.value = '';
     bcInput.style.display = '';
     if (bcYearSelect) bcYearSelect.style.display = 'none';
+    bcInput.placeholder = 'dd/mm/yyyy';
   } else if (bcType.value === 'thang') {
     bcInput.style.display = 'none';
     if (bcYearSelect) {
