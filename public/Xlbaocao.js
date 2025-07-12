@@ -213,7 +213,7 @@ function renderDayReportTable() {
       <td class="bc-stt">${i+1}</td>
       <td>${r[1]}</td>
       <td>${r[2]}</td>
-      <td>${r[9]}</td>
+      <td>${r[11]}</td>
     </tr>`;
   }
   const tbody = document.getElementById('bcDayTableBody');
@@ -319,7 +319,7 @@ bcSearchBtn.onclick = async function() {
 
     const rows = rawTHONGKE.filter(r => {
       let rawDate = getDay(r[0]);
-      return rawDate === dayStr && (r[14]||'').trim() === "Đã thanh toán";
+      return rawDate === dayStr && (r[16]||'').trim() === "Đã thanh toán";
     });
 
     // Lấy mỗi đơn hàng dòng đầu tiên theo Mã ĐH (cột B), giữ đúng thứ tự xuất hiện
@@ -338,7 +338,7 @@ bcSearchBtn.onclick = async function() {
       bcNote.textContent = `Ngày ${dayStr} không tồn tại trong báo cáo.`;
       return;
     }
-    let total = arr.reduce((t, r) => t + toInteger(r[9]), 0);
+    let total = arr.reduce((t, r) => t + toInteger(r[11]), 0);
 
     // SỬA TẠI ĐÂY: renderDayReportControls trả về controlsHtml, paginationHtml
     let { controlsHtml, paginationHtml } = renderDayReportControls(arr.length, total);
@@ -368,110 +368,105 @@ bcSearchBtn.onclick = async function() {
   }
 
   // ----------------- BÁO CÁO THÁNG -----------------
-  else if(bcType.value === 'thang') {
-    const yearStr = bcYearSelect && bcYearSelect.value ? bcYearSelect.value.trim() : '';
-    if(!/^\d{4}$/.test(yearStr)) {
-      bcNote.textContent = 'Vui lòng chọn năm!';
-      return;
-    }
-    const rows = rawTHONGKE.filter(r => getYear(r[0]) === yearStr && (r[14]||'').trim() === "Đã thanh toán");
-    if(rows.length === 0) {
-      bcNote.textContent = `Năm ${yearStr} không tồn tại trong báo cáo.`;
-      return;
-    }
-    let monthMap = {};
-    rows.forEach(r => {
-      let month = getMonth(r[0]);
-      let orderId = r[1];
-      if(!monthMap[month]) monthMap[month] = {};
-      if(!monthMap[month][orderId]) monthMap[month][orderId] = r;
-    });
-    let monthArr = [];
-    let tongNam = 0;
-    Object.keys(monthMap).sort().forEach(m => {
-      let orders = Object.values(monthMap[m]);
-      let total = orders.reduce((t, r) => t + toInteger(r[9]), 0);
-      tongNam += total;
-      monthArr.push({ month: m, total, count: orders.length });
-    });
-    monthArr.forEach(mo => { mo.tyle = tongNam ? Math.round(mo.total*100/tongNam) : 0; });
-    let html = `
-      <div class="bc-report-title">BÁO CÁO DOANH THU THÁNG</div>
-      <div class="bc-table-total-right">
-        Tổng cộng: <span>${formatCurrency(tongNam)}</span>
-      </div>
-      <div class="bc-table-wrap">
-        <table class="bc-table">
-          <thead>
-            <tr>
-              <th>Tháng</th>
-              <th>Thành tiền</th>
-              <th>Tỷ lệ (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${monthArr.map(mo => `<tr>
-              <td class="bc-month">${mo.month}/${yearStr}</td>
-              <td>${formatCurrency(mo.total)}</td>
-              <td>${mo.tyle}%</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-    bcTableWrap.innerHTML = html;
+else if(bcType.value === 'thang') {
+  const yearStr = bcYearSelect && bcYearSelect.value ? bcYearSelect.value.trim() : '';
+  if(!/^\d{4}$/.test(yearStr)) {
+    bcNote.textContent = 'Vui lòng chọn năm!';
+    return;
   }
+  const rows = rawTHONGKE.filter(r => getYear(r[0]) === yearStr && (r[16]||'').trim() === "Đã thanh toán");
+  if(rows.length === 0) {
+    bcNote.textContent = `Năm ${yearStr} không tồn tại trong báo cáo.`;
+    return;
+  }
+  let monthMap = {};
+  let tongNam = 0;
+  rows.forEach(r => {
+    let month = getMonth(r[0]);
+    if (!monthMap[month]) monthMap[month] = [];
+    monthMap[month].push(r);
+  });
+  let monthArr = [];
+  Object.keys(monthMap).sort().forEach(m => {
+    let total = monthMap[m].reduce((t, r) => t + toInteger(r[11]), 0);
+    tongNam += total;
+    monthArr.push({ month: m, total, count: monthMap[m].length });
+  });
+  monthArr.forEach(mo => { mo.tyle = tongNam ? Math.round(mo.total*100/tongNam) : 0; });
+  let html = `
+    <div class="bc-report-title">BÁO CÁO DOANH THU THÁNG</div>
+    <div class="bc-table-total-right">
+      Tổng cộng: <span>${formatCurrency(tongNam)}</span>
+    </div>
+    <div class="bc-table-wrap">
+      <table class="bc-table">
+        <thead>
+          <tr>
+            <th>Tháng</th>
+            <th>Thành tiền</th>
+            <th>Tỷ lệ (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${monthArr.map(mo => `<tr>
+            <td class="bc-month">${mo.month}/${yearStr}</td>
+            <td>${formatCurrency(mo.total)}</td>
+            <td>${mo.tyle}%</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  bcTableWrap.innerHTML = html;
+}
 
   // ----------------- BÁO CÁO NĂM -----------------
-  else if(bcType.value === 'nam') {
-    const rows = rawTHONGKE.filter(r => (r[14]||'').trim() === "Đã thanh toán");
-    if(rows.length === 0) {
-      bcNote.textContent = "Không có dữ liệu trong báo cáo.";
-      return;
-    }
-    let yearMap = {};
-    rows.forEach(r => {
-      let year = getYear(r[0]);
-      let orderId = r[1];
-      if(!yearMap[year]) yearMap[year] = {};
-      if(!yearMap[year][orderId]) yearMap[year][orderId] = r;
-    });
-    let yearArr = [];
-    let tongAll = 0;
-    Object.keys(yearMap).sort().forEach(y => {
-      let orders = Object.values(yearMap[y]);
-      let total = orders.reduce((t, r) => t + toInteger(r[9]), 0);
-      tongAll += total;
-      yearArr.push({ year: y, total, count: orders.length });
-    });
-    yearArr.forEach(yo => { yo.tyle = tongAll ? Math.round(yo.total*100/tongAll) : 0; });
-    let html = `
-      <div class="bc-report-title">BÁO CÁO DOANH THU NĂM</div>
-      <div class="bc-table-total-right">
-        Tổng cộng: <span>${formatCurrency(tongAll)}</span>
-      </div>
-      <div class="bc-table-wrap">
-        <table class="bc-table">
-          <thead>
-            <tr>
-              <th>Năm</th>
-              <th>Thành tiền</th>
-              <th>Tỷ lệ (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${yearArr.map(yo => `<tr>
-              <td class="bc-year">${yo.year}</td>
-              <td>${formatCurrency(yo.total)}</td>
-              <td>${yo.tyle}%</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-    bcTableWrap.innerHTML = html;
+else if(bcType.value === 'nam') {
+  const rows = rawTHONGKE.filter(r => (r[16]||'').trim() === "Đã thanh toán");
+  if(rows.length === 0) {
+    bcNote.textContent = "Không có dữ liệu trong báo cáo.";
+    return;
   }
-
+  let yearMap = {};
+  let tongAll = 0;
+  rows.forEach(r => {
+    let year = getYear(r[0]);
+    if (!yearMap[year]) yearMap[year] = [];
+    yearMap[year].push(r);
+  });
+  let yearArr = [];
+  Object.keys(yearMap).sort().forEach(y => {
+    let total = yearMap[y].reduce((t, r) => t + toInteger(r[11]), 0);
+    tongAll += total;
+    yearArr.push({ year: y, total, count: yearMap[y].length });
+  });
+  yearArr.forEach(yo => { yo.tyle = tongAll ? Math.round(yo.total*100/tongAll) : 0; });
+  let html = `
+    <div class="bc-report-title">BÁO CÁO DOANH THU NĂM</div>
+    <div class="bc-table-total-right">
+      Tổng cộng: <span>${formatCurrency(tongAll)}</span>
+    </div>
+    <div class="bc-table-wrap">
+      <table class="bc-table">
+        <thead>
+          <tr>
+            <th>Năm</th>
+            <th>Thành tiền</th>
+            <th>Tỷ lệ (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${yearArr.map(yo => `<tr>
+            <td class="bc-year">${yo.year}</td>
+            <td>${formatCurrency(yo.total)}</td>
+            <td>${yo.tyle}%</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  bcTableWrap.innerHTML = html;
+}
   // ----------------- Lựa chọn chưa hợp lệ -----------------
   else {
     bcNote.textContent = "Vui lòng chọn loại báo cáo.";
