@@ -1,6 +1,8 @@
 import { google } from 'googleapis';
 
-// Setup Google Sheets Auth
+let productsCache = { value: null, expires: 0 };
+const CACHE_TTL = 60000; // 1 phút
+
 const auth = new google.auth.JWT(
   process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
   null,
@@ -10,34 +12,36 @@ const auth = new google.auth.JWT(
 const sheets = google.sheets({ version: 'v4', auth });
 
 export default async function handler(req, res) {
-  // Đảm bảo đủ biến môi trường
+  const now = Date.now();
+  if (productsCache.value && productsCache.expires > now) {
+    return res.status(200).json(productsCache.value);
+  }
+
   if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY || !process.env.GOOGLE_SHEET_ID) {
     return res.status(500).json({ error: 'Thiếu cấu hình Google Sheets' });
   }
 
   try {
     await auth.authorize();
-    // Lấy đầy đủ các cột cần thiết: A-H (ID, maNV, caLV, DonGia, linkAnhNV, Tình trạng, Đang bận, Đã full)
+
+    // 1. Lấy sản phẩm
     const { data } = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: 'Products!A2:H201'
     });
     const rows = data.values || [];
-
-    // Parse dữ liệu thành object sản phẩm chi tiết
     const products = rows.map((r) => ({
       id: r[0]?.trim() || "",
       maNV: r[1]?.trim() || "",
       caLV: r[2]?.toString().trim() || "",
       donGia: Number((r[3] || "0").replace(/[^\d]/g, "")),
       linkAnhNV: r[4]?.trim() || "",
-      trangThai: r[5]?.trim() || "",    // cột F
-      dangBan: r[6]?.trim() || "",      // cột G
-      daFull: r[7]?.trim() || "",       // cột H
+      trangThai: r[5]?.trim() || "",
+      dangBan: r[6]?.trim() || "",
+      daFull: r[7]?.trim() || "",
     }))
     .filter(p => p.maNV && p.caLV && p.donGia);
 
-    // Gom theo maNV, group các ca lại
     const empMap = {};
     for (const prod of products) {
       if (!empMap[prod.maNV]) {
@@ -56,28 +60,38 @@ export default async function handler(req, res) {
       });
     }
 
-    // Lọc ra các nhân viên hợp lệ: 
-    // Nếu tất cả ca của nhân viên đều là "Nghỉ việc" hoặc "Nghỉ phép", loại bỏ luôn thẻ đó
     const result = [];
     for (const emp of Object.values(empMap)) {
       const allCaNghi = emp.caList.every(
         ca => ca.trangThai === "Nghỉ việc" || ca.trangThai === "Nghỉ phép"
       );
       if (allCaNghi) continue;
-
-      // Check trạng thái ĐÃ FULL (FE sẽ tự disable thẻ nếu cần)
       const anyCaFull = emp.caList.some(ca => ca.daFull === "Đã full");
       result.push({
         maNV: emp.maNV,
         linkAnhNV: emp.linkAnhNV,
-        caList: emp.caList, // FE sẽ tự lọc ca nghỉ phép/nghỉ việc khi show popup
+        caList: emp.caList,
         isFull: anyCaFull,
         allCaFull: emp.caList.every(ca => ca.daFull === "Đã full")
       });
     }
 
-    // LUÔN trả về dữ liệu mới nhất (KHÔNG còn cache)
-    res.status(200).json(result);
+    // 2. Lấy danh sách bàn trống
+    const { data: tableData } = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
+      range: 'COUNTER!D2:D',
+    });
+    const bookedTables = (tableData.values || [])
+      .map(row => Number(row && row[0]))
+      .filter(x => Number.isInteger(x) && x > 0);
+    const allTables = Array.from({ length: 150 }, (_, i) => i + 1);
+    const availableTables = allTables.filter(table => !bookedTables.includes(table));
+
+    // Cache lại cả products và availableTables
+    productsCache.value = { products: result, availableTables };
+    productsCache.expires = now + CACHE_TTL;
+
+    res.status(200).json({ products: result, availableTables });
   } catch (err) {
     console.error("Lỗi getProducts.js:", err);
     res.status(500).json({ error: 'Lỗi lấy sản phẩm từ Google Sheets' });
