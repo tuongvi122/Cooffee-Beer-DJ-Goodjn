@@ -495,4 +495,24 @@ function renderReport(type, rows, dayStr, yearStr) {
 
   // Nếu không hợp lệ
   bcNote.textContent = "Vui lòng chọn loại báo cáo.";
+  document.addEventListener('DOMContentLoaded', function() {
+  var bcInput = document.getElementById('bcInput');
+  var dateHelp = document.getElementById('dateHelp');
+  var bcType = document.getElementById('bcType');
+  
+  if(bcInput && dateHelp && bcType) {
+    // Ẩn dòng hướng dẫn khi nhập/chọn ngày
+    bcInput.addEventListener('input', function() {
+      if (bcType.value === 'ngay' && bcInput.value) {
+        dateHelp.style.display = 'none';
+      }
+    });
+    // Nếu xoá ngày, hiện lại dòng hướng dẫn (tùy nhu cầu)
+    bcInput.addEventListener('change', function() {
+      if (bcType.value === 'ngay' && !bcInput.value) {
+        dateHelp.style.display = '';
+      }
+    });
+  }
+});
 }
