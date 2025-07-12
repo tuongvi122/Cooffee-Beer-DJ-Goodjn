@@ -288,6 +288,9 @@ bcResetBtn.onclick = function() {
   bcNote.textContent = '';
   bcTableWrap.innerHTML = '';
   lastSearch = { type: null, day: null, year: null, data: null };
+    // Ẩn dòng hướng dẫn chọn ngày
+  var dateHelp = document.getElementById('dateHelp');
+  if (dateHelp) dateHelp.style.display = 'none';
 };
 
 // Hàm gọi API lấy dữ liệu, chỉ lọc phía server
