@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     // 1. Lấy sản phẩm
     const { data } = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'Products!A2:H201'
+      range: 'Products!A2:H350'
     });
     const rows = data.values || [];
     const products = rows.map((r) => ({
