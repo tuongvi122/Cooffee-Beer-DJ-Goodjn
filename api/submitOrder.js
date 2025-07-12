@@ -138,7 +138,7 @@ export default async function handler(req, res) {
 
     // Gửi Telegram cho từng nhân viên và quản lý (chờ hoàn thành để đảm bảo gửi)
     const telegramMsg =
-  `📝 *ĐƠN ĐẶT DỊCH VỤ MỚI*
+      `📝 *ĐƠN ĐẶT DỊCH VỤ MỚI*
 
 ⏰ Thời gian: ${timeVNStr}
 🆔 Mã đơn: ${orderCode}
@@ -153,6 +153,7 @@ ${items.map(i => `- *${i.maNV}*: Ca LV ${i.caLV} Giá: ${formatCurrency(i.donGia
 
 💰 *TỔNG CỘNG:* ${formatCurrency(total)}
 `;
+
     const sent = new Set();
     const telegramPromises = [];
     for (const it of items) {
@@ -165,17 +166,12 @@ ${items.map(i => `- *${i.maNV}*: Ca LV ${i.caLV} Giá: ${formatCurrency(i.donGia
     if (TELEGRAM_MANAGER_ID) {
       telegramPromises.push(sendTelegram(TELEGRAM_MANAGER_ID, telegramMsg));
     }
-    // Gửi tất cả tin nhắn Telegram đồng thời, đảm bảo gửi xong trước khi trả về FE (chuẩn cho môi trường Vercel)
-    try {
-      await Promise.all(telegramPromises);
-      res.status(200).json({ success: true, orderCode });
-    } catch (err) {
-      // Nếu có lỗi gửi Telegram, vẫn trả về thành công đơn hàng nhưng log lỗi gửi Telegram
-      console.error('Lỗi gửi Telegram:', err);
-      res.status(200).json({ 
-        success: true, 
-        orderCode, 
-        warning: 'Gửi Telegram có lỗi, hãy kiểm tra lại kênh Telegram hoặc bot!' 
-      });
-    }
+    await Promise.all(telegramPromises);
+
+    // Trả về kết quả thành công cho FE
+    res.status(200).json({ success: true, orderCode });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Lỗi khi xử lý đơn hàng' });
+  }
 }
