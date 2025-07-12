@@ -13,12 +13,13 @@ const sheets = google.sheets({ version: 'v4', auth });
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
 
-// Helper: Định dạng tiền tệ VN
+// Cache Telegram ID (5 phút)
+let telegramCache = { value: null, expires: 0 };
+const TELEGRAM_CACHE_TTL = 5 * 60 * 1000;
+
 function formatCurrency(num) {
   return Number(num).toLocaleString('vi-VN') + "₫";
 }
-
-// Helper: Lấy thời gian VN định dạng DD/MM/YYYY HH:mm:ss
 function getVNTimeForSheet() {
   const now = new Date();
   const vnTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
@@ -30,8 +31,6 @@ function getVNTimeForSheet() {
   const seconds = String(vnTime.getSeconds()).padStart(2, '0');
   return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 }
-
-// === Hàm sinh mã đơn theo COUNTER sheet ===
 async function generateOrderCodeByCounterSheet(tableNum) {
   const counterRange = 'COUNTER!A1:B1';
   const resp = await sheets.spreadsheets.values.get({
@@ -62,18 +61,40 @@ async function generateOrderCodeByCounterSheet(tableNum) {
   });
   return `${orderNumber}${Number(tableNum)}`;
 }
-
-// Hàm gửi telegram
+async function getTelegramMap() {
+  const now = Date.now();
+  if (telegramCache.value && telegramCache.expires > now) {
+    return telegramCache.value;
+  }
+  const hookData = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.GOOGLE_SHEET_ID,
+    range: 'IDDISCORD!A2:B'
+  });
+  const mapHooks = Object.fromEntries((hookData.data.values || [])
+    .map(([maNV, telegramId]) => [maNV, telegramId]));
+  telegramCache.value = mapHooks;
+  telegramCache.expires = now + TELEGRAM_CACHE_TTL;
+  return mapHooks;
+}
 async function sendTelegram(chatId, message) {
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-  await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: message
-    })
-  });
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+    const data = await resp.json();
+    if (!data.ok) {
+      console.error('Gửi telegram thất bại:', data);
+    }
+  } catch (err) {
+    console.error('Lỗi gửi telegram:', err);
+  }
 }
 
 export default async function handler(req, res) {
@@ -82,28 +103,31 @@ export default async function handler(req, res) {
     const { name, phone, contact, tableNum, note, items } = req.body;
     await auth.authorize();
 
-    // 1. Sinh mã, tổng, thời gian VN
-    const orderCode = await generateOrderCodeByCounterSheet(tableNum);
+    // Lấy orderCode và Telegram ID đồng thời
+    const [orderCode, mapHooks] = await Promise.all([
+      generateOrderCodeByCounterSheet(tableNum),
+      getTelegramMap()
+    ]);
     const timeVNStr = getVNTimeForSheet();
     const total = items.reduce((sum, i) => sum + Number(i.donGia), 0);
 
-    // 2. Ghi Google Sheets
+    // Ghi đơn vào Google Sheets
     const rows = items.map((it, idx) => ([
-      timeVNStr,               // A: Thời gian
-      Number(orderCode),       // B: Mã đơn hàng
-      name,                    // C: Họ tên
-      String(phone),           // D: SĐT
-      contact,                 // E: Email
-      String(it.maNV),         // F: Mã NV
-      Number(it.caLV),         // G: Ca làm việc
-      Number(it.donGia),       // H: Đơn giá
-      Number(it.donGia),       // I: Thành tiền
-      idx === 0 ? Number(total) : '', // J: Tổng cộng (chỉ dòng đầu)
-      '',                      // K: GIẢM GIÁ (mặc định rỗng)
-      '',                      // L: TỔNG THU (mặc định rỗng)
-      Number(tableNum),        // M: Số bàn
-      note,                    // N: Ghi chú
-      "V"                      // O: Ghi thêm chữ V (nếu cần, kiểm tra lại header sheet)
+      timeVNStr,
+      Number(orderCode),
+      name,
+      String(phone),
+      contact,
+      String(it.maNV),
+      Number(it.caLV),
+      Number(it.donGia),
+      Number(it.donGia),
+      idx === 0 ? Number(total) : '',
+      '',
+      '',
+      Number(tableNum),
+      note,
+      "V"
     ]));
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
@@ -112,17 +136,10 @@ export default async function handler(req, res) {
       requestBody: { values: rows }
     });
 
-    // 3. Lấy Telegram ID từ sheet IDDISCORD (cột B)
-    const hookData = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'IDDISCORD!A2:B'
-    });
-    const mapHooks = Object.fromEntries((hookData.data.values || [])
-      .map(([maNV, telegramId]) => [maNV, telegramId]));
-
-    // 4. Format tin nhắn Telegram (có thể chỉnh lại gọn hơn nếu muốn)
+    // Gửi Telegram cho từng nhân viên và quản lý (chờ hoàn thành để đảm bảo gửi)
     const telegramMsg =
-      `📝 ĐƠN ĐẶT DỊCH VỤ MỚI
+      `📝 *ĐƠN ĐẶT DỊCH VỤ MỚI*
+
 ⏰ Thời gian: ${timeVNStr}
 🆔 Mã đơn: ${orderCode}
 👤 Khách hàng: ${name}
@@ -130,12 +147,13 @@ export default async function handler(req, res) {
 ✉️ Email: ${contact}
 🪑 Bàn số: ${tableNum}
 📝 Ghi chú: ${note}
-Danh sách dịch vụ:
-${items.map(i => `- ${i.maNV}: Ca LV ${i.caLV} Giá: ${formatCurrency(i.donGia)}`).join('\n')}
-💰 TỔNG CỘNG: ${formatCurrency(total)}
+
+*Danh sách dịch vụ:*
+${items.map(i => `- *${i.maNV}*: Ca LV ${i.caLV} Giá: ${formatCurrency(i.donGia)}`).join('\n')}
+
+💰 *TỔNG CỘNG:* ${formatCurrency(total)}
 `;
 
-    // 5. Gửi Telegram cho từng nhân viên và quản lý
     const sent = new Set();
     const telegramPromises = [];
     for (const it of items) {
@@ -145,12 +163,12 @@ ${items.map(i => `- ${i.maNV}: Ca LV ${i.caLV} Giá: ${formatCurrency(i.donGia)}
         sent.add(telegramId);
       }
     }
-    // Gửi cho quản lý nếu có
     if (TELEGRAM_MANAGER_ID) {
       telegramPromises.push(sendTelegram(TELEGRAM_MANAGER_ID, telegramMsg));
     }
     await Promise.all(telegramPromises);
 
+    // Trả về kết quả thành công cho FE
     res.status(200).json({ success: true, orderCode });
   } catch (err) {
     console.error(err);
