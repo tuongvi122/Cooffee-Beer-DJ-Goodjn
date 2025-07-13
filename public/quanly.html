@@ -123,9 +123,6 @@
 
     /* MOBILE TABLE CUSTOM - ONLY FOR MOBILE */
     @media (max-width: 600px) {
-  .site-content {
-    padding-bottom: 80px !important; /* hoặc giá trị lớn hơn chiều cao footer */
-  }
       h2 {
         font-size: 1.2em !important;
         margin: 10px 0 18px 0 !important;
@@ -298,7 +295,7 @@
       .table-pagination {
         justify-content: center !important;
         margin-top: 10px !important;
-        margin-bottom: 50px !important;
+        margin-bottom: 0 !important;
         gap: 0;
       }
       .table-pagination button {
@@ -620,8 +617,8 @@
       transition: color 0.2s;
     }
     @media (max-width: 600px) {
-      .modal-dialog { max-width: 99vw !important; min-width: 0; }
-      .modal-content {
+    .modal-dialog { max-width: 99vw !important; min-width: 0; }
+    .modal-content {
     width: 95vw !important;
     max-width: 98vw !important;
     margin: 0 auto !important;
@@ -629,7 +626,6 @@
     overflow-y: auto !important;
     box-sizing: border-box;
   }
-
       .staff-list-table th, .staff-list-table td { font-size: 0.92em; padding: 1px 0; }
       .staff-action-select { width: 55px; font-size: 0.93em; height: 22px; }
       .delete-staff-btn { min-width: 34px; min-height: 19px; font-size: 0.91em; }
@@ -999,6 +995,10 @@
               <label for="modalTable">Số bàn:</label>
               <input id="modalTable">
             </div>
+            <div class="order-info-row">
+            <label for="modalNote">Ghi chú:</label>
+            <input id="modalNote">
+            </div>
             <label class="section-title">1. Nhân viên phục vụ</label>
             <div class="staff-both-btns">
               <button class="btn-tatca" onclick="modalTatCaDongY()">Tất cả đồng ý</button>
@@ -1361,6 +1361,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("modalSDT").value = modalOrder.phone;
       document.getElementById("modalEmail").value = modalOrder.email;
       document.getElementById("modalTable").value = modalOrder.table;
+      document.getElementById("modalNote").value = modalOrder.note;
       document.getElementById("modalGhiChu").value = modalOrder.qlNote || "";
       renderModalStaffTable();
       document.body.style.overflow = "hidden";
@@ -1629,7 +1630,7 @@ document.getElementById('cancelDeleteStaffBtn').onclick = function() {
           phone: document.getElementById("modalSDT").value.trim(),
           email: document.getElementById("modalEmail").value.trim(),
           table: document.getElementById("modalTable").value.trim(),
-          note: modalOrder.note
+          note: document.getElementById("modalNote").value.trim(),
         };
    const response = await fetch('/api/orderquanly', {
       method: 'POST',
@@ -1680,7 +1681,7 @@ document.getElementById('cancelDeleteStaffBtn').onclick = function() {
         updateDropdownColor(e.target);
       }
     });
-    // ================== AUTO REFRESH ======================
+// ================== AUTO REFRESH ======================
 // Chỉ tự động refresh nếu đang ở trang quản lý đơn hàng
     if (window.location.pathname.includes("quanly")) {
   setInterval(async function(){
