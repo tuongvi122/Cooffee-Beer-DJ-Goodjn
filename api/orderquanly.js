@@ -1,28 +1,30 @@
 import { google } from 'googleapis';
 import nodemailer from 'nodemailer';
 
-if (typeof fetch === 'undefined') global.fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+if (typeof fetch === 'undefined') global.fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-// Helper to clean number (remove . , đ ...)
+// ==================
+// === KHAI BÁO BIẾN TELEGRAM ===
+// ==================
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
+
+// ==================
+// === HELPER FUNCTIONS ===
+// ==================
 function cleanNumber(val) {
   if (!val) return 0;
   return Number(String(val).replace(/[^\d]/g, "")) || 0;
 }
-
-// Helper to clean text (ensure string)
 function cleanText(val) {
   return (val || '').toString().trim();
 }
-
-// Helper for current time in dd/MM/yyyy HH:mm:ss (giờ VN)
 function getVNDatetimeString() {
   const now = new Date();
-  const vnTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"}));
+  const vnTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
   const pad = n => n.toString().padStart(2, '0');
-  return `${pad(vnTime.getDate())}/${pad(vnTime.getMonth() + 1)}/${vnTime.getFullYear()} ${pad(vnTime.getHours())}:${pad(vnTime.getMinutes())}:${pad(vnTime.getSeconds())}`;
+  return `${pad(vnTime.getDate())}/${pad(vnTime.getMonth() + 1)}/${pad(vnTime.getFullYear())} ${pad(vnTime.getHours())}:${pad(vnTime.getMinutes())}:${pad(vnTime.getSeconds())}`;
 }
-
-// Helper: parse time string "dd/MM/yyyy HH:mm:ss" to Date object
 function parseVNTimeString(str) {
   if (!str) return new Date(0);
   const [datePart, timePart] = str.split(' ');
@@ -31,8 +33,6 @@ function parseVNTimeString(str) {
   const [hour, min, sec] = timePart.split(':').map(Number);
   return new Date(year, month - 1, day, hour, min, sec);
 }
-
-// Helper: định dạng tiền VNĐ
 function formatCurrency(num) {
   return Number(num).toLocaleString('vi-VN') + "₫";
 }
@@ -56,43 +56,20 @@ const auth = new google.auth.JWT(
   emailService, null, key,
   ['https://www.googleapis.com/auth/spreadsheets']
 );
-const sheets = google.sheets({version: 'v4', auth});
+const sheets = google.sheets({ version: 'v4', auth });
 
-// Sheet and columns mapping (UPDATED for new columns)
+// Sheet and columns mapping
 const ORDERS_SHEET = "Orders";
 const PRODUCTS_SHEET = "Products";
 const COLS = {
-  A: 0,   // Timestamp
-  B: 1,   // MÃ DH (orderId)
-  C: 2,   // TÊN KHÁCH HÀNG
-  D: 3,   // SĐT
-  E: 4,   // EMAIL
-  F: 5,   // MÃ NV
-  G: 6,   // CA LV
-  H: 7,   // ĐƠN GIÁ
-  I: 8,   // THÀNH TIỀN
-  J: 9,   // TỔNG CỘNG (dòng đầu)
-  K: 10,  // GIẢM GIÁ (mới)
-  L: 11,  // TỔNG THU (mới)
-  M: 12,  // SỐ BÀN (đã dịch)
-  N: 13,  // GHI CHÚ DH (đã dịch)
-  O: 14,  // KH ĐÃ ĐẶT ĐƠN (đã dịch)
-  P: 15,  // QUẢN LÝ XÁC NHẬN DH (đã dịch)
-  Q: 16,  // TÌNH TRẠNG THANH TOÁN (đã dịch)
-  R: 17,  // ĐÁNH GIÁ KHÁCH HÀNG
-  S: 18,  // ĐIỂM ĐÁNH GIÁ
-  T: 19,  // GHI CHÚ (quản lý ghi chú - cuối, đã dịch)
-  U: 20   // TRẠNG THÁI IN BILL (nếu cần)
+  A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, G: 6, H: 7, I: 8, J: 9, K: 10, L: 11,
+  M: 12, N: 13, O: 14, P: 15, Q: 16, R: 17, S: 18, T: 19, U: 20
 };
-
-// Get Orders sheetId dynamically
 async function getOrdersSheetId() {
   const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
   const sheet = meta.data.sheets.find(s => s.properties.title === ORDERS_SHEET);
   return sheet ? sheet.properties.sheetId : 0;
 }
-
-// Gửi Email cho khách hàng
 async function sendEmail(to, subject, html) {
   await transporter.sendMail({
     from: process.env.SMTP_USER,
@@ -102,44 +79,61 @@ async function sendEmail(to, subject, html) {
   });
 }
 
-// Gửi Discord cho nhân viên và quản lý (KHÔNG thay đổi mẫu đóng khung)
-async function sendDiscordToStaffAndManager(maNVs, content) {
-  // Lấy webhook từ sheet IDDISCORD (A2:B) [mã NV, URL webhook]
-  const hookData = await sheets.spreadsheets.values.get({
+// ==================
+// === GỬI TELEGRAM (giống submitOrder.js) ===
+// ==================
+
+// Gửi telegram cho 1 chatId
+async function sendTelegram(chatId, message) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+    const data = await resp.json();
+    if (!data.ok) {
+      console.error('Gửi telegram thất bại:', data);
+    }
+  } catch (err) {
+    console.error('Lỗi gửi telegram:', err);
+  }
+}
+
+// Lấy map Telegram từ sheet IDDISCORD!A2:B
+async function getTelegramMap() {
+  const teleData = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
     range: 'IDDISCORD!A2:B'
   });
-  const mapHooks = Object.fromEntries((hookData.data.values||[]).map(([maNV, url]) => [maNV, url]));
-  const sent = new Set();
-  const discordPromises = [];
-  for (const maNV of maNVs) {
-    const url = mapHooks[maNV];
-    if (url && !sent.has(url)) {
-      discordPromises.push(
-        fetch(url, {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ content })
-        })
-      );
-      sent.add(url);
-    }
-  }
-  // Gửi cho quản lý
-  if (process.env.MANAGER_DISCORD_WEBHOOK) {
-    discordPromises.push(
-      fetch(process.env.MANAGER_DISCORD_WEBHOOK, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ content })
-      })
-    );
-  }
-  await Promise.all(discordPromises);
+  return Object.fromEntries((teleData.data.values || []).map(([maNV, teleId]) => [maNV, teleId]));
 }
 
-// Tạo hộp Discord đẹp (giữ nguyên mẫu cũ)
-function discordOrderBox({
+// Gửi telegram đến nhân viên (không trùng) và quản lý
+async function sendTelegramToStaffAndManager(maNVs, content) {
+  const mapTele = await getTelegramMap();
+  const sent = new Set();
+  // Gửi từng nhân viên (loại trùng)
+  for (const maNV of maNVs) {
+    const teleId = mapTele[maNV];
+    if (teleId && !sent.has(teleId)) {
+      await sendTelegram(teleId, content);
+      sent.add(teleId);
+    }
+  }
+  // Gửi quản lý (luôn luôn)
+  if (TELEGRAM_MANAGER_ID) {
+    await sendTelegram(TELEGRAM_MANAGER_ID, content);
+  }
+}
+
+// Tạo nội dung thông báo cho Telegram
+function telegramOrderText({
   titleIcon,
   titleText,
   time,
@@ -151,30 +145,33 @@ function discordOrderBox({
   note,
   staffList,
   total,
-  ghiChu // <- thêm dòng này
+  ghiChu
 }) {
-  return [
-    "┌────────────────────────────────┐",
-    `│ ${titleIcon} **${titleText.toUpperCase()}**`,
-    "│--------------------------------",
-    `│⏰ Thời gian: ${time}`,
-    `│🧾 Mã đơn hàng: ${orderId}`,
-    `│👤 Khách hàng: ${name}`,
-    `│📞 SĐT: ${phone}`,
-    `│📧 Email: ${email}`,
-    `│🪑 Bàn số: ${table}`,
-    `│💬 Ghi chú: ${note}`,
-    "│",
-    "│**Danh sách dịch vụ:**",
-        ...staffList.map(s => `- ${s.maNV}  Ca ${s.caLV}  ${s.trangThai}`),
-    "│---------------------------------",
-    `│💰 **TỔNG CỘNG: ${formatCurrency(total)}**`,
-        ghiChu ? `📝 **Ghi chú quản lý:** ${ghiChu}` : "", // Thêm dòng này
-    "└────────────────────────────────┘"
-  ].join('\n');
+  return (
+`${titleIcon} *${titleText.toUpperCase()}*
+
+⏰ Thời gian: ${time}
+🆔 Mã đơn: ${orderId}
+👤 Khách hàng: ${name}
+📞 SĐT: ${phone}
+✉️ Email: ${email}
+🪑 Bàn số: ${table}
+📝 Ghi chú: ${note || "_Không có_"}
+
+*Danh sách dịch vụ:*
+${staffList.map(i => 
+  `- *${i.maNV}*: Ca LV ${i.caLV}` +
+  (i.donGia > 0 ? ` Giá: ${formatCurrency(i.donGia)}` : '') +
+  ` - ${i.trangThai}`
+).join('\n')}
+
+💰 *TỔNG CỘNG:* ${formatCurrency(total)}
+${ghiChu ? `\n📝 *Ghi chú quản lý:* ${ghiChu}` : ''}
+`
+  );
 }
 
-// Tạo HTML email xác nhận mới chuyên nghiệp (chỉ show NV "Đồng ý")
+// Email HTML xác nhận (giữ nguyên logic cũ)
 function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table, note, staffList, total }) {
   const contact = email;
   const orderCode = orderId;
@@ -240,24 +237,24 @@ function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table
     </table>
   </div>`;
 }
-// Gửi Email/Discord sau khi lưu đơn (Email chỉ NV "Đồng ý")
-async function sendMailAndDiscord({staffList, orderId, name, phone, email, table, note, ghiChu, tongcong}) {
+
+// Gửi Email/Telegram sau khi lưu đơn (gửi từng người, giống submitOrder.js)
+async function sendMailAndTelegram({ staffList, orderId, name, phone, email, table, note, ghiChu, tongcong }) {
   let allCancel = staffList.every(s => (s.trangThai === "Hủy đơn"));
-  // Chỉ lấy NV "Đồng ý" có giá trị > 0
   let staffDongY = staffList.filter(s => s.trangThai === "Đồng ý" && cleanNumber(s.donGia) > 0);
-  const maNVs = staffList.map(s=>s.maNV).filter(Boolean);
+  const maNVs = staffList.map(s => s.maNV).filter(Boolean);
   const timeVNStr = getVNDatetimeString();
   const total = staffList.reduce((sum, s) => sum + cleanNumber(s.donGia), 0);
 
-  let discordTitle = allCancel
+  let teleTitle = allCancel
     ? "HỦY ĐƠN HÀNG SỐ " + orderId
     : "XÁC NHẬN ĐƠN HÀNG SỐ " + orderId;
 
-  let discordIcon = allCancel ? "❌" : "✅";
+  let teleIcon = allCancel ? "❌" : "✅";
 
-  let discordMsg = discordOrderBox({
-    titleIcon: discordIcon,
-    titleText: discordTitle,
+  let teleMsg = telegramOrderText({
+    titleIcon: teleIcon,
+    titleText: teleTitle,
     time: timeVNStr,
     orderId,
     name,
@@ -267,37 +264,37 @@ async function sendMailAndDiscord({staffList, orderId, name, phone, email, table
     note,
     staffList,
     total,
-    ghiChu // Thêm dòng này
+    ghiChu
   });
 
   try {
-    await sendDiscordToStaffAndManager(maNVs, discordMsg);
-  } catch(e) {
-    console.error('LỖI gửi Discord:', e.message);
+    await sendTelegramToStaffAndManager(maNVs, teleMsg);
+  } catch (e) {
+    console.error('LỖI gửi Telegram:', e.message);
   }
 
-  // Chỉ cần có NV "Đồng ý" (có giá trị) thì gửi email xác nhận cho khách, chỉ liệt kê NV này
+  // Email xác nhận (giữ nguyên)
   if (staffDongY.length > 0) {
-  try {
-    await sendEmail(
-      email,
-      `Đơn đặt dịch vụ - Mã đơn ${orderId}`,
-      htmlOrderConfirmEmailV2({
-        orderId,
-        timeVNStr,
-        name,
-        phone,
+    try {
+      await sendEmail(
         email,
-        table,
-        note,
-        staffList: staffDongY,
-        total: staffDongY.reduce((sum, s) => sum + cleanNumber(s.donGia), 0)
-      })
-    );
-  } catch(e) {
-    console.error('LỖI gửi Email xác nhận:', e.message);
+        `Đơn đặt dịch vụ - Mã đơn ${orderId}`,
+        htmlOrderConfirmEmailV2({
+          orderId,
+          timeVNStr,
+          name,
+          phone,
+          email,
+          table,
+          note,
+          staffList: staffDongY,
+          total: staffDongY.reduce((sum, s) => sum + cleanNumber(s.donGia), 0)
+        })
+      );
+    } catch (e) {
+      console.error('LỖI gửi Email xác nhận:', e.message);
+    }
   }
-}
   // Email hủy đơn vẫn giữ như cũ (gửi cho khách)
   if (allCancel) {
     try {
@@ -308,11 +305,15 @@ async function sendMailAndDiscord({staffList, orderId, name, phone, email, table
           <div style="color:#1976d2;font-size:15px;">Hẹn quý khách đặt dịch vụ lần sau, xin cảm ơn!</div>
         </div>
       `);
-    } catch(e) {
+    } catch (e) {
       console.error('LỖI gửi Email hủy:', e.message);
     }
   }
 }
+
+// ==========================
+// ==== API ROUTE HANDLER ====
+// ==========================
 export default async function handler(req, res) {
   // --- GET products ---
   if (req.method === 'GET' && req.query && req.query.products === '1') {
@@ -322,7 +323,7 @@ export default async function handler(req, res) {
         range: PRODUCTS_SHEET
       });
       const rows = result.data.values;
-      if (!rows || rows.length < 2) return res.status(200).json({products: []});
+      if (!rows || rows.length < 2) return res.status(200).json({ products: [] });
       const products = rows.slice(1)
         .filter(row => {
           const status = (row[5] || '').toString().trim();
@@ -336,35 +337,35 @@ export default async function handler(req, res) {
           status: row[5],
           lockStatus: row[6],
         }));
-      return res.status(200).json({products});
+      return res.status(200).json({ products });
     } catch (error) {
-      return res.status(500).json({products: [], error: error.message});
+      return res.status(500).json({ products: [], error: error.message });
     }
   }
-  // Endpoint: /api/orderquanly?productsAll=1 -> trả về tất cả nhân viên, không filter điều kiện nào cả
-if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
-  try {
-    const result = await sheets.spreadsheets.values.get({
-      spreadsheetId: sheetId,
-      range: PRODUCTS_SHEET
-    });
-    const rows = result.data.values;
-    if (!rows || rows.length < 2) return res.status(200).json({products: []});
-    const products = rows.slice(1)
-      .map(row => ({
-        maNV: row[1],
-        caLV: row[2],
-        donGia: cleanNumber(row[3]),
-        status: row[5],
-        lockStatus: row[6],
-      }));
-    return res.status(200).json({products});
-  } catch (error) {
-    return res.status(500).json({products: [], error: error.message});
+  // Endpoint: /api/orderquanly?productsAll=1 -> trả về tất cả nhân viên
+  if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
+    try {
+      const result = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: PRODUCTS_SHEET
+      });
+      const rows = result.data.values;
+      if (!rows || rows.length < 2) return res.status(200).json({ products: [] });
+      const products = rows.slice(1)
+        .map(row => ({
+          maNV: row[1],
+          caLV: row[2],
+          donGia: cleanNumber(row[3]),
+          status: row[5],
+          lockStatus: row[6],
+        }));
+      return res.status(200).json({ products });
+    } catch (error) {
+      return res.status(500).json({ products: [], error: error.message });
+    }
   }
-}
 
-  // --- POST: Lưu/cập nhật đơn hàng, gửi mail và Discord ---
+  // --- POST: Lưu/cập nhật đơn hàng, gửi mail và Telegram ---
   if (req.method === 'POST') {
     try {
       const {
@@ -372,7 +373,7 @@ if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
         name, phone, email, table, note
       } = req.body;
       if (!orderId || !Array.isArray(staffList) || !staffList.length) {
-        return res.status(400).json({error: 'Thiếu thông tin đơn hàng hoặc danh sách nhân viên'});
+        return res.status(400).json({ error: 'Thiếu thông tin đơn hàng hoặc danh sách nhân viên' });
       }
 
       // Lấy dữ liệu cũ
@@ -441,15 +442,14 @@ if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
           row[COLS.H] = cleanNumber(s.donGia);
           row[COLS.I] = colI;
           row[COLS.J] = (idx === 0) ? cleanNumber(tongcong) : "";
-          row[COLS.K] = ""; // GIẢM GIÁ (bổ sung nếu có, còn lại để trống)
-          row[COLS.L] = ""; // TỔNG THU (bổ sung nếu có, còn lại để trống)
-          row[COLS.M] = cleanNumber(table); // SỐ BÀN (đã cập nhật lại)
+          row[COLS.K] = "";
+          row[COLS.L] = "";
+          row[COLS.M] = cleanNumber(table);
           row[COLS.N] = cleanText(note);
-          row[COLS.O] = colO; // KH ĐÃ ĐẶT ĐƠN
-          row[COLS.P] = colP; // QL XÁC NHẬN
-          row[COLS.Q] = colQ; // TÌNH TRẠNG THANH TOÁN
-          // Các cột R, S, T, U nếu cần có thể bổ sung ở đây (ghi chú QL thì T)
-          row[COLS.T] = cleanText(ghiChu); // GHI CHÚ QL
+          row[COLS.O] = colO;
+          row[COLS.P] = colP;
+          row[COLS.Q] = colQ;
+          row[COLS.T] = cleanText(ghiChu);
           values.push(row);
         });
         await sheets.spreadsheets.values.append({
@@ -459,12 +459,12 @@ if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
           requestBody: { values }
         });
 
-        // Gửi Email + Discord khi xác nhận đơn hàng
-        await sendMailAndDiscord({
+        // Gửi Email + Telegram khi xác nhận đơn hàng
+        await sendMailAndTelegram({
           staffList, orderId, name, phone, email, table, note, ghiChu, tongcong
         });
 
-        return res.status(200).json({success: true});
+        return res.status(200).json({ success: true });
       }
 
       // === QUY TRÌNH B: Không có nhân viên mới ===
@@ -490,33 +490,32 @@ if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
             rows[i][COLS.H] = cleanNumber(staff.donGia);
             rows[i][COLS.I] = colI;
             if (i === existingRows[0]) rows[i][COLS.J] = cleanNumber(tongcong);
-            // Giảm giá, tổng thu nếu có thay đổi thì cập nhật ở COLS.K, COLS.L
-            rows[i][COLS.M] = cleanNumber(table); // SỐ BÀN
-            rows[i][COLS.N] = cleanText(note); // GHI CHÚ ĐH
-            rows[i][COLS.O] = colO; // KH ĐÃ ĐẶT ĐƠN
-            rows[i][COLS.P] = colP; // QL XÁC NHẬN
-            rows[i][COLS.Q] = colQ; // TÌNH TRẠNG THANH TOÁN
-            rows[i][COLS.T] = cleanText(ghiChu); // GHI CHÚ QL
+            rows[i][COLS.M] = cleanNumber(table);
+            rows[i][COLS.N] = cleanText(note);
+            rows[i][COLS.O] = colO;
+            rows[i][COLS.P] = colP;
+            rows[i][COLS.Q] = colQ;
+            rows[i][COLS.T] = cleanText(ghiChu);
           }
         }
       }
-for (const i of existingRows) {
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: sheetId,
-    range: `${ORDERS_SHEET}!A${i + 1}:T${i + 1}`,
-    valueInputOption: 'USER_ENTERED',
-    requestBody: { values: [rows[i].slice(0, 20)] }
-  });
-}
+      for (const i of existingRows) {
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: sheetId,
+          range: `${ORDERS_SHEET}!A${i + 1}:T${i + 1}`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: { values: [rows[i].slice(0, 20)] }
+        });
+      }
 
-      // Gửi Email + Discord khi xác nhận đơn hàng
-      await sendMailAndDiscord({
+      // Gửi Email + Telegram khi xác nhận đơn hàng
+      await sendMailAndTelegram({
         staffList, orderId, name, phone, email, table, note, ghiChu, tongcong
       });
 
-      return res.status(200).json({success: true});
+      return res.status(200).json({ success: true });
     } catch (error) {
-      res.status(500).json({error: error.message || 'Internal server error'});
+      res.status(500).json({ error: error.message || 'Internal server error' });
     }
     return;
   }
@@ -524,19 +523,18 @@ for (const i of existingRows) {
   // --- GET: Trả về dữ liệu Orders đã lọc và SẮP XẾP, xác định trạng thái nút xác nhận ---
   if (req.method === 'GET') {
     try {
-  const result = await sheets.spreadsheets.values.get({
-  spreadsheetId: sheetId,
-  range: ORDERS_SHEET + '!A2:T'
-});
+      const result = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: ORDERS_SHEET + '!A2:T'
+      });
       const rows = result.data.values;
-      if (!rows || rows.length < 2) return res.status(200).json({orders: []});
+      if (!rows || rows.length < 2) return res.status(200).json({ orders: [] });
       let ordersMap = {};
 
       for (let i = 1; i < rows.length; i++) {
         let row = rows[i];
         let orderId = row[COLS.B];
         if (!orderId) continue;
-
         if (!ordersMap[orderId]) ordersMap[orderId] = [];
         ordersMap[orderId].push(row);
       }
@@ -544,9 +542,7 @@ for (const i of existingRows) {
       let ordersArr = [];
       for (let orderId in ordersMap) {
         let orderRows = ordersMap[orderId];
-
         if (orderRows.some(r => (r[COLS.Q] || "").trim() === "Đã thanh toán")) continue;
-        // 2. BỎ QUA ĐƠN KHÔNG DÒNG NÀO Ở CỘT O ("KH ĐÃ ĐẶT ĐƠN") KHÁC RỖNG
         if (!orderRows.some(r => (r[COLS.O] || "").toString().trim() !== "")) continue;
 
         let allO_V = orderRows.every(r => (r[COLS.O] || "").trim() === "V");
@@ -575,8 +571,8 @@ for (const i of existingRows) {
           donGia: cleanNumber(r[COLS.H]),
           trangThai:
             (r[COLS.P] === "V") ? "Đồng ý" :
-            (r[COLS.P] === "Không tham gia") ? "Không tham gia" :
-            (r[COLS.P] === "X") ? "Hủy đơn" : ""
+              (r[COLS.P] === "Không tham gia") ? "Không tham gia" :
+                (r[COLS.P] === "X") ? "Hủy đơn" : ""
         }));
 
         ordersArr.push({
@@ -599,12 +595,12 @@ for (const i of existingRows) {
         let dateB = parseVNTimeString(b.time);
         return dateB - dateA;
       });
-      res.status(200).json({orders: ordersArr});
+      res.status(200).json({ orders: ordersArr });
     } catch (error) {
-      res.status(500).json({error: error.message || 'Internal server error'});
+      res.status(500).json({ error: error.message || 'Internal server error' });
     }
     return;
   }
 
-  res.status(405).json({error: 'Method not allowed'});
+  res.status(405).json({ error: 'Method not allowed' });
 }
