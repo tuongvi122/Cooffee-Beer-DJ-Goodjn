@@ -23,10 +23,10 @@ module.exports = async (req, res) => {
     const sheetId = process.env.GOOGLE_SHEET_ID;
     const sheetName = 'Orders';
 
-    // Chỉ lấy cột/dòng cần thiết (giả sử tối đa 2000 dòng, A-O)
+    // Lấy dải cột mới (A-U = 21 cột, index 0-20)
     const rows = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A1:O2001`,
+      range: `${sheetName}!A1:U1501`,
     });
 
     // Xử lý header và data
@@ -35,9 +35,9 @@ module.exports = async (req, res) => {
 
     // Lọc các dòng có mã đơn cần tìm, xác nhận 'V', đơn giá > 0
     const filtered = dataRows.filter(r => {
-      const code = (r[1] || '').toString().trim();
-      const xacnhan = (r[13] || '').toString().trim();
-      const dongia = (r[7] || '').toString().replace(/\D/g, '');
+      const code = (r[1] || '').toString().trim(); // cột B
+      const xacnhan = (r[15] || '').toString().trim(); // cột R (sau khi thêm 2 cột mới, cũ là 15, mới là 17)
+      const dongia = (r[7] || '').toString().replace(/\D/g, ''); // cột H
       return (
         code === orderCode &&
         xacnhan === 'V' &&
@@ -53,21 +53,24 @@ module.exports = async (req, res) => {
 
     // Compose bill data
     const bill = filtered.map(r => ({
-      timestamp: r[0] || '',
-      orderCode: r[1] || '',
+      timestamp: r[0] || '',             // A
+      orderCode: r[1] || '',             // B
       customer: {
-        name: r[2] || '',
-        phone: r[3] || '',
-        email: r[4] || '',
-        tableNum: r[10] || '',
+        name: r[2] || '',                // C
+        phone: r[3] || '',               // D
+        email: r[4] || '',               // E
+        tableNum: r[12] || '',           // M (Sau khi thêm 2 cột mới, cũ là 10, mới là 12)
       },
-      maNV: r[5] || '',
-      caLV: r[6] || '',
-      donGia: (r[7] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
-      thanhTien: (r[8] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
-      ghiChu: r[11] || '',
-      status: r[14] || '', // cột O
-      orderDate: r[0] ? r[0].split(' ')[0] : '',
+      maNV: r[5] || '',                  // F
+      caLV: r[6] || '',                  // G
+      donGia: (r[7] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''), // H
+      thanhTien: (r[8] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''), // I
+      tongCong: (r[9] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''), // J
+      giamGia: (r[10] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''), // K
+      tongThu: (r[11] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''), // L
+      ghiChu: r[13] || '',               // N (cũ 11, mới 13)
+      status: r[16] || '',               // Q (cũ 14, mới 16)
+      orderDate: r[0] ? r[0].split(' ')[0] : '', // A
     }));
 
     // Thêm ngày thực hiện (giờ khi gọi API)
