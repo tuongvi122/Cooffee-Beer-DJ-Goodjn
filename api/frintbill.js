@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
     // Lấy toàn bộ dữ liệu để xác định đúng dòng
     const rows = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A1:O`,
+      range: `${sheetName}!A1:U`,
     });
     const dataRows = rows.data.values.slice(1);
 
@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
 
     // --- Cập nhật nhanh bằng batchUpdate ---
     const requests = updates.map(rowNum => ({
-      range: `${sheetName}!O${rowNum}`,
+      range: `${sheetName}!Q${rowNum}`,
       values: [['Đã thanh toán']]
     }));
     await sheets.spreadsheets.values.batchUpdate({
