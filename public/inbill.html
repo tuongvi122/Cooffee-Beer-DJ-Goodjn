@@ -37,7 +37,7 @@
       display: flex;
       flex-direction: column;
       padding-top: 30px;
-      padding-bottom: 50px;  /* hoặc 70px nếu cần rộng hơn, tùy chiều cao footer */
+      padding-bottom: 50px;
       align-items: center;
     }
     #footer-container {
@@ -63,145 +63,6 @@
       text-align: center;
       line-height: 1.15;
       word-break: break-word;
-    }
-    @media (max-width: 600px) {
-      .mobile-navbar {
-        position: relative;
-        display: flex !important;
-        align-items: center;
-        width: 100vw;
-        background: #228B22;
-        min-height: 54px;
-        height: 54px;
-        z-index: 10001;
-      }
-      .mobile-navbar .hamburger {
-        padding: 12px 12px 12px 7px;
-        font-size: 27px;
-        color: #fff;
-        background: none;
-        border: none;
-        outline: none;
-        margin-right: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
-      .mobile-navbar .navbar-title {
-        flex: 1 1 70%;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        line-height: 1.1;
-        white-space: nowrap;
-        overflow: hidden;
-        padding-right: 0;
-      }
-      .mobile-navbar .navbar-title .brand-main {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 1.13em;
-        line-height: 1.1;
-        margin-bottom: 0;
-      }
-      .mobile-navbar .navbar-title .brand-sub {
-        color: #e1ba0a;
-        font-weight: bold;
-        font-size: 0.99em;
-        line-height: 1;
-        margin-top: 0;
-      }
-      .mobile-navbar .mobile-hotline {
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border-radius: 30px;
-        padding: 3px 16px 3px 11px;
-        box-shadow: 0 0 5px #1113;
-        height: 28px;
-        font-size: 0.98em;
-        white-space: nowrap;
-        overflow: hidden;
-        text-decoration: none !important;
-      }
-      .mobile-navbar .mobile-hotline .hotline-number {
-        font-size: 1.07em;
-        margin-left: 3px;
-        font-weight: bold;
-        color: #0011ff;
-        letter-spacing: 0.5px;
-        text-decoration: none !important;
-      }
-      .mobile-navbar .mobile-hotline:link,
-      .mobile-navbar .mobile-hotline:visited,
-      .mobile-navbar .mobile-hotline:hover,
-      .mobile-navbar .mobile-hotline:active {
-        text-decoration: none !important;
-      }
-      .mobile-navbar-menu {
-        display: none;
-        position: fixed;
-        top: 54px;
-        left: 0;
-        min-width: 180px;
-        width: max-content;
-        max-width: 92vw;
-        background: #228B22;
-        color: #fff;
-        z-index: 12000;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
-        border-radius: 0 0 10px 0;
-        padding: 0 0 16px 0;
-        animation: slideInMenu 0.18s;
-      }
-      .mobile-navbar-menu.open { display: block; }
-      @keyframes slideInMenu {
-        from { transform: translateX(-90%); opacity: 0.5; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      .mobile-navbar-menu ul {
-        list-style: none;
-        margin: 0;
-        padding: 10px 0 0 0;
-      }
-      .mobile-navbar-menu li {
-        padding: 13px 0 9px 18px;
-        font-size: 1.12em;
-        cursor: pointer;
-        font-weight: bold;
-        border-bottom: 1px solid rgba(255,255,255,0.10);
-        transition: background 0.1s;
-      }
-      .mobile-navbar-menu li:active,
-      .mobile-navbar-menu li:hover {
-        background: #1c6e1b;
-      }
-      .mobile-navbar-menu li:last-child { border-bottom: none; }
-      #footer-container {
-        min-height: 54px;
-        height: 54px;
-        font-size: 0.98em;
-        padding: 0 7px;
-        line-height: 1.15;
-      }
-      #footer-container div {
-        width: 100%;
-        text-align: center;
-        line-height: 1.15;
-        word-break: break-word;
-      }
-    }
-    @media (max-width: 768px) {
-      #navbar-container .desktop-navbar {
-        display: none !important;
-      }
-    }
-    @media (min-width: 769px) {
-      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
     }
     .bill-panel {
       width: 100%; max-width: 410px; margin: 0 auto 80px auto; margin-top: 22px;
@@ -276,45 +137,6 @@
     .bill-customer-thank {
       color: #08810a; font-size: 1em; font-weight: 600; text-align: center; margin-top: 7px; margin-bottom: 0; letter-spacing: 0.01em;
     }
-    @media (max-width: 600px) {
-      .bill-panel { max-width: 99vw !important; }
-      .bill-print-wrapper { max-width: 95vw !important; }
-      .site-content { padding-bottom: 54px !important; }
-      .bill-header { font-size: 0.98em; }
-      #bill-order-code { font-size: 0.97em; }
-    }
-    @media (max-width: 400px) {
-      .bill-print-wrapper { padding: 6px 2px 10px 2px; }
-      .bill-header { padding: 0 2px; }
-    }
-    @media print {
-      body * { visibility: hidden !important; }
-      .bill-print-wrapper, .bill-print-wrapper * { 
-        visibility: visible !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
-      }
-      .bill-print-wrapper {
-        position: absolute;
-        left: 0; top: 0;
-        width: 54mm !important;
-        min-width: 54mm !important;
-        max-width: 54mm !important;
-        padding-left: 2mm !important;
-        padding-right: 2mm !important;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        margin-top: 10mm !important;
-        margin-bottom: 5mm !important;
-        border: none !important;
-        box-shadow: none !important;
-        background: #fff !important;
-      }
-      @page {
-        size: 58mm auto;
-        margin: 10mm 2mm 5mm 2mm !important;
-      }
-    }
     .main-flex-container {
       display: flex; justify-content: center; align-items: flex-start; width: 100%; max-width: 1200px;
       margin: 0 auto; gap: 32px; padding: 24px 0 0 0; min-height: 600px; box-sizing: border-box;
@@ -335,7 +157,7 @@
     .order-list-table th { background: #e8f2ff; font-weight: 600; color: #1663b1; font-size: 0.9em; }
     .order-list-table tr:nth-child(even) td { background: #f8fbff; }
     .order-list-table tr:hover td { background: #a6f5e5; }
-    .order-list-table td { font-size: 0.9em; max-height: 32px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .order-list-table td { font-size: 0.9em; max-height: 32px; }
     .order-status-btn, .order-status-paid {
       padding: 6px 16px;
       min-width: 140px;
@@ -351,7 +173,15 @@
     }
     .order-status-btn { background: #e20808; color: #fff; cursor: pointer; transition: background 0.15s; }
     .order-status-btn:hover { background: #9e2323; }
-    .order-status-paid { background: #0cac11; color: #fff; cursor: default; }
+    .order-status-paid { background: #0cac11; color: #fff; cursor: default; cursor: pointer;}
+    .order-status-paid:hover {
+    background: #0b7d1e; /* Xanh lá cây đậm hơn khi hover */
+    }
+   .order-edit-btn {
+      background: #2196f3; color: #fff; border: none; border-radius: 6px; padding: 5px 14px;
+      font-weight: bold; cursor: pointer; transition: background 0.13s;
+    }
+    .order-edit-btn:hover { background: #156ab7; }
     .order-pagination-container {
       display: flex;
       align-items: center;
@@ -363,28 +193,20 @@
     .order-entries-select {
       font-size: 1em; padding: 2px 5px; border-radius: 4px; border: 1px solid #b5c8db;
     }
-  .order-pagination {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;  /* Thêm dòng này */
-  margin: 16px auto 0 auto; /* Thêm dòng này để cách bảng phía trên và căn giữa */
-  }
+    .order-pagination {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 16px auto 0 auto;
+    }
     .order-pagination button, .order-pagination span {
       min-width: 32px; padding: 5px 7px; border: none; background: none; color: #1976d2; font-weight: 500;
       border-radius: 5px; cursor: pointer; font-size: 1em;
     }
     .order-pagination .active { background: #2196f3; color: #fff; font-weight: bold; pointer-events: none; }
     .order-pagination button:disabled { color: #bbb; background: #f1f1f1; pointer-events: none; }
-    @media (max-width: 1100px) {
-      .main-flex-container { max-width: 98vw; }
-      .order-list-panel { max-width: 95vw; }
-    }
-    @media (max-width: 700px) {
-      .order-list-panel { min-width: unset; width: 99vw !important; max-width: none !important;}
-      .order-list-table th, .order-list-table td { font-size: 0.96em; padding: 6px 2px;}
-    }
     .order-search-box {
       margin-left: auto;
       display: flex;
@@ -416,26 +238,569 @@
       margin-left: 2px;
     }
     #order-search-clear:hover { background: #a72816; }
-/* Popup modal nút xác nhận in bill */
-/* ===== CSS modal popup thông báo chuẩn mọi trình duyệt ===== */
-#customModal { 
-  position:fixed; left:0; top:0; width:100vw; height:100vh; z-index:11111;
-  display:flex; align-items:center; justify-content:center;
-  background: transparent;
+    /* Popup modal nút xác nhận in bill và sửa đơn hàng */
+    #customModal, #orderEditModal { 
+      position:fixed; left:0; top:0; width:100vw; height:100vh; z-index:11111;
+      display:flex; align-items:center; justify-content:center;
+      background: transparent;
+    }
+    .custom-modal-backdrop {
+      position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18);
+      z-index: 1;
+    }
+    .custom-modal-box, .order-edit-modal-box {
+      position:relative; z-index:2;
+      background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.15);
+      max-width:94vw; width:410px; padding:32px 22px 20px 22px;
+      text-align:center; font-size:1.13em; color:#133;
+      animation: popFadeIn .23s;
+    }
+    #customModal > div {
+  margin: 0 auto;
 }
-.custom-modal-backdrop {
-  position:absolute; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18);
-  z-index: 1;
+    @keyframes popFadeIn { from { opacity:0; transform:scale(0.96);} to { opacity:1; transform:scale(1);} }
+@media print {
+  body * { visibility: hidden !important; }
+  .bill-print-wrapper, .bill-print-wrapper * { 
+    visibility: visible !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .bill-print-wrapper {
+    position: absolute;
+    left: 0; top: 0;
+    width: 58mm !important;
+    min-width: 58mm !important;
+    max-width: 58mm !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+  .bill-logo-title {
+    font-weight: bold;
+    color: #15a138;
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .bill-title-main {
+    color: #0047bb;
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .bill-addr, .bill-phone {
+    text-align: center;
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .bill-info-row, .bill-section-title {
+    width: 100%;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+  .bill-section-title {
+    font-weight: 600;
+    color: #0047bb;
+    margin: 6px 0 2px 0;
+    font-size: 13px;
+  }
+  .bill-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    text-align: center;
+    font-size: 12px;
+    margin: 6px 0;
+  }
+  .bill-table th, .bill-table td {
+    border: 1px solid #bbb;
+    padding: 2px 0;
+    font-size: 12px;
+    text-align: center !important;
+  }
+  .bill-table th {
+    text-align: center !important;
+    font-weight: 600;
+    background: #f4f4f4;
+    font-size: 12px;
+    padding: 2px 0;
+  }
+  .bill-table thead tr {
+    text-align: center !important;
+  }
+  .bill-table td {
+    font-weight: 400;
+  } 
+  .bill-table td:nth-child(1),
+  .bill-table td:nth-child(2),
+  .bill-table td:nth-child(3) {
+  text-align: center !important;
+  }
+  .bill-table td:nth-child(4) {
+    text-align: right !important;
+  }
+  hr {
+    width: 100% !important;
+    border: none;
+    border-top: 1px dashed #222 !important;
+    margin: 6px 0 !important;
+  }
+  .bill-info-row span {
+    display: inline-block;
+    min-width: 30px;
+    max-width: 58%;
+    text-align: right;
+  }
+  .bill-info-row span:first-child {
+    text-align: left;
+    font-weight: 400;
+  }
+  .bill-info-row span:last-child {
+    text-align: right;
+    font-weight: 600;
+  }
+  .bill-customer-thank {
+    color: #15a138;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px !important;
+    font-size: 8px !important;    /* Giảm size xuống nhỏ hơn */
+    line-height: 1.35 !important;
+    word-break: break-word;
+  }
+  .bill-thank-shop {  
+    display: block;
+    font-size: 8px !important;
+    margin-top: 2px;
+    font-weight: bold;
+  }
+  /* Ẩn navbar, footer, popup khi in */
+  #navbar-container, #footer-container, .modal, #orderEditModal, #thankModal {
+    display: none !important;
+  }
 }
-.custom-modal-box {
-  position:relative; z-index:2;
-  background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.15);
-  max-width:88vw; width:360px; padding:32px 22px 20px 22px;
-  text-align:center; font-size:1.13em; color:#133;
-  animation: popFadeIn .23s;
+  /* Popup chỉnh classic style */
+.order-edit-modal-box {
+  background: #fff;
+  border: 1.5px solid #0086FF;
+  border-radius: 8px;
+  box-shadow: none;
+  padding: 12px 26px 18px 26px;
+  max-width: 540px;
+  min-width: 380px;
+  margin: 0 auto;
+  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+  padding-left: 16px;
+  padding-right: 16px;  
 }
-@keyframes popFadeIn { from { opacity:0; transform:scale(0.96);} to { opacity:1; transform:scale(1);} }
 
+.order-edit-modal-box .modal-title {
+  color: #1048c4;
+  font-size: 1.2em;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 3px;
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+}
+.order-edit-modal-box .order-code {
+  color: #15a138;
+  font-size: 1em;
+  font-weight: 600;
+  text-align: center;
+}
+.order-edit-modal-box .order-status {
+  color: #e53935;
+  font-size: 0.95em;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 3px;
+}
+.order-edit-modal-box .divider {
+  border: 0;
+  border-top: 1.5px dashed #bbb;
+  margin: 10px 0;
+}
+.order-edit-modal-box .form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.order-edit-modal-box .form-label {
+  flex: 0 0 120px;      /* hoặc 110-130 tuỳ độ dài */
+  font-weight: 400;     /* Để font bình thường */
+  font-size: 0.9em;       /* Nhỏ lại */
+  color: #222;          /* Nhạt màu một chút */
+  margin-right: 8px;
+  text-align: left;     /* Đảm bảo luôn canh trái */
+  line-height: 1.55;    /* Giúp hàng đều */
+}
+.order-edit-modal-box .form-input {
+  flex: 1;
+  font-size: 0.9em;
+  padding: 4px 8px;
+  border: 1px solid #b4b4b4;
+  border-radius: 0;
+  outline: none;
+}
+.order-edit-modal-box .staff-list-table input {
+  text-align: center;   /* <-- Canh giữa chữ trong input */
+  width: 100%;
+  box-sizing: border-box;
+  border: none;      /* Nếu muốn không viền, hoặc dùng border cho td */
+  padding: 0 4px;    /* Có thể dùng padding nhỏ hoặc để 0 */
+  height: 100%;      /* Nếu dòng bị thấp, có thể điều chỉnh thêm line-height cho td */
+  font-size: 1em;    /* tuỳ chỉnh */
+  background: transparent; /* Nếu muốn nền trong suốt */
+}
+.order-edit-modal-box textarea.form-input {
+  min-height: 28px;
+}
+.order-edit-modal-box .nv-table-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 7px;
+  margin-top: 10px;
+}
+.order-edit-modal-box .nv-table-title {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #1673e7;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+.order-edit-modal-box .btn-them-nv {
+  background: #16b311;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 5px 15px;
+  margin-bottom: 7px;
+  margin-left: 15px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.order-edit-modal-box .btn-them-nv:hover { background: #11990d; }
+.order-edit-modal-box .staff-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  background: #fff;
+}
+.order-edit-modal-box .staff-list-table th,
+.order-edit-modal-box .staff-list-table td {
+  border: 1px solid #a8a8a8;
+  text-align: center;
+  font-size: 0.8em;
+  padding:  0;
+  background: #fff;
+}
+.order-edit-modal-box .staff-list-table th {
+  background: #eafce4;
+  color: #27a33d;
+  font-weight: 700;
+}
+.order-edit-modal-box .btn-xoa-nv {
+      background: #e53935;
+      color: #fff;
+      border: none;
+      min-width: 48px;
+      min-height: 26px;
+      padding: 4px 10px;
+      font-size: 0.96em;
+      border-radius: 4px;
+      font-weight: 600;
+      margin: 0 auto;
+      display: block;
+      transition: background 0.18s;
+}
+.order-edit-modal-box .btn-xoa-nv:hover { background: #c62828; }
+
+.order-edit-modal-box .total-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0;
+  font-size: 1.07em;
+}
+.order-edit-modal-box .total-table td {
+  border: none;
+  padding: 2px 10px 2px 0;
+  font-weight: 600;
+}
+.order-edit-modal-box .total-row {
+  color: #13ad2f;
+  font-size: 0.9em;      /* hoặc font-size lớn hơn mặc định */
+  font-weight: 700;
+}
+.order-edit-modal-box .giamgia-row td {
+  color: #1547ad;
+  font-weight: 500;
+  font-size: 0.9em;
+}
+.order-edit-modal-box .tongthu-row td {
+  color: #c00;
+  font-weight: 700;
+  font-size: 0.9em;
+}
+
+.order-edit-modal-box .edit-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+  margin-bottom: 0;
+  padding: 8px 0 4px 0;
+  background: #fff;
+}
+.order-edit-modal-box .btn-save {
+  background: #19b118;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 0.9em;              /* nhỏ lại */
+  padding: 5px 20px;           /* nhỏ lại */
+  min-width: 70px;             /* nhỏ lại */
+  cursor: pointer;
+  transition: background 0.18s;
+  margin: 0 4px;
+}
+.order-edit-modal-box .btn-save:hover { background: #10900f; }
+.order-edit-modal-box .btn-cancel {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 0.9em;              /* nhỏ lại */
+  padding: 5px 20px;           /* nhỏ lại */
+  min-width: 70px;             /* nhỏ lại */
+  cursor: pointer;
+  transition: background 0.18s;
+  margin: 0 4px;
+}
+.order-edit-modal-box .btn-cancel:hover { background: #c62828; }
+.order-edit-modal-box #edit-tongCong {
+  color: #16a220;
+  font-size: 0.9em !important;
+  font-weight: bold;
+  text-align: right;
+}
+
+.order-edit-modal-box #edit-tongThu {
+  color: #c00;
+  font-size: 0.9em !important;
+  font-weight: bold;
+  text-align: right;
+}
+
+.order-edit-modal-box #edit-giamGia {
+  color: #1547ad;
+  font-size: 0.9em !important;
+  font-weight: 500;
+  text-align: right;
+}
+.order-edit-modal-box .modal-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 2em;
+  color: #c00;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 3;
+  padding: 0 8px;
+  line-height: 1;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+.order-edit-modal-box .modal-close-btn:hover {
+  color: #fff;
+  background: #e53935;
+  border-radius: 50%;
+}
+
+#deleteStaffModal.modal {
+  display: none;
+  position: fixed;
+  z-index: 13000 !important;
+  left: 0; top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(60,70,80,0.18);
+  /* Chỉ căn giữa khi có class show */
+}
+#deleteStaffModal.show {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.delete-staff-modal-dialog {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.delete-staff-modal-content {
+  background: #f8fafc;
+  border-radius: 10px;
+  box-shadow: 0 7px 28px rgba(34,60,80,0.16);
+  border: 1.5px solid #cfe2e8;
+  padding: 21px 20px 16px 20px;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.delete-staff-modal-title {
+  font-size: 1.08em;
+  font-weight: 500;
+  color: #091379;
+  text-align: center;
+  margin-bottom: 18px;
+  line-height: 1.3;
+}
+.delete-staff-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+.delete-staff-btn-confirm,
+.delete-staff-btn-cancel {
+  padding: 6px 20px;
+  min-width: 0;
+  font-size: 1em;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  box-shadow: none;
+  outline: none;
+  /* Giảm chiều cao và chiều dài nút */
+  min-width: 54px;
+}
+.delete-staff-btn-confirm {
+  background: #0cac14;
+  color: #fff;
+}
+.delete-staff-btn-confirm:hover {
+  background: #189b11;
+}
+.delete-staff-btn-cancel {
+  background: #e91b0d;
+  color: #ffffff;
+}
+.delete-staff-btn-cancel:hover {
+  background: #c50909;
+  color: #ffffff;
+}
+@media (min-width: 768px) {
+  .order-list-table {
+    table-layout: auto !important;   /* BỎ fixed, chuyển lại auto */
+    width: 100%;
+  }
+  .order-list-table th, .order-list-table td {
+    white-space: nowrap;      /* Mặc định là không xuống dòng (ngắn gọn) */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    max-width: unset;
+  }
+  /* CHỈ cột dài mới ép xuống dòng */
+  .order-list-table td.ten-khach-hang,
+  .order-list-table td.ma-nv {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 150px;   /* hoặc 120-170px tuỳ ý */
+  }
+}
+/* Popup Đã lưu thành công */
+#thankModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 12000;
+}
+
+#thankModal.show {
+  display: flex;
+}
+
+.modal-dialog {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 320px;
+  width: 90%;
+  margin: 0 auto;
+  height: 100%; /* Đảm bảo căn giữa theo chiều dọc */
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: none;
+  overflow: hidden;
+  width: 100%; /* Đảm bảo chiều rộng tự động điều chỉnh */
+}
+
+.modal-body {
+  padding: 0;
+}
+
+.popup-thank {
+  padding: 20px 24px;
+  text-align: center;
+  background: #e1f1fb;
+  border-radius: 10px;
+}
+
+.popup-thank .title {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #0e3f8f;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.popup-thank .btn-back {
+  margin-top: 8px;
+  padding: 6px 18px;
+  background: #03a9f4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95em;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.popup-thank .btn-back:hover {
+  background: #0288d1;
+}
+/* phần CSS popup sau khi in customModal*/
 #customModal button {
   font-size:1em; 
   padding:8px 22px; 
@@ -446,7 +811,7 @@
   box-shadow: none !important;
   outline: none !important;
   color: #fff !important;
-  background: #888 !important; /* fallback, sẽ bị override bên dưới */
+  background: #888 !important; 
   background-color: #888 !important;
   cursor:pointer !important;
   filter: none !important;
@@ -499,43 +864,27 @@
   box-shadow: none !important;
   filter: grayscale(0.18) brightness(1.04) !important;
 }
-
-/* Đảm bảo không bị ảnh hưởng bởi media print hoặc các CSS khác */
-@media print {
-  #customModal, #customModal * {
-    visibility: visible !important;
-    color-adjust: exact !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
+/* phủ mờ popup khi đang lưu */
+.edit-modal-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(200, 200, 200, 0.55);
+  z-index: 2000;
+  display: none;
+  cursor: wait;
+  border-radius: 8px;
 }
-  </style>
+#orderEditModal {
+  position: absolute;
+  left: 0; top: 0; width: 100vw; min-height: 100vh;
+  z-index: 1999;
+  display: block;
+}
+</style>
 </head>
 <body>
   <!-- NAVBAR -->
   <div id="navbar-container">
-    <!-- Mobile Navbar -->
-    <div class="mobile-navbar">
-      <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
-        <i class="fa fa-bars"></i>
-      </button>
-      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
-        <span class="brand-main">Coffee & Beer</span>
-        <span class="brand-sub">DJ GooDjn</span>
-      </a>
-      <a class="mobile-hotline" href="tel:0902926636">
-        <i class="fa-solid fa-phone" style="color:#e53935"></i>
-        <span class="hotline-number">0902 926 636</span>
-      </a>
-    </div>
-    <nav class="mobile-navbar-menu" id="mobileMenu">
-      <ul>
-        <li data-href="index.html">Đặt dịch vụ</li>
-        <li data-href="danhgiakh.html">Đánh giá dịch vụ</li>
-        <li id="mobileLogoutTab" style="display:none;">Đăng xuất</li>
-      </ul>
-    </nav>
-    <!-- Desktop Navbar (tải động qua JS) -->
     <div class="desktop-navbar"></div>
   </div>
   <div class="site-content">
@@ -563,15 +912,16 @@
             <tr>
               <th style="width: 42px;">Stt</th>
               <th style="width: 70px;">Số đơn</th>
-              <th style="width: 18%;">Tên khách hàng</th>
+              <th class="ten-khach-hang" style="width: 18%;">Tên khách hàng</th>
               <th style="width: 60px;">Số bàn</th>
-              <th style="width: 210px;">Mã NV</th>
+              <th class="ma-nv" style="width: 210px;">Mã NV</th>
               <th style="width: 110px;">Tổng tiền</th>
               <th style="width: 155px;">Xác nhận</th>
+              <th style="width: 90px;">Sửa ĐH</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="7" style="text-align:center;color:#888;">Đang tải...</td></tr>
+            <tr><td colspan="8" style="text-align:center;color:#888;">Đang tải...</td></tr>
           </tbody>
         </table>
         <div id="order-pagination" class="order-pagination"></div>
@@ -595,103 +945,81 @@
       </div>
     </div>
   </div>
+  <!-- Popup thông báo ở giữa màn hình -->
+<div id="deleteStaffModal" class="modal" style="display:none;">
+  <div class="delete-staff-modal-dialog">
+    <div class="delete-staff-modal-content">
+      <div class="delete-staff-modal-title" id="deleteStaffModalMsg">Bạn có chắc chắn muốn xóa nhân viên này?</div>
+      <div class="delete-staff-modal-actions">
+        <button class="delete-staff-btn-confirm" id="deleteStaffModalBtnOK">Xóa</button>
+        <button class="delete-staff-btn-cancel" id="deleteStaffModalBtnCancel">Hủy</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Popup sửa đơn hàng -->
+<div id="orderEditModal" style="display:none;">
+  <div class="custom-modal-backdrop"></div>
+  <div class="order-edit-modal-box" id="orderEditModalContent"></div>
+  <div class="edit-modal-overlay" id="editModalOverlay" style="display:none;"></div>
+</div>
+<!-- Popup Đã lưu thành công -->
+<div class="modal fade" id="thankModal" tabindex="-1" role="dialog" aria-labelledby="thankModalLabel" aria-hidden="true" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="popup-thank">
+          <div class="title" id="thankModalTitle">Đã lưu thành công!</div>
+          <button class="btn-back" id="thankModalBtnBack" onclick="closeThankModal()">Quay lại</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Popup thông báo sau khi in bill -->
+<div id="customModal" style="display:none;">
+  <div class="custom-modal-backdrop"></div>
+  <div class="custom-modal-box">
+    <div id="customModalMsg">Nội dung thông báo</div>
+    <div style="text-align:center; margin-top:20px;">
+      <button id="customModalBtnOK" class="btn-ok">OK</button>
+      <button id="customModalBtnCancel" class="btn-cancel" style="display:none;">Cancel</button>
+    </div>
+  </div>
+</div>
   <script>
-    // Kiểm tra đăng nhập, nếu chưa sẽ chuyển về login.html
+    // --- ĐĂNG NHẬP, NAVBAR ---
     if(!localStorage.getItem('isLoggedIn')) window.location.replace('login.html');
-
-    // Hàm hiện/ẩn tab Đăng xuất cả desktop và mobile
     function showLogoutTabIfLoggedIn() {
       var logoutTab = document.getElementById('logoutTab');
-      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
       if(localStorage.getItem('isLoggedIn') === '1') {
         if (logoutTab) logoutTab.style.display = '';
-        if (mobileLogoutTab) mobileLogoutTab.style.display = '';
       } else {
         if (logoutTab) logoutTab.style.display = 'none';
-        if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
       }
     }
-    // Hàm đăng xuất
     function logout() {
       localStorage.removeItem('isAdmin');
       localStorage.removeItem('isLoggedIn');
       window.location.replace('login.html');
     }
-    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
-    fetch('navbar.html')
-      .then(response => response.text())
-      .then(html => {
-        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html;
-        showLogoutTabIfLoggedIn();
-        // Gắn sự kiện cho nút Đăng xuất desktop nếu chưa có
-        var logoutTab = document.getElementById('logoutTab');
-        if(logoutTab) logoutTab.onclick = logout;
-      });
-
-    // Xử lý menu mobile
+    fetch('navbar.html').then(r=>r.text()).then(html=>{
+      document.querySelector('#navbar-container .desktop-navbar').innerHTML = html;
+      showLogoutTabIfLoggedIn();
+      var logoutTab = document.getElementById('logoutTab');
+      if(logoutTab) logoutTab.onclick = logout;
+    });
     document.addEventListener('DOMContentLoaded', function(){
-      var hamburger = document.getElementById('hamburgerBtn');
-      var menu = document.getElementById('mobileMenu');
-      document.addEventListener('click', function(e){
-        if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
-          menu.classList.remove('open');
-        }
-      });
-      hamburger.onclick = function(e){
-        e.stopPropagation();
-        menu.classList.toggle('open');
-      };
-      menu.querySelectorAll('li[data-href]').forEach(function(tab){
-        tab.onclick = function(){
-          menu.classList.remove('open');
-          window.location.href = tab.getAttribute('data-href');
-        };
-      });
-      // Gắn sự kiện cho nút Đăng xuất trên mobile
-      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
-      if(mobileLogoutTab) {
-        mobileLogoutTab.onclick = function() { logout(); };
-      }
       showLogoutTabIfLoggedIn();
     });
 
-    // Footer auto-hide on mobile input focus (bàn phím ảo)
-    (function(){
-      function isMobile() { return window.innerWidth <= 768; }
-      function hideFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = 'none';
-      }
-      function showFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = '';
-      }
-      document.addEventListener('DOMContentLoaded', function() {
-        if(!isMobile()) return;
-        var inputs = document.querySelectorAll('input, textarea, select');
-        inputs.forEach(function(el) {
-          el.addEventListener('focus', hideFooter);
-          el.addEventListener('blur', showFooter);
-        });
-        var oldHeight = window.innerHeight;
-        window.addEventListener('resize', function() {
-          if(!isMobile()) return;
-          if(window.innerHeight < oldHeight - 80) hideFooter();
-          else showFooter();
-          oldHeight = window.innerHeight;
-        });
-      });
-    })();
-  </script>
-  <!-- ========== BILL PANEL ========== -->
-  <script>
+    // --- BILL PANEL ---
     const inputOrderCode = document.getElementById('bill-order-code');
     const btnSearch = document.getElementById('bill-search-btn');
     const btnPrint = document.getElementById('bill-print-btn');
     const btnReset = document.getElementById('bill-reset-btn');
     const billStatusNote = document.getElementById('bill-status-note');
     const billArea = document.getElementById('bill-print-area');
-
     let currentBillData = null, currentOrderCode = null, isPaid = false;
 
     btnSearch.onclick = async function() {
@@ -721,7 +1049,7 @@
         const unpaid = data.bill.some(row => !row.status || row.status.trim() === "");
         if (isPaid) {
           billStatusNote.innerHTML = `<span class="bill-status-paid"><i class="fa fa-check-circle"></i> Đã thanh toán</span>`;
-          btnPrint.disabled = true;
+          btnPrint.disabled = false;
         } else if (unpaid) {
           billStatusNote.innerHTML = `<span class="bill-status-unpaid"><i class="fa fa-exclamation-triangle"></i> CHƯA thanh toán!</span>`;
           btnPrint.disabled = false;
@@ -736,39 +1064,40 @@
         btnPrint.disabled = true;
       }
     };
-  btnPrint.onclick = function() {
-  if (!currentBillData || !currentOrderCode) return;
-  let printed = false;
-  const handleAfterPrint = async () => {
-    if (printed) return;
-    printed = true;
-    window.removeEventListener('afterprint', handleAfterPrint);
-    showCustomModal(
-      'Bạn đã in hóa đơn thành công?<br><small>Nhấn OK để xác nhận, hoặc Cancel để KHÔNG ghi nhận thanh toán.</small>',
-      async function() {
-        btnPrint.disabled = true;
-        try {
-          await fetch('/api/frintbill', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              order: currentOrderCode,
-              items: currentBillData.bill.map(row => ({ maNV: row.maNV, caLV: row.caLV }))
-            })
-          });
-          await loadOrderList();
-          await btnSearch.onclick();
-          showCustomModal('Đã ghi nhận thanh toán thành công!', null);
-        } catch (e) {
-          showCustomModal('Lỗi cập nhật trạng thái thanh toán:<br>' + (e.message||e));
-        }
-      },
-      function() {}
-    );
-  };
-  window.addEventListener('afterprint', handleAfterPrint);
-  window.print();
-};
+
+    btnPrint.onclick = function() {
+      if (!currentBillData || !currentOrderCode) return;
+      let printed = false;
+      const handleAfterPrint = async () => {
+        if (printed) return;
+        printed = true;
+        window.removeEventListener('afterprint', handleAfterPrint);
+        showCustomModal(
+          'Bạn đã in hóa đơn thành công?<br><small>Nhấn OK để xác nhận, hoặc Cancel để KHÔNG ghi nhận thanh toán.</small>',
+          async function() {
+            btnPrint.disabled = false;
+            try {
+              await fetch('/api/frintbill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  order: currentOrderCode,
+                  items: currentBillData.bill.map(row => ({ maNV: row.maNV, caLV: row.caLV }))
+                })
+              });
+              await loadOrderList();
+              await btnSearch.onclick();
+              showCustomModal('Đã ghi nhận thanh toán thành công!', null);
+            } catch (e) {
+              showCustomModal('Lỗi cập nhật trạng thái thanh toán:<br>' + (e.message||e));
+            }
+          },
+          function() {}
+        );
+      };
+      window.addEventListener('afterprint', handleAfterPrint);
+      window.print();
+    };
 
     btnReset.onclick = function() {
       inputOrderCode.value = '';
@@ -777,6 +1106,7 @@
       btnPrint.disabled = true;
       currentBillData = null; currentOrderCode = null; isPaid = false;
     };
+
     function renderBill(data) {
       if (!data || !data.bill || data.bill.length === 0) { billArea.innerHTML = ''; return; }
       const row = data.bill[0], orderDate = row.orderDate || "", orderCode = row.orderCode || "",
@@ -793,50 +1123,68 @@
           total += +item.thanhTien;
         }
       });
-      billArea.innerHTML = `
-        <div>
-          <div class="bill-logo-title">GooDjn DJ Coffee & Beer</div>
-          <div class="bill-addr">65 Đ. Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh</div>
-          <div class="bill-phone">SDT: 0902 926 636</div>
-          <div class="bill-title-main">BILL DỊCH VỤ NHÂN VIÊN</div>
-          <div class="bill-info-row"><span>Ngày đặt hàng</span><span>${orderDate}</span></div>
-          <div class="bill-info-row"><span>Số đơn đặt hàng</span><span>${orderCode}</span></div>
-          <div class="bill-info-row"><span>Ngày thực hiện</span><span>${performDate}</span></div>
-          <div class="bill-section-title">Thông tin khách hàng</div>
-          <div class="bill-info-row"><span>Tên khách hàng</span><span>${customer.name||""}</span></div>
-          <div class="bill-info-row"><span>Số điện thoại</span><span>${customer.phone||""}</span></div>
-          <div class="bill-info-row"><span>Email</span><span>${customer.email||""}</span></div>
-          <div class="bill-info-row"><span>Số bàn</span><span>${customer.tableNum||""}</span></div>
-          <div class="bill-section"></div>
-          <table class="bill-table">
-            <thead>
-              <tr><th style="min-width:50px">Mã NV</th><th style="min-width:30px">Ca LV</th><th style="min-width:60px">Đơn giá</th><th style="min-width:70px">Thành tiền</th></tr>
-            </thead>
-            <tbody>${tableRows}</tbody>
-            <tfoot>
-              <tr class="bill-total-row">
-                <td colspan="3" style="text-align:right;">TỔNG THU</td>
-                <td style="text-align:right;">${formatMoney(total)} đ</td>
-              </tr>
-            </tfoot>
-          </table>
-          <div class="bill-customer-thank">Cảm ơn Quý Khách đã chọn dịch vụ tại<br/>GooDjn DJ Coffee & Beer !</div>
-        </div>
-      `;
+
+      const tongCong = row.tongCong !== undefined && row.tongCong !== "" ? row.tongCong : total;
+      const giamGia = row.giamGia !== undefined && row.giamGia !== "" ? row.giamGia : 0;
+      const tongThu = row.tongThu !== undefined && row.tongThu !== "" ? row.tongThu : (total - Number(giamGia));
+
+     billArea.innerHTML = `
+  <div class="bill-print-wrapper">
+    <div class="bill-logo-title">GooDjn DJ Coffee & Beer</div>
+    <div class="bill-addr">65 Đ. Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh</div>
+    <div class="bill-phone">SDT: 0902 926 636</div>
+    <div class="bill-title-main">BILL DỊCH VỤ NHÂN VIÊN</div>
+    <div class="bill-info-row"><span>Ngày đặt hàng</span><span>${orderDate}</span></div>
+    <div class="bill-info-row"><span>Số đơn đặt hàng</span><span>${orderCode}</span></div>
+    <div class="bill-info-row"><span>Ngày thực hiện</span><span>${performDate}</span></div>
+    <div class="bill-section-title">Thông tin khách hàng</div>
+    <div class="bill-info-row"><span>Tên khách hàng</span><span>${customer.name||""}</span></div>
+    <div class="bill-info-row"><span>Số điện thoại</span><span>${customer.phone||""}</span></div>
+    <div class="bill-info-row"><span>Email</span><span>${customer.email||""}</span></div>
+    <div class="bill-info-row"><span>Số bàn</span><span>${customer.tableNum||""}</span></div>
+    <table class="bill-table">
+      <thead>
+        <tr>
+          <th>Mã NV</th>
+          <th>Ca LV</th>
+          <th>Đơn giá</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+    <hr>
+    <div class="bill-info-row">
+      <span>Tổng cộng</span>
+      <span>${formatMoney(tongCong)} đ</span>
+    </div>
+    <div class="bill-info-row">
+      <span>Giảm giá</span>
+      <span>${formatMoney(giamGia)} đ</span>
+    </div>
+    <div class="bill-info-row" style="font-weight:bold;">
+      <span>Tổng thu</span>
+      <span>${formatMoney(tongThu)} đ</span>
+    </div>
+  <div class="bill-customer-thank">
+  Cảm ơn Quý Khách đã chọn dịch <br>
+  <span class="bill-thank-shop">vụ tại GooDjn DJ Coffee & Beer!</span>
+  </div>
+  </div>
+`; 
     }
     function formatMoney(val) {
       try { return Number(val).toLocaleString('vi-VN'); } catch { return val; }
     }
     inputOrderCode.addEventListener('keyup', function(e) { if (e.key === 'Enter') btnSearch.click(); });
 
-    // ========== ORDER LIST + SEARCH + PAGINATION ==========
+    // --- ORDER LIST + SEARCH + PAGINATION ---
     let ordersData = [], filteredOrders = [], orderTablePage = 1, orderEntriesPerPage = 10;
     const orderEntriesSelect = document.getElementById('order-entries-select');
     const orderPaginationDiv = document.getElementById('order-pagination');
     const orderSearchInput = document.getElementById('order-search-input');
     const orderSearchClear = document.getElementById('order-search-clear');
 
-    // Debounce tìm kiếm
     let searchTimer = null;
     function filterOrders(keyword) {
       if (!keyword) return ordersData.slice();
@@ -883,11 +1231,12 @@
       renderOrderTable();
       renderOrderPagination();
     });
+
     function renderOrderTable() {
       const table = document.querySelector('#order-list-table tbody');
       const data = filteredOrders.length ? filteredOrders : [];
       if (!data.length) {
-        table.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#888;">Không có đơn hàng.</td></tr>`;
+        table.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#888;">Không có đơn hàng.</td></tr>`;
         return;
       }
       const startIdx = (orderTablePage - 1) * orderEntriesPerPage;
@@ -898,25 +1247,36 @@
         html += `<tr>
           <td>${i + 1}</td>
           <td>${o.orderCode}</td>
-          <td style="text-align:left;">${o.customerName}</td>
+          <td class="ten-khach-hang" style="text-align:left;">${o.customerName}</td>
           <td>${o.tableNum}</td>
-          <td style="text-align:left;">${o.maNVs}</td>
+          <td class="ma-nv" style="text-align:left;">${o.maNVs}</td>
           <td style="text-align:right;">${Number(o.total).toLocaleString('vi-VN')}</td>
           <td>${
             o.status === 'Đã thanh toán'
-              ? `<span class="order-status-paid">Đã thanh toán</span>`
-              : `<button class="order-status-btn" data-order="${o.orderCode}">Chưa thanh toán</button>`
+            ? `<button class="order-status-paid" data-order="${o.orderCode}">Đã thanh toán</button>`
+            : `<button class="order-status-btn" data-order="${o.orderCode}">Chưa thanh toán</button>`
           }</td>
+          <td>
+            <button class="order-edit-btn" data-order="${o.orderCode}">Sửa</button>
+          </td>
         </tr>`;
       }
       table.innerHTML = html;
-      Array.from(table.querySelectorAll('.order-status-btn')).forEach(btn => {
+      Array.from(table.querySelectorAll('.order-status-btn, .order-status-paid')).forEach(btn => {
         btn.addEventListener('click', function() {
           const order = this.getAttribute('data-order');
           if (order) {
             inputOrderCode.value = order;
             btnSearch.click();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      });
+      Array.from(table.querySelectorAll('.order-edit-btn')).forEach(btn => {
+        btn.addEventListener('click', function() {
+          const order = this.getAttribute('data-order');
+          if (order) {
+            showEditOrderModal(order);
           }
         });
       });
@@ -948,7 +1308,7 @@
     };
     async function loadOrderList() {
       const table = document.querySelector('#order-list-table tbody');
-      table.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#888;">Đang tải...</td></tr>`;
+      table.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#888;">Đang tải...</td></tr>`;
       try {
         const resp = await fetch('/api/listorders');
         if (!resp.ok) throw new Error('Không thể tải dữ liệu!');
@@ -960,24 +1320,378 @@
         renderOrderPagination();
       } catch (e) {
         ordersData = []; filteredOrders = [];
-        table.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#e53935;">Lỗi tải dữ liệu!</td></tr>`;
+        table.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#e53935;">Lỗi tải dữ liệu!</td></tr>`;
         orderPaginationDiv.innerHTML = '';
       }
     }
     loadOrderList();
+
+    // ==== POPUP SỬA ĐƠN HÀNG ====
+async function showEditOrderModal(orderCode) {
+  let order, products, availableProducts;
+  try {
+    const resp = await fetch('/api/listorders?order=' + encodeURIComponent(orderCode));
+    if (!resp.ok) throw new Error('Không lấy được dữ liệu!');
+    const data = await resp.json();
+    order = data.order;
+    products = data.products || [];
+    availableProducts = data.availableProducts || [];
+    if (!order) throw new Error('Không tìm thấy đơn hàng!');
+  } catch (e) {
+    showCustomModal('Lỗi: ' + (e.message || e));
+    return;
+  }
+  const productMap = {};
+  products.forEach(item => {
+    if (!productMap[item.maNV]) productMap[item.maNV] = {};
+    productMap[item.maNV][item.caLV] = item.donGia;
+  });
+
+  const modal = document.getElementById('orderEditModal');
+  const content = document.getElementById('orderEditModalContent');
+  function renderMaNVOptions(selectedMaNV, onlyAvailable = false, usedNVs = []) {
+  let list = onlyAvailable ? availableProducts : products;
+  if (onlyAvailable) {
+    list = list.filter(p =>
+      p.maNV.trim() !== '' && // Đảm bảo maNV không rỗng
+      !(p.lockStatus && (p.lockStatus.trim().toLowerCase() === "nghỉ việc" || p.lockStatus.trim().toLowerCase() === "nghỉ phép")) && // Chỉ loại bỏ "Nghỉ việc" hoặc "Nghỉ phép"
+      !(p.isBusy && p.isBusy.trim().toLowerCase() === "đang bận") && // Chỉ loại bỏ "Đang bận"
+      !usedNVs.includes(p.maNV)
+    );
+  }
+  let uniqueMaNVs = Array.from(new Set(list.map(p => p.maNV)));
+  let html = `<option value="">--Chọn NV--</option>`;
+  html += uniqueMaNVs.map(ma =>
+    `<option value="${ma}" ${ma === selectedMaNV ? 'selected' : ''}>${ma}</option>`
+  ).join('');
+  return html;
+}
+  function renderCaLVOptions(maNV, selectedCaLV) {
+    if (!maNV) return `<option value="">--Chọn ca--</option>`;
+    let caLVs = products.filter(p => p.maNV === maNV).map(p => p.caLV);
+    caLVs = Array.from(new Set(caLVs));
+    let html = `<option value="">--Chọn ca--</option>`;
+    html += caLVs.map(ca =>
+      `<option value="${ca}" ${ca == selectedCaLV ? 'selected' : ''}>${ca}</option>`
+    ).join('');
+    return html;
+  }
+
+  function updateDonGia(tr) {
+    const maNV = tr.querySelector('.nv-maNV').value;
+    const caLV = tr.querySelector('.nv-caLV').value;
+    const donGiaInput = tr.querySelector('.nv-donGia');
+    const donGiaRaw = (productMap[maNV] && productMap[maNV][caLV]) ? productMap[maNV][caLV] : '';
+    donGiaInput.value = formatInputMoney(donGiaRaw);
+    const thanhTienInput = tr.querySelector('.nv-thanhTien');
+    thanhTienInput.value = donGiaRaw ? formatInputMoney(donGiaRaw) : '';
+    calSummary();
+  }
+
+      let nvRowsHtml = '';
+      let usedNVs = [];
+      (order.nhanVien || []).forEach((nv, idx) => {
+        usedNVs.push(nv.maNV);
+    nvRowsHtml += `<tr data-idx="${idx}">
+  <td>
+    <select class="nv-maNV">${renderMaNVOptions(nv.maNV, false)}</select>
+  </td>
+  <td>
+    <select class="nv-caLV">${renderCaLVOptions(nv.maNV, nv.caLV)}</select>
+  </td>
+  <td>
+    <input class="nv-donGia" value="${formatInputMoney(nv.donGia || '')}" />
+  </td>
+  <td>
+    <input class="nv-thanhTien" value="${formatInputMoney(nv.thanhTien || '')}" autocomplete="off" />
+  </td>
+  <td>
+    <button class="btn-xoa-nv" type="button">Xóa</button>
+  </td>
+</tr>`;
+      });
+
+      content.innerHTML = `
+        <button class="modal-close-btn" id="edit-modal-close" title="Đóng">&times;</button>
+        <div class="modal-title">THÔNG TIN ĐƠN HÀNG</div>
+        <div class="order-code">Mã đơn hàng: ${order.orderCode}</div>
+        <div class="order-status">Trạng thái: ${order.trangThai === 'Đã thanh toán' ? '<span style="color:#15a138">Đã thanh toán</span>' : '<span style="color:#e53935">Chưa thanh toán</span>'}</div>
+        <hr class="divider"/>
+        <div class="form-row">
+          <div class="form-label">Tên khách hàng</div>
+          <input id="edit-customer-name" class="form-input" value="${order.customer.name || ''}" maxlength="64" />
+        </div>
+        <div class="form-row">
+          <div class="form-label">Số điện thoại</div>
+          <input id="edit-customer-phone" class="form-input" value="${order.customer.phone || ''}" maxlength="24" />
+        </div>
+        <div class="form-row">
+          <div class="form-label">Địa chỉ Email</div>
+          <input id="edit-customer-email" class="form-input" value="${order.customer.email || ''}" maxlength="64" />
+        </div>
+        <div class="form-row">
+          <div class="form-label">Số bàn</div>
+          <input id="edit-table-num" class="form-input" type="number" min="0" max="99" value="${order.tableNum || ''}" />
+        </div>
+        <div class="form-row">
+          <div class="form-label">Ghi chú</div>
+          <textarea id="edit-note" class="form-input">${order.ghiChu || ''}</textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-label">Ghi chú quản lý</div>
+          <textarea id="edit-note-ql" class="form-input">${order.noteQuanLy || ''}</textarea>
+        </div>
+        <div class="nv-table-row">
+          <span class="nv-table-title">1.Danh sách Nhân viên</span>
+          <button class="btn-them-nv" type="button" id="btn-them-nv">Thêm NV mới</button>
+        </div>
+        <table class="staff-list-table" id="edit-nv-table">
+          <thead>
+            <tr>
+              <th>Mã NV</th>
+              <th>Ca LV</th>
+              <th>Đơn giá</th>
+              <th>Thành tiền</th>
+              <th>Sửa/Xóa</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${nvRowsHtml}
+          </tbody>
+        </table>
+        <table class="total-table">
+          <tr class="total-row">
+            <td style="width:140px;">Tổng cộng</td>
+            <td><input id="edit-tongCong" value="${order.tongCong || ''}" readonly style="width:90px;text-align:right; font-weight:700; color:#13ad2f; background:#fff; border:none;" /></td>
+          </tr>
+          <tr class="giamgia-row">
+            <td>Giảm giá</td>
+            <td><input id="edit-giamGia" autocomplete="off" value="${formatInputMoney(order.giamGia || '')}" style="width:90px;text-align:right;" /></td>
+          </tr>
+          <tr class="tongthu-row">
+            <td>Tổng thu</td>
+            <td><input id="edit-tongThu" value="${order.tongThu || ''}" readonly style="width:90px;text-align:right;font-weight:700;color:#c00; background:#fff; border:none;" /></td>
+          </tr>
+        </table>
+        <div class="edit-modal-actions">
+          <button class="btn-save" id="edit-btn-save"><i class="fa fa-save"></i> Lưu</button>
+          <button class="btn-cancel" id="edit-btn-cancel"><i class="fa fa-times"></i> Đóng</button>
+        </div>
+      `;
+      modal.style.display = 'flex';
+
+  content.querySelectorAll('#edit-nv-table tbody tr').forEach(tr => {
+  const donGiaInput = tr.querySelector('.nv-donGia');
+  const thanhTienInput = tr.querySelector('.nv-thanhTien');
+  donGiaInput.addEventListener('input', function() {
+    let donGiaRaw = this.value.replace(/[^\d]/g, '');
+    this.value = formatInputMoney(donGiaRaw);
+    thanhTienInput.value = formatInputMoney(donGiaRaw); // cập nhật thành tiền
+    calSummary();
+  });
+  thanhTienInput.addEventListener('input', function() {
+    let v = this.value.replace(/[^\d]/g,'');
+    this.value = formatInputMoney(v);
+    calSummary();
+  });
+});
+
+// Giảm giá - luôn format khi nhập
+document.getElementById('edit-giamGia').addEventListener('input', function() {
+  let v = this.value.replace(/[^\d]/g,'');
+  this.value = formatInputMoney(v);
+  calSummary();
+});
+      document.getElementById('edit-btn-cancel').onclick = () => { modal.style.display = 'none'; };
+      document.getElementById('edit-modal-close').onclick = () => { modal.style.display = 'none'; };
+
+      content.querySelectorAll('#edit-nv-table tbody tr').forEach(tr => {
+        tr.querySelector('.nv-maNV').onchange = function() {
+          let maNV = this.value;
+          let caLVSelect = tr.querySelector('.nv-caLV');
+          caLVSelect.innerHTML = renderCaLVOptions(maNV, caLVSelect.value);
+          updateDonGia(tr);
+        };
+        tr.querySelector('.nv-caLV').onchange = function() {
+          updateDonGia(tr);
+        };
+    tr.querySelector('.btn-xoa-nv').onclick = function() {
+    showDeleteStaffModal(
+    function() { tr.remove(); calSummary(); },
+    function() { /* Không làm gì nếu hủy */ }
+  );
+};
+      });
+  document.getElementById('btn-them-nv').onclick = function() {
+  const tbody = document.getElementById('edit-nv-table').querySelector('tbody');
+  let idx = tbody.children.length;
+  let currUsedNVs = [];
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const v = tr.querySelector('.nv-maNV')?.value;
+    if (v) currUsedNVs.push(v);
+  });
+  let trElem = document.createElement('tr');
+  trElem.setAttribute('data-idx', idx);
+  trElem.innerHTML = `
+    <td><select class="nv-maNV">${renderMaNVOptions('', true, currUsedNVs)}</select></td>
+    <td><select class="nv-caLV"><option value="">--Chọn ca--</option></select></td>
+    <td><input class="nv-donGia" value="" /></td>
+    <td><input class="nv-thanhTien" autocomplete="off" value="" /></td>
+    <td><button class="btn-xoa-nv" type="button">Xóa</button></td>
+  `;
+  tbody.appendChild(trElem);
+  // SỰ KIỆN: Khi sửa đơn giá, tự động cập nhật thành tiền cùng dòng
+trElem.querySelector('.nv-donGia').addEventListener('input', function() {
+  let donGiaRaw = this.value.replace(/[^\d]/g, '');
+  this.value = formatInputMoney(donGiaRaw);
+  trElem.querySelector('.nv-thanhTien').value = formatInputMoney(donGiaRaw);
+  calSummary();
+});
+
+  // SỰ KIỆN FORMAT cho input Thành tiền 
+  trElem.querySelector('.nv-thanhTien').addEventListener('input', function() {
+    let v = this.value.replace(/[^\d]/g,'');
+    this.value = formatInputMoney(v);
+    calSummary();
+  });
+
+  // Sự kiện chọn NV thì cập nhật dropdown Ca LV và Đơn giá, Thành tiền
+  const maNVSelect = trElem.querySelector('.nv-maNV');
+  const caLVSelect = trElem.querySelector('.nv-caLV');
+  maNVSelect.onchange = function() {
+    let maNV = this.value;
+    caLVSelect.innerHTML = renderCaLVOptions(maNV, '');
+    updateDonGia(trElem);
+  };
+  caLVSelect.onchange = function() {
+    updateDonGia(trElem);
+  };
+  // Sự kiện xóa dòng
+  trElem.querySelector('.btn-xoa-nv').onclick = function() {
+    showDeleteStaffModal(
+      function() { trElem.remove(); calSummary(); },
+      function() { }
+    );
+  };
+  // Sự kiện nhập thành tiền thủ công
+  trElem.querySelector('.nv-thanhTien').addEventListener('input', calSummary);
+};
+function formatInputMoney(val) {
+  val = val + '';
+  val = val.replace(/[^\d]/g, '');
+  if (!val) return '';
+  return Number(val).toLocaleString('vi-VN');
+}
+  function showDeleteStaffModal(onOK, onCancel) {
+  var modal = document.getElementById('deleteStaffModal');
+  modal.style.display = 'flex';
+  document.getElementById('deleteStaffModalBtnOK').onclick = function() {
+    modal.style.display = 'none';
+    if (onOK) onOK();
+  };
+  document.getElementById('deleteStaffModalBtnCancel').onclick = function() {
+    modal.style.display = 'none';
+    if (onCancel) onCancel();
+  };
+}
+
+  function calSummary() {
+  const tbody = document.getElementById('edit-nv-table').querySelector('tbody');
+  let sum = 0;
+  tbody.querySelectorAll('tr').forEach(tr=>{
+    let v = Number((tr.querySelector('.nv-thanhTien')||{value:0}).value.replace(/[^\d]/g,''));
+    if(!isNaN(v)) sum += v;
+  });
+  document.getElementById('edit-tongCong').value = formatInputMoney(sum);
+  let giam = Number((document.getElementById('edit-giamGia').value||'').replace(/[^\d]/g,''));
+  if(isNaN(giam)) giam = 0;
+  let tongThu = sum - giam;
+  if(tongThu < 0) tongThu = 0;
+  document.getElementById('edit-tongThu').value = formatInputMoney(tongThu);
+}
+      content.querySelectorAll('.nv-thanhTien, .nv-donGia, .nv-caLV').forEach(inp => inp.oninput = calSummary);
+      document.getElementById('edit-giamGia').oninput = calSummary;
+      calSummary();
+
+  document.getElementById('edit-btn-save').onclick = async function() {
+  let customer = {
+    name: document.getElementById('edit-customer-name').value.trim(),
+    phone: document.getElementById('edit-customer-phone').value.trim(),
+    email: document.getElementById('edit-customer-email').value.trim()
+  };
+  let tableNum = document.getElementById('edit-table-num').value.trim();
+  let ghiChu = document.getElementById('edit-note').value.trim();
+  let tongCong = document.getElementById('edit-tongCong').value.replace(/\D/g,'');
+  let giamGia = document.getElementById('edit-giamGia').value.replace(/\D/g,'');
+  let tongThu = document.getElementById('edit-tongThu').value.replace(/\D/g,'');
+  let nhanVien = [];
+  content.querySelectorAll('#edit-nv-table tbody tr').forEach(tr=>{
+    let maNV = (tr.querySelector('.nv-maNV')||{value:''}).value.trim();
+    let caLV = (tr.querySelector('.nv-caLV')||{value:''}).value.trim();
+    let donGia = (tr.querySelector('.nv-donGia')||{value:''}).value.replace(/\D/g,'');
+    let thanhTien = (tr.querySelector('.nv-thanhTien')||{value:''}).value.replace(/\D/g,'');
+    if(maNV && caLV && donGia && thanhTien) nhanVien.push({maNV,caLV,donGia,thanhTien});
+  });
+  if (nhanVien.length == 0) {
+    showCustomModal('Phải có ít nhất 1 nhân viên phục vụ!');
+    return;
+  }
+  const overlay = document.getElementById('editModalOverlay');
+  try {
+    document.getElementById('edit-btn-save').disabled = true;
+    if (overlay) overlay.style.display = 'block'; // Hiện overlay
+
+    let postBody = {
+      orderCode: order.orderCode,
+      customer,
+      tableNum,
+      ghiChu,
+      nhanVien,
+      tongCong,
+      giamGia,
+      tongThu,
+      trangThai: order.trangThai,
+      noteQuanLy: document.getElementById('edit-note-ql').value.trim(), // Sửa dòng này!
+      inBill: order.inBill||''
+    };
+    let resp = await fetch('/api/listorders', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(postBody)
+    });
+    let data = await resp.json();
+
+    if (data && data.success) {
+      document.getElementById('orderEditModal').style.display = 'none';
+      if (overlay) overlay.style.display = 'none'; // Ẩn overlay khi đóng popup
+      showThankModal('Đã lưu thành công!');
+    } else {
+      if (overlay) overlay.style.display = 'none';
+      showThankModal('Lưu thất bại! ' + (data && data.error ? data.error : ''));
+      document.getElementById('edit-btn-save').disabled = false;
+    }
+  } catch(e) {
+    if (overlay) overlay.style.display = 'none';
+    showThankModal('Lỗi lưu: ' + (e.message||e));
+    document.getElementById('edit-btn-save').disabled = false;
+  }
+};
+    }
+  function showThankModal(title = "Đã lưu thành công!") {
+  var modal = document.getElementById('thankModal');
+  var titleElem = document.getElementById('thankModalTitle');
+  titleElem.innerHTML = title;
+  modal.classList.add('show');
+  modal.style.display = 'block';
+}
+function closeThankModal() {
+  var modal = document.getElementById('thankModal');
+  modal.classList.remove('show');
+  modal.style.display = 'none';
+  loadOrderList() //reload lại trang tại đây 
+}
   </script>
-  <!-- Popup thông báo ở giữa màn hình -->
-<div id="customModal" style="display:none;">
-  <div class="custom-modal-backdrop"></div>
-  <div class="custom-modal-box">
-    <div id="customModalMsg">Nội dung thông báo</div>
-    <div style="text-align:center; margin-top:20px;">
-      <button id="customModalBtnOK" class="btn-ok">OK</button>
-      <button id="customModalBtnCancel" class="btn-cancel" style="display:none;">Cancel</button>
-    </div>
-  </div>
-</div>
-<script>
+  <script>
 /**
  * Hiện popup xác nhận, thay cho confirm
  * @param {string} msg - Nội dung thông báo
