@@ -48,29 +48,32 @@ module.exports = async (req, res) => {
   const orderId = row[1] || 'undefined';
 
   // Nếu là dòng đầu tiên gặp orderId, lưu lại thông tin & điểm thưởng
-  if (!mapOrders[orderId]) {
-    const reviewed = row[17] === 'Đã đánh giá';
-// Lấy point y như cách lấy 'total': chỉ lấy giá trị thực tế dòng đầu, không ép về 0 nếu rỗng
-     const point = reviewed ? Number(row[18]) || 0 : 0;
+if (!mapOrders[orderId]) {
+  // Tìm tất cả các dòng cùng orderId
+  const allRowsSameOrder = rows.filter(
+    r => (r[1] || 'undefined') === orderId
+  );
+  // Nếu bất kỳ dòng nào cột R (index 17) KHÁC rỗng => đã đánh giá
+  const reviewed = allRowsSameOrder.some(r => (r[17] || '').trim() !== '');
+  const point = reviewed ? Number(row[18]) || 0 : 0;
 
-    mapOrders[orderId] = {
-      orderId,
-      time: row[0] || '',
-      name: row[2] || '',
-      phone: row[3] || '',
-      email: row[4] || '',
-      table: row[12] || '',
-      total: Number((row[11] || '').replace(/[^0-9]/g, '')) || 0,
-      reviewed,
-      status: reviewed ? 'Đã đánh giá' : '',
-      point,
-      staffCodes: [],
-      staffList: [],
-      reviewButton: reviewed ? 'Đã đánh giá' : 'Đánh giá',
-      locked: reviewed
-    };
-  }
-
+  mapOrders[orderId] = {
+    orderId,
+    time: row[0] || '',
+    name: row[2] || '',
+    phone: row[3] || '',
+    email: row[4] || '',
+    table: row[12] || '',
+    total: Number((row[11] || '').replace(/[^0-9]/g, '')) || 0,
+    reviewed,
+    status: reviewed ? 'Đã đánh giá' : '',
+    point,
+    staffCodes: [],
+    staffList: [],
+    reviewButton: reviewed ? 'Đã đánh giá' : 'Đánh giá',
+    locked: reviewed
+  };
+}
   // Dòng nào cũng có thể có staffCode/shift, nên vẫn bổ sung vào staffList
   const staffCode = row[5] || '';
   const shift = row[6] || '';
