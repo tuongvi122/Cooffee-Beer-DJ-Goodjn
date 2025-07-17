@@ -384,20 +384,6 @@
   }
 }
   /* Popup chỉnh classic style */
-.order-edit-modal-box {
-  background: #fff;
-  border: 1.5px solid #0086FF;
-  border-radius: 8px;
-  box-shadow: none;
-  padding: 12px 26px 18px 26px;
-  max-width: 540px;
-  min-width: 380px;
-  margin: 0 auto;
-  font-family: Arial, Helvetica, sans-serif;
-  position: relative;
-  padding-left: 16px;
-  padding-right: 16px;  
-}
 
 .order-edit-modal-box .modal-title {
   color: #1048c4;
@@ -453,10 +439,11 @@
   width: 100%;
   box-sizing: border-box;
   border: none;      /* Nếu muốn không viền, hoặc dùng border cho td */
-  padding: 0 4px;    /* Có thể dùng padding nhỏ hoặc để 0 */
+  padding: 0 1px;    /* Có thể dùng padding nhỏ hoặc để 0 */
   height: 100%;      /* Nếu dòng bị thấp, có thể điều chỉnh thêm line-height cho td */
   font-size: 1em;    /* tuỳ chỉnh */
   background: transparent; /* Nếu muốn nền trong suốt */
+  margin: 0;
 }
 .order-edit-modal-box textarea.form-input {
   min-height: 28px;
@@ -474,6 +461,7 @@
   color: #1673e7;
   margin-right: 10px;
   white-space: nowrap;
+  line-height: 2;
 }
 .order-edit-modal-box .btn-them-nv {
   background: #16b311;
@@ -507,18 +495,29 @@
   background: #eafce4;
   color: #27a33d;
   font-weight: 700;
+  padding: 5px 2px; 
 }
+.order-edit-modal-box .staff-list-table th:nth-child(1),
+.order-edit-modal-box .staff-list-table td:nth-child(1) { width: 10px; }
+.order-edit-modal-box .staff-list-table th:nth-child(2),
+.order-edit-modal-box .staff-list-table td:nth-child(2) { width: 10px; }
+.order-edit-modal-box .staff-list-table th:nth-child(3),
+.order-edit-modal-box .staff-list-table td:nth-child(3) { width: 100px; }
+.order-edit-modal-box .staff-list-table th:nth-child(4),
+.order-edit-modal-box .staff-list-table td:nth-child(4) { width: 100px; }
+.order-edit-modal-box .staff-list-table th:nth-child(5),
+.order-edit-modal-box .staff-list-table td:nth-child(5) { width: 20px; }
+
 .order-edit-modal-box .btn-xoa-nv {
       background: #e53935;
       color: #fff;
       border: none;
       min-width: 48px;
-      min-height: 26px;
-      padding: 4px 10px;
+      padding: 3px 8px;
       font-size: 0.96em;
       border-radius: 4px;
       font-weight: 600;
-      margin: 0 auto;
+      margin: 2px auto;      /* Thêm margin trên/dưới để nút không dính sát viền cell */
       display: block;
       transition: background 0.18s;
 }
@@ -732,72 +731,49 @@
 /* Popup Đã lưu thành công */
 #thankModal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
+  inset: 0;
   z-index: 12000;
+  display: none; /* Mặc định ẩn */
+  align-items: center;         /* Canh giữa dọc */
+  justify-content: center;     /* Canh giữa ngang */
+  background: rgba(0,0,0,0.25); /* overlay nền mờ */
 }
-
 #thankModal.show {
-  display: flex;
+  display: flex !important;    /* Hiện popup khi có class show */
 }
-
-.modal-dialog {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 320px;
-  width: 90%;
-  margin: 0 auto;
-  height: 100%; /* Đảm bảo căn giữa theo chiều dọc */
-}
-
-.modal-content {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: none;
-  overflow: hidden;
-  width: 100%; /* Đảm bảo chiều rộng tự động điều chỉnh */
-}
-
-.modal-body {
-  padding: 0;
-}
-
-.popup-thank {
-  padding: 20px 24px;
-  text-align: center;
+#thankModal .popup-thank {
   background: #e1f1fb;
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.13);
+  padding: 26px 36px 22px 36px;
+  min-width: 220px;
+  max-width: 340px;          /* Vừa nội dung, không quá rộng */
+  margin: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
-.popup-thank .title {
-  font-size: 1.1em;
+#thankModal .popup-thank .title {
+  font-size: 1.13em;
   font-weight: 600;
   color: #0e3f8f;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   line-height: 1.3;
 }
-
-.popup-thank .btn-back {
-  margin-top: 8px;
-  padding: 6px 18px;
+#thankModal .popup-thank .btn-back {
+  margin-top: 10px;
+  padding: 7px 22px;
   background: #03a9f4;
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 7px;
   cursor: pointer;
-  font-size: 0.95em;
+  font-size: 1em;
   font-weight: 500;
   transition: background 0.2s;
 }
-.popup-thank .btn-back:hover {
+#thankModal .popup-thank .btn-back:hover {
   background: #0288d1;
 }
 /* phần CSS popup sau khi in customModal*/
@@ -866,23 +842,64 @@
 }
 /* phủ mờ popup khi đang lưu */
 .edit-modal-overlay {
-  position: absolute;
+  position: fixed;  
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(200, 200, 200, 0.55);
   z-index: 2000;
   display: none;
   cursor: wait;
-  border-radius: 8px;
 }
 #orderEditModal {
-  position: absolute;
   left: 0; top: 0; width: 100vw; min-height: 100vh;
   z-index: 1999;
   display: block;
 }
+.modal-content.order-edit-modal-box {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgb(2, 163, 18);
+  border: 2px solid #14b55f;
+  max-width: 100%;
+  width: 100%;
+  padding: 12px 20px 18px 20px;
+  box-sizing: border-box;
+  position: relative;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.modal {
+  display: none;
+  z-index: 12000 !important;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(0,0,0,0.2);
+}
+.modal.show {
+  display: block !important;
+}
+#orderEditModal .modal-dialog {
+  margin: 200px auto 60px auto;
+  max-width: 470px;
+  width: 96vw;
+  min-width: 320px;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: none;
+  overflow: hidden;
+  width: 100%; /* Đảm bảo chiều rộng tự động điều chỉnh */
+}
+
+.modal-body {
+  padding: 0;
+}
 </style>
 </head>
-<body>
+<body>`
   <!-- NAVBAR -->
   <div id="navbar-container">
     <div class="desktop-navbar"></div>
@@ -958,10 +975,13 @@
   </div>
 </div>
   <!-- Popup sửa đơn hàng -->
-<div id="orderEditModal" style="display:none;">
-  <div class="custom-modal-backdrop"></div>
-  <div class="order-edit-modal-box" id="orderEditModalContent"></div>
-  <div class="edit-modal-overlay" id="editModalOverlay" style="display:none;"></div>
+<div id="orderEditModal" class="modal" tabindex="-1" role="dialog" aria-labelledby="orderEditModalLabel" aria-hidden="true" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content order-edit-modal-box" id="orderEditModalContent">
+      <!-- Nội dung popup sửa đơn hàng sẽ render vào đây -->
+    </div>
+    <div class="edit-modal-overlay" id="editModalOverlay" style="display:none;"></div>
+  </div>
 </div>
 <!-- Popup Đã lưu thành công -->
 <div class="modal fade" id="thankModal" tabindex="-1" role="dialog" aria-labelledby="thankModalLabel" aria-hidden="true" style="display:none;">
@@ -1725,6 +1745,18 @@ function showCustomModal(msg, onOK, onCancel) {
     }
   };
 }
+// ----- LOGIC SHOW/HIDE POPUP giống quanly.html -----
+function showOrderEditModal() {
+  var modal = document.getElementById('orderEditModal');
+  modal.classList.add('show');
+  modal.style.display = 'block';
+}
+function hideOrderEditModal() {
+  var modal = document.getElementById('orderEditModal');
+  modal.classList.remove('show');
+  modal.style.display = 'none';
+}
+
 </script>
 </body>
 </html>
