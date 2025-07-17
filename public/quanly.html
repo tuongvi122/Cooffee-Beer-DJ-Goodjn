@@ -1087,6 +1087,7 @@
 function logout() {
   localStorage.removeItem('isAdmin');
   localStorage.removeItem('isLoggedIn');
+  clearAllCookies();
   window.location.replace('login.html');
 }
     // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
@@ -1716,6 +1717,34 @@ document.getElementById('cancelDeleteStaffBtn').onclick = function() {
     // Gọi khi page load
     window.addEventListener('DOMContentLoaded', checkOrdersEmptyNote);
   </script>
+  <script>
+// Hàm xóa toàn bộ cookie phía client
+function clearAllCookies() {
+  document.cookie.split(";").forEach(function(c) {
+    document.cookie = c.replace(/^ +/, "")
+      .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+  });
+}
+
+// Hàm logout đầy đủ: xóa localStorage, cookie và chuyển về login
+function logoutAll() {
+  localStorage.removeItem('isAdmin');
+  localStorage.removeItem('isLoggedIn');
+  clearAllCookies();
+  window.location.replace('login.html');
+}
+
+// Khi phát hiện back/forward trên history (popstate)
+window.addEventListener('popstate', function(event) {
+  logoutAll();
+});
+
+// Chặn truy cập khi không phải admin
+if(localStorage.getItem('isAdmin') !== '1') {
+  clearAllCookies();
+  window.location.replace('login.html');
+}
+</script>
   <script>
 function redirectToLogin() {
     // Xoá toàn bộ cookie phía client (nếu muốn)
