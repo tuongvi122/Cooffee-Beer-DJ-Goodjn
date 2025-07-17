@@ -124,7 +124,7 @@ export default async function handler(req, res) {
       Number(it.donGia),
       idx === 0 ? Number(total) : '',
       '',
-      '',
+      idx === 0 ? Number(total) : '', // L <--- SỬA ở đây cho cột L
       Number(tableNum),
       note,
       "V"
