@@ -1,11 +1,17 @@
 import { google } from 'googleapis';
 import nodemailer from 'nodemailer';
+
 if (typeof fetch === 'undefined') global.fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
+// ==================
 // === KHAI BÁO BIẾN TELEGRAM ===
+// ==================
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
+
+// ==================
 // === HELPER FUNCTIONS ===
+// ==================
 function cleanNumber(val) {
   if (!val) return 0;
   return Number(String(val).replace(/[^\d]/g, "")) || 0;
@@ -41,6 +47,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS
   }
 });
+
 // Google Sheets Auth
 const sheetId = process.env.GOOGLE_SHEET_ID;
 const emailService = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -71,7 +78,10 @@ async function sendEmail(to, subject, html) {
     html
   });
 }
+
+// ==================
 // === GỬI TELEGRAM (giống submitOrder.js) ===
+// ==================
 
 // Gửi telegram cho 1 chatId
 async function sendTelegram(chatId, message) {
@@ -301,7 +311,9 @@ async function sendMailAndTelegram({ staffList, orderId, name, phone, email, tab
   }
 }
 
+// ==========================
 // ==== API ROUTE HANDLER ====
+// ==========================
 export default async function handler(req, res) {
   // --- GET products ---
   if (req.method === 'GET' && req.query && req.query.products === '1') {
@@ -354,11 +366,6 @@ export default async function handler(req, res) {
   }
 
   // --- POST: Lưu/cập nhật đơn hàng, gửi mail và Telegram ---
-function getOldDiscountValue(orderRows) {
-  // Giá trị giảm giá cũ nằm ở cột K của dòng đầu tiên
-  if (!orderRows || !orderRows.length) return 0;
-  return cleanNumber(orderRows[0][COLS.K]);
-}
   if (req.method === 'POST') {
     try {
       const {
@@ -369,153 +376,118 @@ function getOldDiscountValue(orderRows) {
         return res.status(400).json({ error: 'Thiếu thông tin đơn hàng hoặc danh sách nhân viên' });
       }
 
-      // Lấy dữ liệu cũ
+      // 1. Đọc toàn bộ sheet vào rows (để xác định dòng cần xóa)
       const getRes = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
-        range: ORDERS_SHEET
+        range: ORDERS_SHEET + '!A1:U2001'
       });
-      const rows = getRes.data.values || [];
+      const header = getRes.data.values[0];
+      const rows = getRes.data.values.slice(1);
 
-      // Xác định các dòng liên quan đơn hàng này
-      let existingRows = [];
-      for (let i = 1; i < rows.length; i++) {
-        if (String(rows[i][COLS.B]) === String(orderId)) existingRows.push(i);
+      // 2. Xác định index dòng cần xóa của đơn hàng cũ
+      const oldRowsIdx = [];
+      for (let i = 0; i < rows.length; i++) {
+        if (String(rows[i][COLS.B]) === String(orderId)) oldRowsIdx.push(i);
       }
-      // Xác định có nhân viên mới không
-      let currentMaNVs = rows.filter(r => String(r[COLS.B]) === String(orderId)).map(r => (r[COLS.F] || "") + "_" + (r[COLS.G] || ""));
-      let reqMaNVs = staffList.map(s => (s.maNV || "") + "_" + (s.caLV || ""));
-      let hasNewStaff = reqMaNVs.some(reqID => !currentMaNVs.includes(reqID)) || currentMaNVs.length !== reqMaNVs.length;
-      // Tìm tất cả các dòng đang có của đơn hàng này
-      let orderRows = [];
-      for (let i = 1; i < rows.length; i++) {
-        if (String(rows[i][COLS.B]) === String(orderId)) orderRows.push(rows[i]);
-      }
-      // Lấy giá trị giảm giá cũ từ cột K (dòng đầu tiên của đơn hàng này)
-      const oldDiscount = getOldDiscountValue(orderRows)
-      // === QUY TRÌNH A: Có nhân viên mới ===
-      if (hasNewStaff) {
+
+      // 3. Lấy giá trị giảm giá cũ từ cột K, nếu có
+      let oldDiscount = 0;
+      if (oldRowsIdx.length > 0) oldDiscount = cleanNumber(rows[oldRowsIdx[0]][COLS.K]);
+
+      // 4. Xóa vật lý các dòng cũ bằng batchUpdate/deleteDimension (nếu có)
+      if (oldRowsIdx.length > 0) {
         const ordersSheetId = await getOrdersSheetId();
-        for (let i = existingRows.length - 1; i >= 0; i--) {
-          await sheets.spreadsheets.batchUpdate({
-            spreadsheetId: sheetId,
-            requestBody: {
-              requests: [{
-                deleteDimension: {
-                  range: {
-                    sheetId: ordersSheetId,
-                    dimension: 'ROWS',
-                    startIndex: existingRows[i],
-                    endIndex: existingRows[i] + 1
-                  }
+        // Chuyển về index của sheet (bao gồm header), rows[0] là dòng 2 trên sheet
+        // oldRowsIdx là index trong mảng rows, sheet là dòng oldRowsIdx+1 (do header là dòng 1)
+        // Chuẩn bị các range liên tiếp
+        const sortedIdx = oldRowsIdx.map(i => i + 1).sort((a, b) => a - b); // sheet index (header dòng 0)
+        let requests = [];
+        let start = sortedIdx[0];
+        let end = start + 1;
+        for (let i = 1; i < sortedIdx.length; i++) {
+          if (sortedIdx[i] === sortedIdx[i - 1] + 1) {
+            end = sortedIdx[i] + 1;
+          } else {
+            requests.push({
+              deleteDimension: {
+                range: {
+                  sheetId: ordersSheetId,
+                  dimension: 'ROWS',
+                  startIndex: start,
+                  endIndex: end
                 }
-              }]
-            }
-          });
-        }
-        let nowStr = getVNDatetimeString();
-        let values = [];
-        staffList.forEach((s, idx) => {
-          let state = s.trangThai || "Đồng ý";
-          let colO = "", colP = "", colQ = "", colI = 0;
-          if (state === "Đồng ý") {
-            colO = colP = "V";
-            colI = cleanNumber(s.donGia);
-            colQ = "";
-          } else if (state === "Không tham gia") {
-            colO = colP = "Không tham gia";
-            colI = 0;
-            colQ = "Hủy đơn hàng";
-          } else if (state === "Hủy đơn") {
-            colO = colP = "X";
-            colI = 0;
-            colQ = "Hủy đơn hàng";
-          }
-                    let row = [];
-          row[COLS.A] = nowStr;
-          row[COLS.B] = cleanNumber(orderId);
-          row[COLS.C] = cleanText(name);
-          row[COLS.D] = cleanText(phone);
-          row[COLS.E] = cleanText(email);
-          row[COLS.F] = cleanText(s.maNV);
-          row[COLS.G] = cleanNumber(s.caLV);
-          row[COLS.H] = cleanNumber(s.donGia);
-          row[COLS.I] = colI;
-          row[COLS.J] = (idx === 0) ? cleanNumber(tongcong) : "";
-          // --- GIỮ NGUYÊN GIÁ TRỊ GIẢM GIÁ CŨ ở cột K ---
-          row[COLS.K] = (idx === 0) ? oldDiscount : "";
-          // --- TÍNH GIÁ TRỊ CỘT L: Thành tiền sau giảm ---
-          row[COLS.L] = (idx === 0)
-            ? (cleanNumber(tongcong) - oldDiscount)
-            : "";
-          row[COLS.M] = cleanNumber(table);
-          row[COLS.N] = cleanText(note);
-          row[COLS.O] = colO;
-          row[COLS.P] = colP;
-          row[COLS.Q] = colQ;
-          row[COLS.T] = cleanText(ghiChu);
-          values.push(row);
-        });
-        await sheets.spreadsheets.values.append({
-          spreadsheetId: sheetId,
-          range: ORDERS_SHEET + "!A:T",
-          valueInputOption: 'USER_ENTERED',
-          requestBody: { values }
-        });
-
-        // Gửi Email + Telegram khi xác nhận đơn hàng
-        await sendMailAndTelegram({
-          staffList, orderId, name, phone, email, table, note, ghiChu, tongcong
-        });
-
-        return res.status(200).json({ success: true });
-      }
-
-      // === QUY TRÌNH B: Không có nhân viên mới ===
-      for (let i = 1; i < rows.length; i++) {
-        if (String(rows[i][COLS.B]) === String(orderId)) {
-          let staff = staffList.find(s => String(s.maNV) === String(rows[i][COLS.F]) && String(s.caLV) === String(rows[i][COLS.G]));
-          if (staff) {
-            let state = staff.trangThai || "Đồng ý";
-            let colO = "", colP = "", colQ = "", colI = 0;
-            if (state === "Đồng ý") {
-              colO = colP = "V";
-              colI = cleanNumber(staff.donGia);
-              colQ = "";
-            } else if (state === "Không tham gia") {
-              colO = colP = "Không tham gia";
-              colI = 0;
-              colQ = "Hủy đơn hàng";
-            } else if (state === "Hủy đơn") {
-              colO = colP = "X";
-              colI = 0;
-              colQ = "Hủy đơn hàng";
-            }
-            rows[i][COLS.H] = cleanNumber(staff.donGia);
-            rows[i][COLS.I] = colI;
-            if (i === existingRows[0]) rows[i][COLS.J] = cleanNumber(tongcong);
-            // --- CHỈ CẬP NHẬT CỘT L ở dòng đầu tiên ---
-            if (i === existingRows[0]) {
-            rows[i][COLS.L] = cleanNumber(tongcong) - oldDiscount;
-            }
-            rows[i][COLS.M] = cleanNumber(table);
-            rows[i][COLS.N] = cleanText(note);
-            rows[i][COLS.O] = colO;
-            rows[i][COLS.P] = colP;
-            rows[i][COLS.Q] = colQ;
-            rows[i][COLS.T] = cleanText(ghiChu);
+              }
+            });
+            start = sortedIdx[i];
+            end = start + 1;
           }
         }
-      }
-      for (const i of existingRows) {
-        await sheets.spreadsheets.values.update({
+        requests.push({
+          deleteDimension: {
+            range: {
+              sheetId: ordersSheetId,
+              dimension: 'ROWS',
+              startIndex: start,
+              endIndex: end
+            }
+          }
+        });
+        await sheets.spreadsheets.batchUpdate({
           spreadsheetId: sheetId,
-          range: `${ORDERS_SHEET}!A${i + 1}:T${i + 1}`,
-          valueInputOption: 'USER_ENTERED',
-          requestBody: { values: [rows[i].slice(0, 20)] }
+          requestBody: { requests }
         });
       }
 
-      // Gửi Email + Telegram khi xác nhận đơn hàng
+      // 5. Tạo dòng mới cho đơn hàng
+      let nowStr = getVNDatetimeString();
+      let newOrderRows = staffList.map((s, idx) => {
+        let state = s.trangThai || "Đồng ý";
+        let colO = "", colP = "", colQ = "", colI = 0;
+        if (state === "Đồng ý") {
+          colO = colP = "V";
+          colI = cleanNumber(s.donGia);
+          colQ = "";
+        } else if (state === "Không tham gia") {
+          colO = colP = "Không tham gia";
+          colI = 0;
+          colQ = "Hủy đơn hàng";
+        } else if (state === "Hủy đơn") {
+          colO = colP = "X";
+          colI = 0;
+          colQ = "Hủy đơn hàng";
+        }
+        let row = [];
+        row[COLS.A] = nowStr;
+        row[COLS.B] = cleanNumber(orderId);
+        row[COLS.C] = cleanText(name);
+        row[COLS.D] = cleanText(phone);
+        row[COLS.E] = cleanText(email);
+        row[COLS.F] = cleanText(s.maNV);
+        row[COLS.G] = cleanNumber(s.caLV);
+        row[COLS.H] = cleanNumber(s.donGia);
+        row[COLS.I] = colI;
+        row[COLS.J] = (idx === 0) ? cleanNumber(tongcong) : "";
+        row[COLS.K] = (idx === 0) ? oldDiscount : "";
+        row[COLS.L] = (idx === 0) ? (cleanNumber(tongcong) - oldDiscount) : "";
+        row[COLS.M] = cleanNumber(table);
+        row[COLS.N] = cleanText(note);
+        row[COLS.O] = colO;
+        row[COLS.P] = colP;
+        row[COLS.Q] = colQ;
+        row[COLS.T] = cleanText(ghiChu);
+        return row;
+      });
+
+      // 6. Append dòng mới vào sheet Orders
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: sheetId,
+        range: ORDERS_SHEET + "!A1",
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
+        requestBody: { values: newOrderRows }
+      });
+
+      // ... Gửi Email + Telegram giữ nguyên như cũ ...
       await sendMailAndTelegram({
         staffList, orderId, name, phone, email, table, note, ghiChu, tongcong
       });
