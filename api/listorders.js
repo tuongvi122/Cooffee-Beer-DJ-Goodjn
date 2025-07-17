@@ -121,9 +121,10 @@ async function updateOrder(req, res, sheets, spreadsheetId, sheetName) {
     }
   });
   // === LẤY GIÁ TRỊ CŨ CỦA 3 TRƯỜNG: ĐÁNH GIÁ, ĐIỂM ĐÁNH GIÁ, TRẠNG THÁI IN BILL ===
-let oldDanhGia = '', oldDiemDanhGia = '', oldInBill = '';
+let oldDanhGia = '', oldDiemDanhGia = '', oldInBill = '', oldTrangThai = '';
 const oldRow = dataRows.find(r => (r[1] || '').toString().trim() === orderCode);
 if (oldRow) {
+  oldTrangThai = oldRow[16] || '';      // Lấy trạng thái cũ từ sheet
   oldDanhGia = oldRow[17] || '';
   oldDiemDanhGia = oldRow[18] || '';
   oldInBill = oldRow[20] || '';
@@ -187,7 +188,7 @@ if (linesToRemove.length) {
   row[13] = ghiChu || '';                        // N: Ghi chú
   row[14] = 'V';                                 // O: Cố định 'V'
   row[15] = 'V';                                 // P: Cố định 'V'
-  row[16] = (trangThai === 'Đã thanh toán') ? 'Đã thanh toán' : ''; // Q: Trạng thái
+  row[16] = oldTrangThai = '';
   row[17] = oldDanhGia;     
   row[18] = idx === 0 ? oldDiemDanhGia : ''; 
   row[19] = noteQuanLy || '';
