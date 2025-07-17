@@ -7,6 +7,18 @@ async function getSheetId(sheets, spreadsheetId, sheetName) {
   return sheet ? sheet.properties.sheetId : 0;
 }
 
+// ==== HÀM FORMAT GIỜ VIỆT NAM====
+function getVNTimeForSheet() {
+  const now = new Date();
+  const vnTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+  const day = String(vnTime.getDate()).padStart(2, '0');
+  const month = String(vnTime.getMonth() + 1).padStart(2, '0');
+  const year = vnTime.getFullYear();
+  const hours = String(vnTime.getHours()).padStart(2, '0');
+  const minutes = String(vnTime.getMinutes()).padStart(2, '0');
+  const seconds = String(vnTime.getSeconds()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
 // ==== HÀM PHÂN TRANG DANH SÁCH ĐƠN HÀNG ====
 function paginate(list, page, limit) {
   const start = (page - 1) * limit;
@@ -34,7 +46,6 @@ async function getOrderDetail(req, res, sheets, spreadsheetId, sheetName) {
     spreadsheetId,
     range: `Products!A1:G2000`, // Tăng range để lấy đủ dữ liệu
   });
-  console.log('Product Rows:', productRows.data.values); // Debug log
   const allProducts = productRows.data.values.slice(1).map(row => ({
     maNV: row[1] || '', // Cột B: maNV
     caLV: row[2] || '', // Cột C: caLV
@@ -90,19 +101,8 @@ async function getOrderDetail(req, res, sheets, spreadsheetId, sheetName) {
   return res.json({ order, products: allProducts, availableProducts });
 }
 
-// ==== HÀM FORMAT TIME CHUẨN VIỆT NAM (dd/mm/yyyy hh:mm:ss) ====
-function formatVNTime(dt) {
-  const pad = n => n < 10 ? '0' + n : n;
-  const y = dt.getFullYear();
-  const m = pad(dt.getMonth() + 1);
-  const d = pad(dt.getDate());
-  const hh = pad(dt.getHours());
-  const mm = pad(dt.getMinutes());
-  const ss = pad(dt.getSeconds());
-  return `${d}/${m}/${y} ${hh}:${mm}:${ss}`;
-}
-
 // ==== HÀM CẬP NHẬT ĐƠN HÀNG ====
+// Thay đổi hàm này để dùng getVNTimeForSheet()
 async function updateOrder(req, res, sheets, spreadsheetId, sheetName) {
   const { orderCode, customer, tableNum, ghiChu, nhanVien, tongCong, giamGia, tongThu, trangThai, noteQuanLy, inBill, danhGia, diemDanhGia } = req.body;
   if (!orderCode || !Array.isArray(nhanVien) || nhanVien.length === 0)
@@ -168,11 +168,10 @@ if (linesToRemove.length) {
   await sheets.spreadsheets.batchUpdate({ spreadsheetId, requestBody: { requests } });
 }
   // Chuẩn bị data mới để ghi lại
-  let now = new Date();
-  let nowStr = formatVNTime(now);
+  let nowStr = getVNTimeForSheet();
   let values = nhanVien.map((nv, idx) => {
   let row = []; 
-  row[0]  = nowStr;                              // A: Thời gian
+  row[0]  = nowStr;                              // A: Thời gian (đã đồng bộ timezone VN)
   row[1]  = orderCode;                           // B: Mã đơn hàng
   row[2]  = customer.name;                       // C: Tên KH
   row[3]  = String(customer.phone);                      // D: SĐT
@@ -212,7 +211,6 @@ if (linesToRemove.length) {
 
   res.json({ success: true });
 }
-
 // ========= CACHE =========
 let cache = null;
 let cacheTime = 0;
@@ -266,7 +264,6 @@ module.exports = async (req, res) => {
     });
 
     const dataRows = rows.data.values.slice(1);
-
     // Gom đơn hàng theo orderCode
     const ordersMap = new Map();
     for (const r of dataRows) {
