@@ -1716,5 +1716,30 @@ document.getElementById('cancelDeleteStaffBtn').onclick = function() {
     // Gọi khi page load
     window.addEventListener('DOMContentLoaded', checkOrdersEmptyNote);
   </script>
+  <script>
+function redirectToLogin() {
+    // Xoá toàn bộ cookie phía client (nếu muốn)
+    document.cookie.split(";").forEach(function(c) {
+      document.cookie = c.replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    // Chuyển hướng tới trang đăng nhập (đổi đường dẫn nếu cần)
+    window.location.href = "/login";
+}
+
+function checkAndLogoutAtMidnight() {
+    const now = new Date();
+    const tzOffset = 7 * 60; // phút cho Asia/Ho_Chi_Minh
+    const local = new Date(now.getTime() + (tzOffset - now.getTimezoneOffset()) * 60000);
+    const hours = local.getHours();
+    const minutes = local.getMinutes();
+    const seconds = local.getSeconds();
+
+    if (hours === 0 && minutes === 0 && seconds <= 10) {
+        redirectToLogin();
+    }
+}
+setInterval(checkAndLogoutAtMidnight, 5000);
+</script>
 </body>
 </html>
