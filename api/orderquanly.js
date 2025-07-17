@@ -366,6 +366,11 @@ export default async function handler(req, res) {
   }
 
   // --- POST: Lưu/cập nhật đơn hàng, gửi mail và Telegram ---
+function getOldDiscountValue(orderRows) {
+  // Giá trị giảm giá cũ nằm ở cột K của dòng đầu tiên
+  if (!orderRows || !orderRows.length) return 0;
+  return cleanNumber(orderRows[0][COLS.K]);
+}
   if (req.method === 'POST') {
     try {
       const {
@@ -392,7 +397,13 @@ export default async function handler(req, res) {
       let currentMaNVs = rows.filter(r => String(r[COLS.B]) === String(orderId)).map(r => (r[COLS.F] || "") + "_" + (r[COLS.G] || ""));
       let reqMaNVs = staffList.map(s => (s.maNV || "") + "_" + (s.caLV || ""));
       let hasNewStaff = reqMaNVs.some(reqID => !currentMaNVs.includes(reqID)) || currentMaNVs.length !== reqMaNVs.length;
-
+      // Tìm tất cả các dòng đang có của đơn hàng này
+      let orderRows = [];
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][COLS.B]) === String(orderId)) orderRows.push(rows[i]);
+      }
+      // Lấy giá trị giảm giá cũ từ cột K (dòng đầu tiên của đơn hàng này)
+      const oldDiscount = getOldDiscountValue(orderRows)
       // === QUY TRÌNH A: Có nhân viên mới ===
       if (hasNewStaff) {
         const ordersSheetId = await getOrdersSheetId();
@@ -431,7 +442,7 @@ export default async function handler(req, res) {
             colI = 0;
             colQ = "Hủy đơn hàng";
           }
-          let row = [];
+                    let row = [];
           row[COLS.A] = nowStr;
           row[COLS.B] = cleanNumber(orderId);
           row[COLS.C] = cleanText(name);
@@ -442,8 +453,12 @@ export default async function handler(req, res) {
           row[COLS.H] = cleanNumber(s.donGia);
           row[COLS.I] = colI;
           row[COLS.J] = (idx === 0) ? cleanNumber(tongcong) : "";
-          row[COLS.K] = "";
-          row[COLS.L] = "";
+          // --- GIỮ NGUYÊN GIÁ TRỊ GIẢM GIÁ CŨ ở cột K ---
+          row[COLS.K] = (idx === 0) ? oldDiscount : "";
+          // --- TÍNH GIÁ TRỊ CỘT L: Thành tiền sau giảm ---
+          row[COLS.L] = (idx === 0)
+            ? (cleanNumber(tongcong) - oldDiscount)
+            : "";
           row[COLS.M] = cleanNumber(table);
           row[COLS.N] = cleanText(note);
           row[COLS.O] = colO;
@@ -454,7 +469,7 @@ export default async function handler(req, res) {
         });
         await sheets.spreadsheets.values.append({
           spreadsheetId: sheetId,
-          range: ORDERS_SHEET + "!A:Z",
+          range: ORDERS_SHEET + "!A:T",
           valueInputOption: 'USER_ENTERED',
           requestBody: { values }
         });
@@ -490,6 +505,10 @@ export default async function handler(req, res) {
             rows[i][COLS.H] = cleanNumber(staff.donGia);
             rows[i][COLS.I] = colI;
             if (i === existingRows[0]) rows[i][COLS.J] = cleanNumber(tongcong);
+            // --- CHỈ CẬP NHẬT CỘT L ở dòng đầu tiên ---
+            if (i === existingRows[0]) {
+            rows[i][COLS.L] = cleanNumber(tongcong) - oldDiscount;
+            }
             rows[i][COLS.M] = cleanNumber(table);
             rows[i][COLS.N] = cleanText(note);
             rows[i][COLS.O] = colO;
