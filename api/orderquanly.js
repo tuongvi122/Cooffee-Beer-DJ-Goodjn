@@ -1,17 +1,11 @@
 import { google } from 'googleapis';
 import nodemailer from 'nodemailer';
-
 if (typeof fetch === 'undefined') global.fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-// ==================
 // === KHAI BÁO BIẾN TELEGRAM ===
-// ==================
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
-
-// ==================
 // === HELPER FUNCTIONS ===
-// ==================
 function cleanNumber(val) {
   if (!val) return 0;
   return Number(String(val).replace(/[^\d]/g, "")) || 0;
@@ -47,7 +41,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS
   }
 });
-
 // Google Sheets Auth
 const sheetId = process.env.GOOGLE_SHEET_ID;
 const emailService = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -78,10 +71,7 @@ async function sendEmail(to, subject, html) {
     html
   });
 }
-
-// ==================
 // === GỬI TELEGRAM (giống submitOrder.js) ===
-// ==================
 
 // Gửi telegram cho 1 chatId
 async function sendTelegram(chatId, message) {
@@ -311,9 +301,7 @@ async function sendMailAndTelegram({ staffList, orderId, name, phone, email, tab
   }
 }
 
-// ==========================
 // ==== API ROUTE HANDLER ====
-// ==========================
 export default async function handler(req, res) {
   // --- GET products ---
   if (req.method === 'GET' && req.query && req.query.products === '1') {
