@@ -546,5 +546,40 @@
       });
     })();
   </script>
+  <script>
+// Đặt tên key lưu thời điểm truy cập
+const ADMIN_LOGIN_TIME_KEY = 'adminLoginTime_BC';
+
+// Hàm logout
+function autoLogout() {
+  localStorage.removeItem('isAdmin');
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem(ADMIN_LOGIN_TIME_KEY);
+  window.location.replace('login.html');
+}
+
+// Khi vào trang, nếu là admin thì:
+if (localStorage.getItem('isAdmin') === '1') {
+  // Nếu chưa có thời gian login, set vào
+  if (!localStorage.getItem(ADMIN_LOGIN_TIME_KEY)) {
+    localStorage.setItem(ADMIN_LOGIN_TIME_KEY, Date.now());
+  }
+
+  // Hàm kiểm tra mỗi phút
+  setInterval(function() {
+    const loginTime = parseInt(localStorage.getItem(ADMIN_LOGIN_TIME_KEY) || '0', 10);
+    if (loginTime > 0) {
+      const now = Date.now();
+      const TWO_HOURS = 2 * 60 * 60 * 1000; // 2 giờ tính bằng ms
+      if (now - loginTime >= TWO_HOURS) {
+        autoLogout();
+      }
+    }
+  }, 60 * 1000); // 1 phút kiểm tra 1 lần
+}
+
+// Nếu admin đổi tab hoặc reload lại, vẫn giữ đúng thời gian login
+// Nếu logout thủ công, sẽ xóa luôn thời gian
+</script>
 </body>
 </html>
