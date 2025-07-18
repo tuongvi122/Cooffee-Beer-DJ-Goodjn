@@ -33,26 +33,31 @@ module.exports = async (req, res) => {
     const header = rows.data.values[0];
     const dataRows = rows.data.values.slice(1);
 
-    // Lọc các dòng có mã đơn cần tìm, xác nhận 'V', đơn giá > 0
-    const filtered = dataRows.filter(r => {
+    // Lọc các dòng có mã đơn hàng cần tìm
+    const matchedRows = dataRows.filter(r => {
       const code = (r[1] || '').toString().trim(); // cột B
-      const xacnhan = (r[15] || '').toString().trim(); // cột R (sau khi thêm 2 cột mới, cũ là 15, mới là 17)
-      const dongia = (r[7] || '').toString().replace(/\D/g, ''); // cột H
-      return (
-        code === orderCode &&
-        xacnhan === 'V' &&
-        Number(dongia) > 0
-      );
+      return code === orderCode;
     });
 
-    if (!filtered.length) {
-      // Bỏ cache nếu không tìm thấy (đề phòng đơn vừa bị xóa/sửa)
+    if (!matchedRows.length) {
+      // Bỏ cache nếu không tìm thấy
+      cache.delete(orderCode);
+      return res.json({ bill: [] });
+    }
+
+    // Kiểm tra điều kiện: có ít nhất 1 dòng cột O (r[14]) = 'V'
+    const hasVInO = matchedRows.some(r => (r[14] || '').toString().trim() === 'V');
+    // Kiểm tra dòng đầu tiên của orderCode có cột J (r[9]) > 0
+    const tongCongFirst = (matchedRows[0][9] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, '');
+    const tongCongFirstNumber = Number(tongCongFirst);
+
+    if (!hasVInO || !(tongCongFirstNumber > 0)) {
       cache.delete(orderCode);
       return res.json({ bill: [] });
     }
 
     // Compose bill data
-    const bill = filtered.map(r => ({
+    const bill = matchedRows.map(r => ({
       timestamp: r[0] || '',             // A
       orderCode: r[1] || '',             // B
       customer: {
@@ -70,6 +75,7 @@ module.exports = async (req, res) => {
       tongThu: (r[11] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''), // L
       ghiChu: r[13] || '',               // N (cũ 11, mới 13)
       status: r[16] || '',               // Q (cũ 14, mới 16)
+      xacNhanO: r[14] || '',             // O (cột 14, bổ sung nếu cần debug)
       orderDate: r[0] ? r[0].split(' ')[0] : '', // A
     }));
 
