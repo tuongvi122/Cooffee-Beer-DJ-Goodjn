@@ -1684,6 +1684,41 @@ function formatInputMoney(val) {
     if (data && data.success) {
       document.getElementById('orderEditModal').style.display = 'none';
       if (overlay) overlay.style.display = 'none'; // Ẩn overlay khi đóng popup
+      
+      // Cập nhật danh sách đơn hàng nếu có trong response
+      if (data.orders) {
+        ordersData = data.orders;
+        filteredOrders = ordersData.slice();
+        orderTablePage = 1;
+        renderOrderTable();
+        renderOrderPagination();
+      }
+      
+      // Cập nhật bill nếu có trong response
+      if (data.bill) {
+        currentBillData = data.bill;
+        currentOrderCode = order.orderCode;
+        inputOrderCode.value = order.orderCode;
+        
+        // Cập nhật trạng thái thanh toán
+        isPaid = data.bill.bill.some(row => (row.status && row.status.trim() === "Đã thanh toán"));
+        const unpaid = data.bill.bill.some(row => !row.status || row.status.trim() === "");
+        
+        if (isPaid) {
+          billStatusNote.innerHTML = `<span class="bill-status-paid"><i class="fa fa-check-circle"></i> Đã thanh toán</span>`;
+          btnPrint.disabled = false;
+        } else if (unpaid) {
+          billStatusNote.innerHTML = `<span class="bill-status-unpaid"><i class="fa fa-exclamation-triangle"></i> CHƯA thanh toán!</span>`;
+          btnPrint.disabled = false;
+        } else {
+          billStatusNote.innerHTML = '';
+          btnPrint.disabled = true;
+        }
+        
+        // Render bill
+        renderBill(data.bill);
+      }
+      
       showThankModal('Đã lưu thành công!');
     } else {
       if (overlay) overlay.style.display = 'none';
@@ -1708,7 +1743,7 @@ function closeThankModal() {
   var modal = document.getElementById('thankModal');
   modal.classList.remove('show');
   modal.style.display = 'none';
-  loadOrderList() //reload lại trang tại đây 
+  // Không cần loadOrderList() nữa vì đã cập nhật từ response
 }
   </script>
   <script>

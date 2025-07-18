@@ -209,7 +209,123 @@ if (linesToRemove.length) {
     require('./getbill').bustCache(orderCode);
   } catch (e) {}
 
-  res.json({ success: true });
+  // Lấy lại dữ liệu mới nhất và trả về cả orders và bill
+  try {
+    const now = Date.now();
+    
+    // Lấy lại dữ liệu từ sheet
+    const rows = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!A1:U2001`,
+    });
+
+    const dataRows = rows.data.values.slice(1);
+    
+    // Gom đơn hàng theo orderCode
+    const ordersMap = new Map();
+    for (const r of dataRows) {
+      const code = (r[1] || '').toString().trim();
+      if (!code) continue;
+      const timestamp = r[0];
+      if (!ordersMap.has(code)) {
+        ordersMap.set(code, {
+          orderCode: code,
+          customerName: r[2] || '',
+          tableNum: r[12] || '',
+          maNVs: new Set(),
+          total: 0,
+          statusArr: [],
+          timestamp,
+        });
+      }
+      const o = ordersMap.get(code);
+      o.maNVs.add(r[5] || '');
+      o.total += Number((r[8] || '').toString().replace(/[^\d]/g, '')) || 0;
+      o.statusArr.push((r[16] || '').toString().trim());
+    }
+
+    // Build danh sách đơn
+    let orders = Array.from(ordersMap.values()).map(o => ({
+      orderCode: o.orderCode,
+      customerName: o.customerName,
+      tableNum: o.tableNum,
+      maNVs: Array.from(o.maNVs).join(', '),
+      total: o.total,
+      status: o.statusArr.some(s => s === 'Đã thanh toán') ? 'Đã thanh toán' : 'Chưa thanh toán',
+      timestamp: o.timestamp,
+    }));
+
+    // Sắp xếp theo thời gian giảm dần
+    orders.sort((a, b) => {
+      function parseVNDate(str) {
+        if (!str || str.trim() === '') return new Date(0);
+        const [date, time] = str.trim().split(' ');
+        if (!date) return new Date(0);
+        const [d, m, y] = date.split('/');
+        const [hh = '00', mm = '00', ss = '00'] = (time || '').split(':');
+        return new Date(parseInt(y), parseInt(m) - 1, parseInt(d), parseInt(hh), parseInt(mm), parseInt(ss));
+      }
+      const dateA = parseVNDate(a.timestamp);
+      const dateB = parseVNDate(b.timestamp);
+      return dateB - dateA;
+    });
+
+    // Lưu vào cache
+    cache = orders;
+    cacheTime = Date.now();
+
+    // Nếu có orderCode, thêm bill vào response
+    let bill = null;
+    if (orderCode) {
+      // Lọc các dòng của đơn hàng này
+      const filtered = dataRows.filter(r => {
+        const code = (r[1] || '').toString().trim();
+        const xacnhan = (r[15] || '').toString().trim();
+        const dongia = (r[7] || '').toString().replace(/\D/g, '');
+        return (
+          code === orderCode &&
+          xacnhan === 'V' &&
+          Number(dongia) > 0
+        );
+      });
+
+      if (filtered.length > 0) {
+        bill = {
+          bill: filtered.map(r => ({
+            timestamp: r[0] || '',
+            orderCode: r[1] || '',
+            customer: {
+              name: r[2] || '',
+              phone: r[3] || '',
+              email: r[4] || '',
+              tableNum: r[12] || '',
+            },
+            maNV: r[5] || '',
+            caLV: r[6] || '',
+            donGia: (r[7] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+            thanhTien: (r[8] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+            tongCong: (r[9] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+            giamGia: (r[10] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+            tongThu: (r[11] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+            ghiChu: r[13] || '',
+            status: r[16] || '',
+            orderDate: r[0] ? r[0].split(' ')[0] : '',
+          })),
+          now: new Date().toLocaleString('vi-VN', { hour12: false })
+        };
+      }
+    }
+
+    const response = { success: true, orders };
+    if (bill) {
+      response.bill = bill;
+    }
+
+    res.json(response);
+  } catch (e) {
+    console.error('Error fetching updated data:', e);
+    res.json({ success: true });
+  }
 }
 // ========= CACHE =========
 let cache = null;

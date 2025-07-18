@@ -2,6 +2,14 @@
 const { google } = require('googleapis');
 
 // Cache RAM ngắn hạn để giảm quota Google API, realtime khi vừa thanh toán sẽ bust cache
+// 
+// TỐI ƯU CACHE CHO HIỆU SUẤT:
+// - Sử dụng Map để lưu trữ cache cho nhiều orderCode khác nhau
+// - TTL 4 giây giúp giảm API calls nhưng vẫn đảm bảo dữ liệu cập nhật
+// - Tự động bust cache khi có thay đổi trạng thái thanh toán
+// - Đối với các call lặp lại trong thời gian ngắn, sử dụng cache để tránh gọi API
+// - Khuyến khích sử dụng API listorders mới sau khi cập nhật đơn hàng để nhận cả orders và bill
+//
 let cache = new Map(); // key: orderCode, value: { bill, now, cacheTime }
 const CACHE_TTL = 4; // giây
 
