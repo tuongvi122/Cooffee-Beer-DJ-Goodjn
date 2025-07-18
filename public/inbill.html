@@ -1682,10 +1682,37 @@ function formatInputMoney(val) {
     let data = await resp.json();
 
     if (data && data.success) {
-      document.getElementById('orderEditModal').style.display = 'none';
-      if (overlay) overlay.style.display = 'none'; // Ẩn overlay khi đóng popup
-      showThankModal('Đã lưu thành công!');
-    } else {
+  document.getElementById('orderEditModal').style.display = 'none';
+  if (overlay) overlay.style.display = 'none'; // Ẩn overlay khi đóng popup
+  showThankModal('Đã lưu thành công!');
+
+  // --- Render lại danh sách đơn hàng ---
+  ordersData = Array.isArray(data.orders) ? data.orders : [];
+  filteredOrders = ordersData.slice();
+  orderTablePage = 1;
+  renderOrderTable();
+  renderOrderPagination();
+
+  // --- Render lại bill ---
+  document.getElementById('bill-order-code').value = orderCode;
+  const newBillData = { bill: data.bill };
+  currentBillData = newBillData;
+  currentOrderCode = orderCode;
+  isPaid = data.bill.some(row => (row.status && row.status.trim() === "Đã thanh toán"));
+  const unpaid = data.bill.some(row => !row.status || row.status.trim() === "");
+  if (isPaid) {
+    billStatusNote.innerHTML = `<span class="bill-status-paid"><i class="fa fa-check-circle"></i> Đã thanh toán</span>`;
+    btnPrint.disabled = false;
+  } else if (unpaid) {
+    billStatusNote.innerHTML = `<span class="bill-status-unpaid"><i class="fa fa-exclamation-triangle"></i> CHƯA thanh toán!</span>`;
+    btnPrint.disabled = false;
+  } else {
+    billStatusNote.innerHTML = '';
+    btnPrint.disabled = true;
+  }
+  renderBill(newBillData);
+} 
+    else {
       if (overlay) overlay.style.display = 'none';
       showThankModal('Lưu thất bại! ' + (data && data.error ? data.error : ''));
       document.getElementById('edit-btn-save').disabled = false;
