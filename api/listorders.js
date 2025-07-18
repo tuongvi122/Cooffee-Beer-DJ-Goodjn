@@ -203,13 +203,98 @@ if (linesToRemove.length) {
     requestBody: { values }
   });
 
-  // Bust cache nếu có
+// Bust cache nếu có
   try {
     module.exports.bustCache();
     require('./getbill').bustCache(orderCode);
   } catch (e) {}
 
-  res.json({ success: true });
+  // === LẤY LẠI DỮ LIỆU SHEET, xử lý trên RAM, trả về cả orders + bill mới nhất ===
+  const rowsAfter = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${sheetName}!A1:U2001`,
+  });
+  const dataRowsAfter = rowsAfter.data.values.slice(1);
+
+  // ---- Xây dựng lại danh sách orders như phần lấy orders ở dưới module.exports ----
+  const ordersMap = new Map();
+  for (const r of dataRowsAfter) {
+    const code = (r[1] || '').toString().trim();
+    if (!code) continue;
+    const timestamp = r[0];
+    if (!ordersMap.has(code)) {
+      ordersMap.set(code, {
+        orderCode: code,
+        customerName: r[2] || '',
+        tableNum: r[12] || '',
+        maNVs: new Set(),
+        tongThu: Number((r[11] || '').toString().replace(/[^\d]/g, '')) || 0, // <-- lấy cột L dòng đầu tiên
+        statusArr: [],
+        timestamp,
+      });
+    }
+    const o = ordersMap.get(code);
+    o.maNVs.add(r[5] || '');
+    o.statusArr.push((r[16] || '').toString().trim());
+  }
+  let orders = Array.from(ordersMap.values()).map(o => ({
+    orderCode: o.orderCode,
+    customerName: o.customerName,
+    tableNum: o.tableNum,
+    maNVs: Array.from(o.maNVs).join(', '),
+    total: o.tongThu, // <--- Sửa lại thành o.tongThu
+    status: o.statusArr.some(s => s === 'Đã thanh toán') ? 'Đã thanh toán' : 'Chưa thanh toán',
+    timestamp: o.timestamp,
+  }));
+
+  // Sắp xếp theo thời gian giảm dần
+  orders.sort((a, b) => {
+    function parseVNDate(str) {
+      if (!str || str.trim() === '') return new Date(0);
+      const [date, time] = str.trim().split(' ');
+      if (!date) return new Date(0);
+      const [d, m, y] = date.split('/');
+      const [hh = '00', mm = '00', ss = '00'] = (time || '').split(':');
+      return new Date(parseInt(y), parseInt(m) - 1, parseInt(d), parseInt(hh), parseInt(mm), parseInt(ss));
+    }
+    const dateA = parseVNDate(a.timestamp);
+    const dateB = parseVNDate(b.timestamp);
+    if (isNaN(dateA) || isNaN(dateB)) return 0;
+    return dateB - dateA;
+  });
+
+  // ---- Build bill chi tiết cho order vừa lưu/sửa ----
+  const detailRows = dataRowsAfter.filter(r => (r[1] || '').toString().trim() === orderCode);
+  // Điều kiện bill như getbill.js: ít nhất 1 dòng cột O (r[14]) = 'V', dòng đầu cột J (r[9]) > 0
+  const hasVInO = detailRows.some(r => (r[14] || '').toString().trim() === 'V');
+  const tongCongFirst = (detailRows[0] && detailRows[0][9]) ? detailRows[0][9].toString().replace(/\./g, '').replace(/[^0-9]/g, '') : '';
+  const tongCongFirstNumber = Number(tongCongFirst);
+  let bill = [];
+  if (hasVInO && tongCongFirstNumber > 0) {
+    bill = detailRows.map(r => ({
+      timestamp: r[0] || '',
+      orderCode: r[1] || '',
+      customer: {
+        name: r[2] || '',
+        phone: r[3] || '',
+        email: r[4] || '',
+        tableNum: r[12] || '',
+      },
+      maNV: r[5] || '',
+      caLV: r[6] || '',
+      donGia: (r[7] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+      thanhTien: (r[8] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+      tongCong: (r[9] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+      giamGia: (r[10] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+      tongThu: (r[11] || '').toString().replace(/\./g, '').replace(/[^0-9]/g, ''),
+      ghiChu: r[13] || '',
+      status: r[16] || '',
+      orderDate: r[0] ? r[0].split(' ')[0] : '',
+    }));
+  }
+
+  // ---- Trả về đồng thời cả danh sách orders và bill vừa sửa ----
+  res.json({ success: true, orders, bill });
 }
 // ========= CACHE =========
 let cache = null;
@@ -276,14 +361,13 @@ module.exports = async (req, res) => {
           customerName: r[2] || '',
           tableNum: r[12] || '',
           maNVs: new Set(),
-          total: 0,
+          tongThu: Number((r[11] || '').toString().replace(/[^\d]/g, '')) || 0, // <-- lấy cột L dòng đầu tiên
           statusArr: [],
           timestamp,
         });
       }
       const o = ordersMap.get(orderCode);
       o.maNVs.add(r[5] || '');
-      o.total += Number((r[8] || '').toString().replace(/[^\d]/g, '')) || 0;
       o.statusArr.push((r[16] || '').toString().trim());
     }
 
@@ -293,7 +377,7 @@ module.exports = async (req, res) => {
       customerName: o.customerName,
       tableNum: o.tableNum,
       maNVs: Array.from(o.maNVs).join(', '),
-      total: o.total,
+      total: o.tongThu, // <--- Sửa lại thành o.tongThu
       status: o.statusArr.some(s => s === 'Đã thanh toán') ? 'Đã thanh toán' : 'Chưa thanh toán',
       timestamp: o.timestamp,
     }));
