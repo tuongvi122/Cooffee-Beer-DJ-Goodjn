@@ -84,7 +84,7 @@
       position: relative;
       transition: box-shadow 0.2s;
     }
-    .product-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
+    .product-card img { width: 100%; height: 173px; object-fit: cover; border-radius: 6px;aspect-ratio: 3/2; }
     .product-card .full-note { color: #d32f2f; font-weight: bold; font-size: 15px; margin-top: 5px; }
     .product-card.disabled { opacity: 0.65; pointer-events: none; }
     .ca-list { margin: 12px 0 0 0; padding: 0; list-style: none; }
@@ -295,8 +295,9 @@
         box-sizing: border-box;
       }
       .product-card img {
-        height: 95px;
+        height: 115px;   /* 173 x 0.66 ~ 115 (tức 1/2 màn hình, vẫn giữ tỷ lệ 3:2) */
         border-radius: 5px;
+        aspect-ratio: 3/2;
       }
     .form-buttons {
     display: flex !important;
@@ -841,7 +842,7 @@
     let cardClass = isFull ? "product-card disabled" : "product-card";
     html += `
       <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
-        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x150?text=' + maNV}" alt="Ảnh sản phẩm" loading="lazy">
+        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x173?text=' + maNV}" alt="Ảnh sản phẩm" loading="lazy">
         <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
         ${isFull ? `<div class="full-note">Đã full</div>` : ""}
       </div>
