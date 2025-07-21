@@ -44,7 +44,7 @@ async function getOrderDetail(req, res, sheets, spreadsheetId, sheetName) {
   // Lấy dữ liệu từ sheet Products
   const productRows = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `Products!A1:G3000`, // Tăng range để lấy đủ dữ liệu
+    range: `Products!A1:G500`, // Tăng range để lấy đủ dữ liệu
   });
   const allProducts = productRows.data.values.slice(1).map(row => ({
     maNV: row[1] || '', // Cột B: maNV
@@ -111,7 +111,7 @@ async function updateOrder(req, res, sheets, spreadsheetId, sheetName) {
   // Lấy toàn bộ dữ liệu để xác định dòng cần xóa
   const rows = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${sheetName}!A1:U2001`,
+    range: `${sheetName}!A1:U3000`,
   });
   const dataRows = rows.data.values.slice(1);
   const linesToRemove = [];
@@ -212,7 +212,7 @@ if (linesToRemove.length) {
   // === LẤY LẠI DỮ LIỆU SHEET, xử lý trên RAM, trả về cả orders + bill mới nhất ===
   const rowsAfter = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${sheetName}!A1:U2001`,
+    range: `${sheetName}!A1:U3000`,
   });
   const dataRowsAfter = rowsAfter.data.values.slice(1);
 
@@ -345,7 +345,7 @@ module.exports = async (req, res) => {
     // Chỉ lấy tới 2000 dòng, cột A-U
     const rows = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A1:U2001`,
+      range: `${sheetName}!A1:U3000`,
     });
 
     const dataRows = rows.data.values.slice(1);
