@@ -124,7 +124,7 @@ let lastSearch = {
 
 function formatCurrency(num) {
   num = Number(num) || 0;
-  return num.toLocaleString('vi-VN');
+  return num.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', '').trim();
 }
 
 // Hàm chuyển "200.000" => 200000
@@ -311,58 +311,11 @@ async function fetchThongke(type, day, year) {
   }
 }
 
-// Sự kiện Search
-bcSearchBtn.onclick = async function() {
-  bcNote.textContent = '';
-  bcTableWrap.innerHTML = '';
-
-  let type = bcType.value;
-  let dayStr = '';
-  let yearStr = '';
-
-  if (type === 'ngay') {
-    let dateStr = (bcInput.value || '').trim();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-      bcNote.textContent = 'Vui lòng chọn ngày!';
-      return;
-    }
-    let [yyyy, mm, dd] = dateStr.split('-');
-    dayStr = `${dd}/${mm}/${yyyy}`;
-  } else if (type === 'thang') {
-    yearStr = bcYearSelect && bcYearSelect.value ? bcYearSelect.value.trim() : '';
-    if (!/^\d{4}$/.test(yearStr)) {
-      bcNote.textContent = 'Vui lòng chọn năm!';
-      return;
-    }
-  }
-
-  // Kiểm tra cache client trước khi gọi API
-  if (
-    lastSearch.type === type &&
-    lastSearch.day === dayStr &&
-    lastSearch.year === yearStr &&
-    lastSearch.data
-  ) {
-    renderReport(type, lastSearch.data, dayStr, yearStr);
-    return;
-  }
-
-  try {
-    bcNote.textContent = 'Đang tải dữ liệu...';
-    const rows = await fetchThongke(type, dayStr, yearStr);
-    lastSearch = { type, day: dayStr, year: yearStr, data: rows };
-    renderReport(type, rows, dayStr, yearStr);
-  } catch (err) {
-    bcNote.textContent = `Không thể lấy dữ liệu báo cáo: ${err.message}`;
-    bcTableWrap.innerHTML = '';
-  }
-};
-
 function renderReport(type, rows, dayStr, yearStr) {
   bcNote.textContent = '';
   bcTableWrap.innerHTML = '';
 
-  // Báo cáo ngày
+  // Báo cáo ngày (KHÔNG ĐỔI)
   if (type === 'ngay') {
     bcDayData = rows;
     bcDayCurrentPage = 1;
@@ -403,20 +356,8 @@ function renderReport(type, rows, dayStr, yearStr) {
       bcNote.textContent = `Năm ${yearStr} không tồn tại trong báo cáo.`;
       return;
     }
-    let monthMap = {};
-    let tongNam = 0;
-    rows.forEach(r => {
-      let month = getMonth(r[0]);
-      if (!monthMap[month]) monthMap[month] = [];
-      monthMap[month].push(r);
-    });
-    let monthArr = [];
-    Object.keys(monthMap).sort().forEach(m => {
-      let total = monthMap[m].reduce((t, r) => t + toInteger(r[11]), 0);
-      tongNam += total;
-      monthArr.push({ month: m, total, count: monthMap[m].length });
-    });
-    monthArr.forEach(mo => { mo.tyle = tongNam ? Math.round(mo.total*100/tongNam) : 0; });
+    // rows: [{monthYear: "MM/YYYY", total, tyle}]
+    let tongNam = rows.reduce((t, r) => t + (Number(r.total) || 0), 0);
     let html = `
       <div class="bc-report-title">BÁO CÁO DOANH THU THÁNG</div>
       <div class="bc-table-total-right">
@@ -432,8 +373,8 @@ function renderReport(type, rows, dayStr, yearStr) {
             </tr>
           </thead>
           <tbody>
-            ${monthArr.map(mo => `<tr>
-              <td class="bc-month">${mo.month}/${yearStr}</td>
+            ${rows.map(mo => `<tr>
+              <td class="bc-month">${mo.monthYear}</td>
               <td>${formatCurrency(mo.total)}</td>
               <td>${mo.tyle}%</td>
             </tr>`).join('')}
@@ -451,20 +392,8 @@ function renderReport(type, rows, dayStr, yearStr) {
       bcNote.textContent = "Không có dữ liệu trong báo cáo.";
       return;
     }
-    let yearMap = {};
-    let tongAll = 0;
-    rows.forEach(r => {
-      let year = getYear(r[0]);
-      if (!yearMap[year]) yearMap[year] = [];
-      yearMap[year].push(r);
-    });
-    let yearArr = [];
-    Object.keys(yearMap).sort().forEach(y => {
-      let total = yearMap[y].reduce((t, r) => t + toInteger(r[11]), 0);
-      tongAll += total;
-      yearArr.push({ year: y, total, count: yearMap[y].length });
-    });
-    yearArr.forEach(yo => { yo.tyle = tongAll ? Math.round(yo.total*100/tongAll) : 0; });
+    // rows: [{year, total, tyle}]
+    let tongAll = rows.reduce((t, r) => t + (Number(r.total) || 0), 0);
     let html = `
       <div class="bc-report-title">BÁO CÁO DOANH THU NĂM</div>
       <div class="bc-table-total-right">
@@ -480,7 +409,7 @@ function renderReport(type, rows, dayStr, yearStr) {
             </tr>
           </thead>
           <tbody>
-            ${yearArr.map(yo => `<tr>
+            ${rows.map(yo => `<tr>
               <td class="bc-year">${yo.year}</td>
               <td>${formatCurrency(yo.total)}</td>
               <td>${yo.tyle}%</td>
