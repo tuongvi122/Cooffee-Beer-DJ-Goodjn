@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
     // Lấy dải cột mới (A-U = 21 cột, index 0-20)
     const rows = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A1:U1501`,
+      range: `${sheetName}!A1:U3000`,
     });
 
     // Xử lý header và data
