@@ -379,7 +379,7 @@ export default async function handler(req, res) {
       // 1. Đọc toàn bộ sheet vào rows (để xác định dòng cần xóa)
       const getRes = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
-        range: ORDERS_SHEET + '!A1:U2001'
+        range: ORDERS_SHEET + '!A1:U2500'
       });
       const header = getRes.data.values[0];
       const rows = getRes.data.values.slice(1);
