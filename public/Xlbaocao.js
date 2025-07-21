@@ -205,10 +205,10 @@ function renderDayReportTable() {
   for (let i = startIdx; i < endIdx; ++i) {
     const r = bcDayData[i];
     tbodyHtml += `<tr>
-      <td class="bc-stt">${i+1}</td>
+      <td class="bc-stt">${i + 1}</td>
       <td>${r[1]}</td>
       <td>${r[2]}</td>
-      <td>${r[11]}</td>
+      <td>${formatCurrency(toInteger(r[11]))}</td> <!-- Sử dụng formatCurrency cho cột Thành tiền -->
     </tr>`;
   }
   const tbody = document.getElementById('bcDayTableBody');
@@ -311,6 +311,53 @@ async function fetchThongke(type, day, year) {
   }
 }
 
+// Sự kiện Search
+bcSearchBtn.onclick = async function() {
+  bcNote.textContent = '';
+  bcTableWrap.innerHTML = '';
+
+  let type = bcType.value;
+  let dayStr = '';
+  let yearStr = '';
+
+  if (type === 'ngay') {
+    let dateStr = (bcInput.value || '').trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      bcNote.textContent = 'Vui lòng chọn ngày!';
+      return;
+    }
+    let [yyyy, mm, dd] = dateStr.split('-');
+    dayStr = `${dd}/${mm}/${yyyy}`;
+  } else if (type === 'thang') {
+    yearStr = bcYearSelect && bcYearSelect.value ? bcYearSelect.value.trim() : '';
+    if (!/^\d{4}$/.test(yearStr)) {
+      bcNote.textContent = 'Vui lòng chọn năm!';
+      return;
+    }
+  }
+
+  // Kiểm tra cache client trước khi gọi API
+  if (
+    lastSearch.type === type &&
+    lastSearch.day === dayStr &&
+    lastSearch.year === yearStr &&
+    lastSearch.data
+  ) {
+    renderReport(type, lastSearch.data, dayStr, yearStr);
+    return;
+  }
+
+  try {
+    bcNote.textContent = 'Đang tải dữ liệu...';
+    const rows = await fetchThongke(type, dayStr, yearStr);
+    lastSearch = { type, day: dayStr, year: yearStr, data: rows };
+    renderReport(type, rows, dayStr, yearStr);
+  } catch (err) {
+    bcNote.textContent = `Không thể lấy dữ liệu báo cáo: ${err.message}`;
+    bcTableWrap.innerHTML = '';
+  }
+};
+
 function renderReport(type, rows, dayStr, yearStr) {
   bcNote.textContent = '';
   bcTableWrap.innerHTML = '';
@@ -351,41 +398,39 @@ function renderReport(type, rows, dayStr, yearStr) {
   }
 
   // Báo cáo tháng
-  if (type === 'thang') {
-    if (rows.length === 0) {
-      bcNote.textContent = `Năm ${yearStr} không tồn tại trong báo cáo.`;
-      return;
-    }
-    // rows: [{monthYear: "MM/YYYY", total, tyle}]
-    let tongNam = rows.reduce((t, r) => t + (Number(r.total) || 0), 0);
-    let html = `
-      <div class="bc-report-title">BÁO CÁO DOANH THU THÁNG</div>
-      <div class="bc-table-total-right">
-        Tổng cộng: <span>${formatCurrency(tongNam)}</span>
-      </div>
-      <div class="bc-table-wrap">
-        <table class="bc-table">
-          <thead>
-            <tr>
-              <th>Tháng</th>
-              <th>Thành tiền</th>
-              <th>Tỷ lệ (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(mo => `<tr>
-              <td class="bc-month">${mo.monthYear}</td>
-              <td>${formatCurrency(mo.total)}</td>
-              <td>${mo.tyle}%</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-    bcTableWrap.innerHTML = html;
+ if (type === 'thang') {
+  if (rows.length === 0) {
+    bcNote.textContent = `Năm ${yearStr} không tồn tại trong báo cáo.`;
     return;
   }
-
+  let tongNam = rows.reduce((t, r) => t + (Number(r.total) || 0), 0);
+  let html = `
+    <div class="bc-report-title">BÁO CÁO DOANH THU THÁNG</div>
+    <div class="bc-table-total-right">
+      Tổng cộng: <span>${formatCurrency(tongNam)}</span>
+    </div>
+    <div class="bc-table-wrap">
+      <table class="bc-table">
+        <thead>
+          <tr>
+            <th>Tháng</th>
+            <th>Thành tiền</th>
+            <th>Tỷ lệ (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(mo => `<tr>
+            <td class="bc-month">${mo.monthYear}</td>
+            <td>${formatCurrency(mo.total)}</td>
+            <td>${mo.tyle}%</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  bcTableWrap.innerHTML = html;
+  return;
+}
   // Báo cáo năm
   if (type === 'nam') {
     if (rows.length === 0) {
