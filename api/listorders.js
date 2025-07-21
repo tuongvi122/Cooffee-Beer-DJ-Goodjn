@@ -32,7 +32,7 @@ async function getOrderDetail(req, res, sheets, spreadsheetId, sheetName) {
   // Lấy dữ liệu từ sheet Orders
   const orderRows = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${sheetName}!A1:U2001`,
+    range: `${sheetName}!A1:U3000`,
   });
   const header = orderRows.data.values[0];
   const dataRows = orderRows.data.values.slice(1);
@@ -44,7 +44,7 @@ async function getOrderDetail(req, res, sheets, spreadsheetId, sheetName) {
   // Lấy dữ liệu từ sheet Products
   const productRows = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `Products!A1:G2000`, // Tăng range để lấy đủ dữ liệu
+    range: `Products!A1:G3000`, // Tăng range để lấy đủ dữ liệu
   });
   const allProducts = productRows.data.values.slice(1).map(row => ({
     maNV: row[1] || '', // Cột B: maNV
