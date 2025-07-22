@@ -930,7 +930,7 @@
               <th style="width: 42px;">Stt</th>
               <th style="width: 70px;">Số đơn</th>
               <th class="ten-khach-hang" style="width: 18%;">Tên khách hàng</th>
-              <th style="width: 60px;">Số bàn</th>
+              <th style="width: 60px;">Thẻ bàn số</th>
               <th class="ma-nv" style="width: 210px;">Mã NV</th>
               <th style="width: 110px;">Tổng tiền</th>
               <th style="width: 155px;">Xác nhận</th>
@@ -1161,7 +1161,7 @@
     <div class="bill-info-row"><span>Tên khách hàng</span><span>${customer.name||""}</span></div>
     <div class="bill-info-row"><span>Số điện thoại</span><span>${customer.phone||""}</span></div>
     <div class="bill-info-row"><span>Email</span><span>${customer.email||""}</span></div>
-    <div class="bill-info-row"><span>Số bàn</span><span>${customer.tableNum||""}</span></div>
+    <div class="bill-info-row"><span>Thẻ bàn số</span><span>${customer.tableNum||""}</span></div>
     <table class="bill-table">
       <thead>
         <tr>
@@ -1450,7 +1450,7 @@ async function showEditOrderModal(orderCode) {
           <input id="edit-customer-email" class="form-input" value="${order.customer.email || ''}" maxlength="64" />
         </div>
         <div class="form-row">
-          <div class="form-label">Số bàn</div>
+          <div class="form-label">Thẻ bàn số</div>
           <input id="edit-table-num" class="form-input" type="number" min="0" max="99" value="${order.tableNum || ''}" />
         </div>
         <div class="form-row">
