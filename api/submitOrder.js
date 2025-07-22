@@ -145,7 +145,7 @@ export default async function handler(req, res) {
 👤 Khách hàng: ${name}
 📞 SĐT: ${phone}
 ✉️ Email: ${contact}
-🪑 Bàn số: ${tableNum}
+🪑 Thẻ bàn số: ${tableNum}
 📝 Ghi chú: ${note}
 
 *Danh sách dịch vụ:*
