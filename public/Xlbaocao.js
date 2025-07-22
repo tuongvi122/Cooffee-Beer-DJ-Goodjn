@@ -1,5 +1,4 @@
-// ==== Thêm đoạn này vào đầu file Xlbaocao.js hoặc trong <style> của trang báo cáo ====
-
+// Xlbaocao.js
 const style = document.createElement('style');
 style.textContent = `
 @media (max-width: 600px) {
@@ -24,7 +23,7 @@ style.textContent = `
   .bc-table-total-right {
     font-size: 0.93em !important;
     line-height: 1.2 !important;
-    color: #1976d2 !important;
+    color: #1976d2 !;
     font-weight: bold !important;
     margin-right: 7px !important;
     padding: 0 !important;
@@ -32,7 +31,7 @@ style.textContent = `
     margin-bottom: 0;
     margin-top: 0;
     padding-bottom: 0;
-    }
+  }
   .bc-table-total-right span {
     font-size: 1em !important;
     font-weight: bold !important;
@@ -80,9 +79,9 @@ style.textContent = `
   gap: 5px;
   font-size: 1em;
   white-space: nowrap;
-  margin-bottom: 0;          /* Bỏ margin dưới */
-  margin-top: 0;             /* Nếu có, bỏ luôn */
-  padding-bottom: 0;         /* Nếu có, bỏ luôn */
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-bottom: 0;
 }
 .report-entries-container select {
   font-size: 1em;
@@ -91,20 +90,23 @@ style.textContent = `
   border: 1.2px solid #b5c8db;
   outline: none;
 }
-/* Thêm style cho tổng cộng bên phải cùng dòng */
-.bc-table-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 0;          /* Bỏ margin dưới */
-  margin-top: 0;             /* Nếu có, bỏ luôn */
-  padding-bottom: 0;         /* Nếu có, bỏ luôn */
+.bc-note-loading::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #43a047;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0; /* Loại bỏ margin vì không có text */
+  vertical-align: middle;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 `;
 document.head.appendChild(style);
-
-// ============ TOÀN BỘ CODE JS DƯỚI ĐÂY GIỮ NGUYÊN ============
 
 const bcType = document.getElementById('bcType');
 const bcInput = document.getElementById('bcInput');
@@ -114,82 +116,99 @@ const bcResetBtn = document.getElementById('bcResetBtn');
 const bcNote = document.getElementById('bcNote');
 const bcTableWrap = document.getElementById('bcTableWrap');
 
-// Dữ liệu báo cáo đã cache client (chỉ cache kết quả mỗi lần search)
-let lastSearch = {
-  type: null,
-  day: null,
-  year: null,
-  data: null
-};
+let cache = new Map(); // Cache theo key `type-day-year`
+const CACHE_EXPIRE = 300000; // 5 phút
 
 function formatCurrency(num) {
-  num = Number(num) || 0;
-  return num.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', '').trim();
+  return (Number(num) || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', '').trim();
 }
 
-// Hàm chuyển "200.000" => 200000
 function toInteger(str) {
-  return Number((str||'').replace(/\./g, '')) || 0;
+  return Number((str || '').replace(/\./g, '')) || 0;
 }
 
-// --- Hàm tách ngày/tháng/năm từ timestamp ---
 function getDay(str) {
   return (str || '').split(' ')[0];
 }
+
 function getMonth(str) {
-  let d = getDay(str).split('/');
-  return d[1] || '';
-}
-function getYear(str) {
-  let d = getDay(str).split('/');
-  return d[2] || '';
+  return getDay(str).split('/')[1] || '';
 }
 
-// ====== Biến phân trang cho báo cáo ngày =======
+function getYear(str) {
+  return getDay(str).split('/')[2] || '';
+}
+
 let bcDayEntriesPerPage = 10;
 let bcDayCurrentPage = 1;
-let bcDayData = []; // mảng chứa các dòng sau khi lọc theo ngày
+let bcDayData = [];
 
 function renderDayReportControls(totalEntries, totalAmount) {
-  let controlsHtml = `
-    <div class="bc-table-controls">
-      <div class="report-entries-container">
-        Hiển thị 
-        <select id="bcDayEntriesSelect">
-          <option value="10"${bcDayEntriesPerPage===10?' selected':''}>10</option>
-          <option value="20"${bcDayEntriesPerPage===20?' selected':''}>20</option>
-          <option value="50"${bcDayEntriesPerPage===50?' selected':''}>50</option>
-          <option value="100"${bcDayEntriesPerPage===100?' selected':''}>100</option>
-        </select>
-        đơn hàng
-      </div>
-      <div class="bc-table-total-right">
-        Tổng cộng: <span>${formatCurrency(totalAmount)}</span>
-      </div>
+  const controls = document.createElement('div');
+  controls.className = 'bc-table-controls';
+  controls.innerHTML = `
+    <div class="report-entries-container">
+      Hiển thị 
+      <select id="bcDayEntriesSelect">
+        <option value="10"${bcDayEntriesPerPage === 10 ? ' selected' : ''}>10</option>
+        <option value="20"${bcDayEntriesPerPage === 20 ? ' selected' : ''}>20</option>
+        <option value="50"${bcDayEntriesPerPage === 50 ? ' selected' : ''}>50</option>
+        <option value="100"${bcDayEntriesPerPage === 100 ? ' selected' : ''}>100</option>
+      </select>
+      đơn hàng
+    </div>
+    <div class="bc-table-total-right">
+      Tổng cộng: <span>${formatCurrency(totalAmount)}</span>
     </div>
   `;
-  let paginationHtml = `<div id="bcDayPagination" class="order-pagination"></div>`;
-  return { controlsHtml, paginationHtml };
+  const pagination = document.createElement('div');
+  pagination.id = 'bcDayPagination';
+  pagination.className = 'order-pagination';
+  return { controls, pagination };
 }
 
 function renderDayPagination(totalEntries) {
   const totalPages = Math.ceil(totalEntries / bcDayEntriesPerPage);
-  let html = '';
-  if (totalPages > 1) {
-    html += `<button ${bcDayCurrentPage === 1 ? 'disabled' : ''} onclick="window.gotoBcDayPage(${bcDayCurrentPage - 1})">Previous</button>`;
-    let start = Math.max(1, bcDayCurrentPage - 2);
-    let end = Math.min(totalPages, bcDayCurrentPage + 2);
-    if (bcDayCurrentPage <= 3) end = Math.min(5, totalPages);
-    if (bcDayCurrentPage >= totalPages - 2) start = Math.max(1, totalPages - 4);
-    if (start > 1) html += `<button onclick="window.gotoBcDayPage(1)">1</button>${start > 2 ? '<span>...</span>' : ''}`;
-    for (let i = start; i <= end; ++i) {
-      html += `<button class="${i === bcDayCurrentPage ? 'active' : ''}" onclick="window.gotoBcDayPage(${i})">${i}</button>`;
-    }
-    if (end < totalPages) html += `${end < totalPages - 1 ? '<span>...</span>' : ''}<button onclick="window.gotoBcDayPage(${totalPages})">${totalPages}</button>`;
-    html += `<button ${bcDayCurrentPage === totalPages ? 'disabled' : ''} onclick="window.gotoBcDayPage(${bcDayCurrentPage + 1})">Next</button>`;
-  }
   const pagDiv = document.getElementById('bcDayPagination');
-  if (pagDiv) pagDiv.innerHTML = html;
+  if (!pagDiv || totalPages <= 1) return;
+
+  const fragment = document.createDocumentFragment();
+  const addButton = (text, page, disabled, active) => {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    if (active) btn.className = 'active';
+    if (!disabled) btn.onclick = () => window.gotoBcDayPage(page);
+    if (disabled) btn.disabled = true;
+    fragment.appendChild(btn);
+  };
+
+  addButton('Previous', bcDayCurrentPage - 1, bcDayCurrentPage === 1);
+  let start = Math.max(1, bcDayCurrentPage - 2);
+  let end = Math.min(totalPages, bcDayCurrentPage + 2);
+  if (bcDayCurrentPage <= 3) end = Math.min(5, totalPages);
+  if (bcDayCurrentPage >= totalPages - 2) start = Math.max(1, totalPages - 4);
+  if (start > 1) {
+    addButton('1', 1, false);
+    if (start > 2) {
+      const span = document.createElement('span');
+      span.textContent = '...';
+      fragment.appendChild(span);
+    }
+  }
+  for (let i = start; i <= end; ++i) {
+    addButton(i, i, false, i === bcDayCurrentPage);
+  }
+  if (end < totalPages) {
+    if (end < totalPages - 1) {
+      const span = document.createElement('span');
+      span.textContent = '...';
+      fragment.appendChild(span);
+    }
+    addButton(totalPages, totalPages, false);
+  }
+  addButton('Next', bcDayCurrentPage + 1, bcDayCurrentPage === totalPages);
+  pagDiv.innerHTML = '';
+  pagDiv.appendChild(fragment);
 }
 
 window.gotoBcDayPage = function(page) {
@@ -201,18 +220,23 @@ window.gotoBcDayPage = function(page) {
 function renderDayReportTable() {
   const startIdx = (bcDayCurrentPage - 1) * bcDayEntriesPerPage;
   const endIdx = Math.min(startIdx + bcDayEntriesPerPage, bcDayData.length);
-  let tbodyHtml = '';
+  const tbody = document.getElementById('bcDayTableBody');
+  if (!tbody) return;
+
+  const fragment = document.createDocumentFragment();
   for (let i = startIdx; i < endIdx; ++i) {
     const r = bcDayData[i];
-    tbodyHtml += `<tr>
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
       <td class="bc-stt">${i + 1}</td>
       <td>${r[1]}</td>
       <td>${r[2]}</td>
-      <td>${formatCurrency(toInteger(r[11]))}</td> <!-- Sử dụng formatCurrency cho cột Thành tiền -->
-    </tr>`;
+      <td>${formatCurrency(toInteger(r[11]))}</td>
+    `;
+    fragment.appendChild(tr);
   }
-  const tbody = document.getElementById('bcDayTableBody');
-  if (tbody) tbody.innerHTML = tbodyHtml;
+  tbody.innerHTML = '';
+  tbody.appendChild(fragment);
 }
 
 function attachBcDayEntriesSelectListener() {
@@ -227,7 +251,6 @@ function attachBcDayEntriesSelectListener() {
   }
 }
 
-// Set input placeholder/type theo loại báo cáo
 function updateInputByType() {
   bcInput.type = 'text';
   bcInput.placeholder = '';
@@ -236,257 +259,190 @@ function updateInputByType() {
   bcInput.removeAttribute('min');
   bcInput.removeAttribute('max');
   bcInput.removeAttribute('step');
-
   if (bcYearSelect) bcYearSelect.style.display = 'none';
-
- // Ẩn hướng dẫn mặc định
-  var dateHelp = document.getElementById('dateHelp');
+  const dateHelp = document.getElementById('dateHelp');
   if (dateHelp) dateHelp.style.display = 'none';
 
   if (bcType.value === 'ngay') {
     bcInput.type = 'date';
-    bcInput.value = '';
-    bcInput.style.display = '';
-    // HIỆN hướng dẫn khi chọn BC ngày
+    bcInput.focus();
     if (dateHelp) dateHelp.style.display = '';
-    if (bcYearSelect) bcYearSelect.style.display = 'none';
   } else if (bcType.value === 'thang') {
     bcInput.style.display = 'none';
     if (bcYearSelect) {
       const thisYear = new Date().getFullYear();
       const fromYear = 2025;
       const toYear = thisYear + 10;
-      bcYearSelect.innerHTML = '<option value="">Chọn năm</option>';
-      for (let y = fromYear; y <= toYear; y++) {
-        bcYearSelect.innerHTML += `<option value="${y}">${y}</option>`;
-      }
+      bcYearSelect.innerHTML = '<option value="">Chọn năm</option>' +
+        Array.from({ length: toYear - fromYear + 1 }, (_, i) => fromYear + i)
+          .map(y => `<option value="${y}">${y}</option>`).join('');
       bcYearSelect.style.display = '';
-      bcYearSelect.value = '';
     }
   } else if (bcType.value === 'nam') {
-    bcInput.value = '';
     bcInput.style.display = 'none';
-    if (bcYearSelect) bcYearSelect.style.display = 'none';
-  } else {
-    bcInput.type = 'text';
-    bcInput.placeholder = '';
-    bcInput.value = '';
-    bcInput.style.display = '';
     if (bcYearSelect) bcYearSelect.style.display = 'none';
   }
   bcNote.textContent = '';
   bcTableWrap.innerHTML = '';
 }
+
 bcType.addEventListener('change', updateInputByType);
 
 bcResetBtn.onclick = function() {
   bcType.value = '';
-  bcInput.value = '';
-  bcInput.placeholder = '';
-  bcInput.style.display = '';
-  if (bcYearSelect) bcYearSelect.style.display = 'none';
-  bcNote.textContent = '';
-  bcTableWrap.innerHTML = '';
-  lastSearch = { type: null, day: null, year: null, data: null };
-    // Ẩn dòng hướng dẫn chọn ngày
-  var dateHelp = document.getElementById('dateHelp');
-  if (dateHelp) dateHelp.style.display = 'none';
+  updateInputByType();
+  cache.clear();
 };
 
-// Hàm gọi API lấy dữ liệu, chỉ lọc phía server
-async function fetchThongke(type, day, year) {
-  let params = new URLSearchParams();
-  params.append('type', type);
-  if (day) params.append('day', day);
-  if (year) params.append('year', year);
-  try {
-    const res = await fetch(`/api/baocaodt.js?${params.toString()}`);
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Lỗi không xác định');
-    }
-    return data.rows || [];
-  } catch (err) {
-    throw err;
-  }
+function debounce(fn, ms) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), ms);
+  };
 }
 
-// Sự kiện Search
-bcSearchBtn.onclick = async function() {
-  bcNote.textContent = '';
+async function fetchThongke(type, day, year) {
+  const cacheKey = `${type}-${day || ''}-${year || ''}`;
+  const cached = cache.get(cacheKey);
+  if (cached && Date.now() - cached.time < CACHE_EXPIRE) {
+    return cached.data;
+  }
+  const params = new URLSearchParams({ type });
+  if (day) params.append('day', day);
+  if (year) params.append('year', year);
+  const res = await fetch(`/api/baocaodt.js?${params.toString()}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Lỗi không xác định');
+  cache.set(cacheKey, { data: data.rows || [], time: Date.now() });
+  return data.rows;
+}
+
+bcSearchBtn.onclick = debounce(async function() {
+  bcNote.className = 'bc-note bc-note-loading'; // Bật spinner, không có text
   bcTableWrap.innerHTML = '';
 
-  let type = bcType.value;
+  const type = bcType.value;
   let dayStr = '';
   let yearStr = '';
 
   if (type === 'ngay') {
-    let dateStr = (bcInput.value || '').trim();
+    const dateStr = (bcInput.value || '').trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      bcNote.className = 'bc-note'; // Tắt spinner
       bcNote.textContent = 'Vui lòng chọn ngày!';
       return;
     }
-    let [yyyy, mm, dd] = dateStr.split('-');
+    const [yyyy, mm, dd] = dateStr.split('-');
     dayStr = `${dd}/${mm}/${yyyy}`;
   } else if (type === 'thang') {
-    yearStr = bcYearSelect && bcYearSelect.value ? bcYearSelect.value.trim() : '';
+    yearStr = bcYearSelect?.value?.trim() || '';
     if (!/^\d{4}$/.test(yearStr)) {
+      bcNote.className = 'bc-note'; // Tắt spinner
       bcNote.textContent = 'Vui lòng chọn năm!';
       return;
     }
   }
 
-  // Kiểm tra cache client trước khi gọi API
-  if (
-    lastSearch.type === type &&
-    lastSearch.day === dayStr &&
-    lastSearch.year === yearStr &&
-    lastSearch.data
-  ) {
-    renderReport(type, lastSearch.data, dayStr, yearStr);
+  try {
+    const rows = await fetchThongke(type, dayStr, yearStr);
+    bcNote.className = 'bc-note'; // Tắt spinner khi hoàn tất
+    renderReport(type, rows, dayStr, yearStr);
+  } catch (err) {
+    bcNote.className = 'bc-note'; // Tắt spinner khi lỗi
+    bcNote.textContent = `Không thể lấy dữ liệu: ${err.message}`;
+  }
+}, 300);
+
+function renderReport(type, rows, dayStr, yearStr) {
+  if (!rows.length) {
+    bcNote.textContent = type === 'ngay' ? `Ngày ${dayStr} không có dữ liệu.` :
+                         type === 'thang' ? `Năm ${yearStr} không có dữ liệu.` :
+                         'Không có dữ liệu trong báo cáo.';
     return;
   }
 
-  try {
-    bcNote.textContent = 'Đang tải dữ liệu...';
-    const rows = await fetchThongke(type, dayStr, yearStr);
-    lastSearch = { type, day: dayStr, year: yearStr, data: rows };
-    renderReport(type, rows, dayStr, yearStr);
-  } catch (err) {
-    bcNote.textContent = `Không thể lấy dữ liệu báo cáo: ${err.message}`;
-    bcTableWrap.innerHTML = '';
-  }
-};
+  const fragment = document.createDocumentFragment();
+  const title = document.createElement('div');
+  title.className = 'bc-report-title';
+  title.textContent = type === 'ngay' ? 'BÁO CÁO DOANH THU NGÀY' :
+                      type === 'thang' ? 'BÁO CÁO DOANH THU THÁNG' :
+                      'BÁO CÁO DOANH THU NĂM';
+  fragment.appendChild(title);
 
-function renderReport(type, rows, dayStr, yearStr) {
-  bcNote.textContent = '';
-  bcTableWrap.innerHTML = '';
-
-  // Báo cáo ngày (KHÔNG ĐỔI)
   if (type === 'ngay') {
     bcDayData = rows;
     bcDayCurrentPage = 1;
-    if (bcDayData.length === 0) {
-      bcNote.textContent = `Ngày ${dayStr} không tồn tại trong báo cáo.`;
-      return;
-    }
-    let total = bcDayData.reduce((t, r) => t + toInteger(r[11]), 0);
-    let { controlsHtml, paginationHtml } = renderDayReportControls(bcDayData.length, total);
-    let html = `
-      <div class="bc-report-title">BÁO CÁO DOANH THU NGÀY</div>
-      ${controlsHtml}
-      <div class="bc-table-wrap">
-        <table class="bc-table">
-          <thead>
-            <tr>
-              <th>Stt</th>
-              <th>Mã ĐH</th>
-              <th>Tên KH</th>
-              <th>Thành tiền</th>
-            </tr>
-          </thead>
-          <tbody id="bcDayTableBody"></tbody>
-        </table>
-      </div>
-      ${paginationHtml}
+    const total = bcDayData.reduce((t, r) => t + toInteger(r[11]), 0);
+    const { controls, pagination } = renderDayReportControls(bcDayData.length, total);
+    const tableWrap = document.createElement('div');
+    tableWrap.className = 'bc-table-wrap';
+    const table = document.createElement('table');
+    table.className = 'bc-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Stt</th>
+          <th>Mã ĐH</th>
+          <th>Tên KH</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody id="bcDayTableBody"></tbody>
     `;
-    bcTableWrap.innerHTML = html;
+    tableWrap.appendChild(table);
+    fragment.appendChild(controls);
+    fragment.appendChild(tableWrap);
+    fragment.appendChild(pagination);
+    bcTableWrap.innerHTML = '';
+    bcTableWrap.appendChild(fragment);
     renderDayReportTable();
     renderDayPagination(bcDayData.length);
     attachBcDayEntriesSelectListener();
-    return;
-  }
-
-  // Báo cáo tháng
- if (type === 'thang') {
-  if (rows.length === 0) {
-    bcNote.textContent = `Năm ${yearStr} không tồn tại trong báo cáo.`;
-    return;
-  }
-  let tongNam = rows.reduce((t, r) => t + (Number(r.total) || 0), 0);
-  let html = `
-    <div class="bc-report-title">BÁO CÁO DOANH THU THÁNG</div>
-    <div class="bc-table-total-right">
-      Tổng cộng: <span>${formatCurrency(tongNam)}</span>
-    </div>
-    <div class="bc-table-wrap">
-      <table class="bc-table">
-        <thead>
+  } else {
+    const total = rows.reduce((t, r) => t + (Number(r.total) || 0), 0);
+    const totalDiv = document.createElement('div');
+    totalDiv.className = 'bc-table-total-right';
+    totalDiv.innerHTML = `Tổng cộng: <span>${formatCurrency(total)}</span>`;
+    const tableWrap = document.createElement('div');
+    tableWrap.className = 'bc-table-wrap';
+    const table = document.createElement('table');
+    table.className = 'bc-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>${type === 'thang' ? 'Tháng' : 'Năm'}</th>
+          <th>Thành tiền</th>
+          <th>Tỷ lệ (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
           <tr>
-            <th>Tháng</th>
-            <th>Thành tiền</th>
-            <th>Tỷ lệ (%)</th>
+            <td class="bc-${type === 'thang' ? 'month' : 'year'}">${r[type === 'thang' ? 'monthYear' : 'year']}</td>
+            <td>${formatCurrency(r.total)}</td>
+            <td>${r.tyle}%</td>
           </tr>
-        </thead>
-        <tbody>
-          ${rows.map(mo => `<tr>
-            <td class="bc-month">${mo.monthYear}</td>
-            <td>${formatCurrency(mo.total)}</td>
-            <td>${mo.tyle}%</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-  bcTableWrap.innerHTML = html;
-  return;
-}
-  // Báo cáo năm
-  if (type === 'nam') {
-    if (rows.length === 0) {
-      bcNote.textContent = "Không có dữ liệu trong báo cáo.";
-      return;
-    }
-    // rows: [{year, total, tyle}]
-    let tongAll = rows.reduce((t, r) => t + (Number(r.total) || 0), 0);
-    let html = `
-      <div class="bc-report-title">BÁO CÁO DOANH THU NĂM</div>
-      <div class="bc-table-total-right">
-        Tổng cộng: <span>${formatCurrency(tongAll)}</span>
-      </div>
-      <div class="bc-table-wrap">
-        <table class="bc-table">
-          <thead>
-            <tr>
-              <th>Năm</th>
-              <th>Thành tiền</th>
-              <th>Tỷ lệ (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(yo => `<tr>
-              <td class="bc-year">${yo.year}</td>
-              <td>${formatCurrency(yo.total)}</td>
-              <td>${yo.tyle}%</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
+        `).join('')}
+      </tbody>
     `;
-    bcTableWrap.innerHTML = html;
-    return;
+    tableWrap.appendChild(table);
+    fragment.appendChild(totalDiv);
+    fragment.appendChild(tableWrap);
+    bcTableWrap.innerHTML = '';
+    bcTableWrap.appendChild(fragment);
   }
-  // Nếu không hợp lệ
-  bcNote.textContent = "Vui lòng chọn loại báo cáo.";
 }
-// Hàm ẩn họn ngày trong ô dòng chữ" Hãy chọn ngày trong ô" sẽ tự động ẩn đi.
 
 document.addEventListener('DOMContentLoaded', function() {
-  var bcInput = document.getElementById('bcInput');
-  var dateHelp = document.getElementById('dateHelp');
-  var bcType = document.getElementById('bcType');
+  const dateHelp = document.getElementById('dateHelp');
   if (bcInput && dateHelp && bcType) {
     bcInput.addEventListener('input', function() {
-      if (bcType.value === 'ngay' && bcInput.value) {
-        dateHelp.style.display = 'none';
-      } else if (bcType.value === 'ngay' && !bcInput.value) {
-        dateHelp.style.display = '';
-      }
+      if (bcType.value === 'ngay' && bcInput.value) dateHelp.style.display = 'none';
+      else if (bcType.value === 'ngay') dateHelp.style.display = '';
     });
     bcInput.addEventListener('change', function() {
-      if (bcType.value === 'ngay' && !bcInput.value) {
-        dateHelp.style.display = '';
-      }
+      if (bcType.value === 'ngay' && !bcInput.value) dateHelp.style.display = '';
     });
   }
 });
