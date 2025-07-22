@@ -4,17 +4,25 @@
   <meta charset="UTF-8">
   <title>Báo Cáo Doanh Thu – Coffee & Beer DJ GooDjn</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Awesome, Google Fonts, and core styles -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" defer/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" defer>
   <style>
+    :root {
+      --primary-green: #228B22;
+      --secondary-green: #43a047;
+      --accent-yellow: #e1ba0a;
+      --error-red: #e53935;
+      --text-dark: #23272f;
+    }
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
       font-family: 'Roboto', Arial, sans-serif;
       background: #fafbfc;
-      color: #23272f;
+      color: var(--text-dark);
       min-height: 100vh;
       box-sizing: border-box;
       overflow-x: hidden;
@@ -40,12 +48,12 @@
       display: flex;
       flex-direction: column;
       padding-top: 60px;
-      padding-bottom: 60px;  /* hoặc 70px nếu cần rộng hơn, tùy chiều cao footer */
+      padding-bottom: 60px;
       min-height: 100vh;
       box-sizing: border-box;
     }
     #footer-container {
-      background: #228B22;
+      background: var(--primary-green);
       color: #fff;
       width: 100vw;
       min-height: 54px;
@@ -72,153 +80,6 @@
       border-radius: 10px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.1);
     }
-    @media (max-width: 700px) {
-      .container {
-        padding: 7px 2vw 10px 2vw !important;
-        border-radius: 0;
-        max-width: 100vw;
-        margin: 12px auto 0;
-        box-shadow: none;
-      }
-      #footer-container {
-        min-height: 54px;
-        height: 54px;
-        font-size: 0.98em;
-        padding: 0 7px;
-        line-height: 1.15;
-      }
-      #footer-container div {
-        width: 100%;
-        text-align: center;
-        line-height: 1.15;
-        word-break: break-word;
-      }
-    }
-    @media (max-width: 768px) {
-      #navbar-container .desktop-navbar {
-        display: none !important;
-      }
-    }
-    @media (min-width: 769px) {
-      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
-    }
-    /* NAVBAR & FOOTER MOBILE */
-    .mobile-navbar {
-      position: relative;
-      display: flex !important;
-      align-items: center;
-      width: 100vw;
-      background: #228B22;
-      min-height: 54px;
-      height: 54px;
-      z-index: 10001;
-    }
-    .mobile-navbar .hamburger {
-      padding: 12px 12px 12px 7px;
-      font-size: 27px;
-      color: #fff;
-      background: none;
-      border: none;
-      outline: none;
-      margin-right: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-    }
-    .mobile-navbar .navbar-title {
-      flex: 1 1 70%;
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-      min-width: 0;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    .mobile-navbar .navbar-title .brand-main {
-      color: #e1ba0a;
-      font-weight: bold;
-      font-size: 1.13em;
-      line-height: 1.1;
-      margin-bottom: 0;
-    }
-    .mobile-navbar .navbar-title .brand-sub {
-      color: #e1ba0a;
-      font-weight: bold;
-      font-size: 0.99em;
-      line-height: 1;
-      margin-top: 0;
-    }
-    .mobile-navbar .mobile-hotline {
-      position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
-      display: flex;
-      align-items: center;
-      background: #fff;
-      border-radius: 30px;
-      padding: 3px 16px 3px 11px;
-      box-shadow: 0 0 5px #1113;
-      height: 28px;
-      font-size: 0.98em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-decoration: none !important;
-    }
-    .mobile-navbar .mobile-hotline .hotline-number {
-      font-size: 1.07em;
-      margin-left: 3px;
-      font-weight: bold;
-      color: #0011ff;
-      letter-spacing: 0.5px;
-      text-decoration: none !important;
-    }
-    .mobile-navbar .mobile-hotline:link,
-    .mobile-navbar .mobile-hotline:visited,
-    .mobile-navbar .mobile-hotline:hover,
-    .mobile-navbar .mobile-hotline:active {
-      text-decoration: none !important;
-    }
-    .mobile-navbar-menu {
-      display: none;
-      position: fixed;
-      top: 54px;
-      left: 0;
-      min-width: 180px;
-      width: max-content;
-      max-width: 92vw;
-      background: #228B22;
-      color: #fff;
-      z-index: 12000;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.13);
-      border-radius: 0 0 10px 0;
-      padding: 0 0 16px 0;
-      animation: slideInMenu 0.18s;
-    }
-    .mobile-navbar-menu.open { display: block; }
-    @keyframes slideInMenu {
-      from { transform: translateX(-90%); opacity: 0.5; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    .mobile-navbar-menu ul {
-      list-style: none;
-      margin: 0;
-      padding: 10px 0 0 0;
-    }
-    .mobile-navbar-menu li {
-      padding: 13px 0 9px 18px;
-      font-size: 1.12em;
-      cursor: pointer;
-      font-weight: bold;
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-      transition: background 0.1s;
-    }
-    .mobile-navbar-menu li:active,
-    .mobile-navbar-menu li:hover {
-      background: #1c6e1b;
-    }
-    .mobile-navbar-menu li:last-child { border-bottom: none; }
-    /* Báo cáo styles */
     .bc-control-bar {
       display: flex;
       align-items: center;
@@ -254,7 +115,7 @@
       transition: border 0.18s;
     }
     .bc-btn-search {
-      background: #43a047;
+      background: var(--secondary-green);
       color: #fff;
       border: none;
       border-radius: 6px;
@@ -265,9 +126,9 @@
       cursor: pointer;
       transition: background 0.18s;
     }
-    .bc-btn-search:hover { background: #228B22; }
+    .bc-btn-search:hover { background: var(--primary-green); }
     .bc-btn-reset {
-      background: #e53935;
+      background: var(--error-red);
       color: #fff;
       border: none;
       border-radius: 6px;
@@ -279,12 +140,12 @@
     }
     .bc-btn-reset:hover { background: #b71c1c; }
     .bc-note {
-      color: #e53935;
+      color: var(--error-red);
       font-size: 1em;
       margin-top: 3px;
       margin-bottom: 0;
       min-height: 22px;
-      text-align: center; /* <-- thêm dòng này để canh giữa */
+      text-align: center;
     }
     .bc-table-wrap {
       margin-top: 5px;
@@ -292,7 +153,7 @@
     }
     .bc-report-title {
       font-weight: 700;
-      color: #228B22;
+      color: var(--primary-green);
       text-align: center;
       font-size: 1.22em;
       margin-bottom: 6px;
@@ -316,23 +177,18 @@
     }
     .bc-table th {
       background: #eafce4;
-      color: #228B22;
+      color: var(--primary-green);
       font-weight: 600;
       font-size: 1.04em;
     }
     .bc-table .bc-stt, .bc-table .bc-month, .bc-table .bc-year {
       font-weight: bold;
-      color: #228B22;
-    }
-    .bc-table .bc-total-row {
-      font-weight: bold;
-      background: #fffde7;
-      color: #388e3c;
+      color: var(--primary-green);
     }
     .bc-table-total-right {
       text-align: right;
       font-weight: bold;
-      color: #228B22;
+      color: var(--primary-green);
       margin-bottom: 2px;
       margin-top: 3px;
       font-size: 1.12em;
@@ -340,14 +196,57 @@
     .bc-table-total-right span {
       color: #388e3c;
     }
-    @media (max-width: 600px) {
-      .bc-control-bar {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 5px;
-        align-items: center;
+    @media (max-width: 768px) {
+      #navbar-container .desktop-navbar { display: none !important; }
+      .mobile-navbar { display: flex !important; }
+    }
+    @media (min-width: 769px) {
+      .mobile-navbar, .mobile-navbar-menu { display: none !important; }
+      #navbar-container .desktop-navbar { display: block !important; }
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 7px 2vw 10px !important;
+        border-radius: 0;
+        max-width: 100vw;
+        margin: 12px auto 0;
+        box-shadow: none;
       }
-      .bc-type-select, .bc-input, .bc-btn-search, .bc-btn-reset {
+      #footer-container {
+        min-height: 54px;
+        height: 54px;
+        font-size: 0.98em;
+        padding: 0 7px;
+        line-height: 1.15;
+      }
+      .bc-control-bar {
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
+        width: max-content;
+        max-width: 98vw;
+      }
+      .bc-table-wrap {
+        padding-left: 3px;
+        padding-right: 3px;
+        margin-top: 3px !important;
+      }
+      .bc-table {
+        width: 100%;
+        margin: 0 0 3px 0;
+        max-width: 100%;
+      }
+      .bc-report-title {
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+        font-size: 1.08em;
+      }
+      .bc-input {
+        width: 140px !important; /* Chiều dài ô input trên mobile */
+        min-width: 100px;
+        max-width: 100%;
+      }
+      .bc-type-select, .bc-btn-search, .bc-btn-reset {
         font-size: 0.98em;
         padding: 6px 8px;
         min-width: 62px;
@@ -357,65 +256,124 @@
         padding: 7px 3px;
       }
       .bc-table { min-width: 300px; }
-      .bc-report-title { font-size: 1.08em; }
     }
-    @media (min-width: 769px) {
-  .mobile-navbar, .mobile-navbar-menu { display: none !important; }
-}
-    @media (max-width: 700px) {
-  .bc-control-bar {
-    justify-content: center !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    width: max-content;
-    max-width: 98vw;
-  }
-    .bc-table-wrap {
-    padding-left: 3px;
-    padding-right: 3px;
-    box-sizing: border-box;
-    margin-top: 3px !important;
-  }
-  .bc-table {
-    width: 100%;
-    margin: 0 0 3px 0;
-    max-width: 100%;
-  }
-    .bc-report-title {
-    margin-top: 3px !important;
-    margin-bottom: 3px !important;
-  }
-    .bc-input {
-    width: 160px !important;
-    min-width: 100px;
-    max-width: 100%;
-  }
-}
-.bc-table-total-right {
-  text-align: right;
-  font-weight: 500;           /* Cho nhỏ hơn, nhẹ hơn */
-  color: #1f1d1d;                /* Ví dụ: màu xám, bạn có thể đổi mã màu khác */
-  font-size: 0.97em;          /* Cho nhỏ lại so với mặc định */
-  margin-bottom: 2px;
-  margin-top: 3px;
-  width: 100%;
-  letter-spacing: 0.5px;
-}
-.bc-table-total-right span {
-  color: #0b0b0b;             /* Ví dụ: xanh lá nhạt hơn, bạn có thể đổi màu khác */
-  font-weight: 600;
-  font-size: 1em;             /* Giữ số nổi bật hơn chữ */
-}
+    .mobile-navbar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100vw;
+      background: var(--primary-green);
+      min-height: 54px;
+      height: 54px;
+      z-index: 10001;
+    }
+    .mobile-navbar .hamburger {
+      padding: 12px 12px 12px 7px;
+      font-size: 27px;
+      color: #fff;
+      background: none;
+      border: none;
+      outline: none;
+      margin-right: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .mobile-navbar .navbar-title {
+      flex: 1 1 70%;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .mobile-navbar .navbar-title .brand-main {
+      color: var(--accent-yellow);
+      font-weight: bold;
+      font-size: 1.13em;
+      line-height: 1.1;
+      margin-bottom: 0;
+    }
+    .mobile-navbar .navbar-title .brand-sub {
+      color: var(--accent-yellow);
+      font-weight: bold;
+      font-size: 0.99em;
+      line-height: 1;
+      margin-top: 0;
+    }
+    .mobile-navbar .mobile-hotline {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-radius: 30px;
+      padding: 3px 16px 3px 11px;
+      box-shadow: 0 0 5px #1113;
+      height: 28px;
+      font-size: 0.98em;
+      white-space: nowrap;
+      text-decoration: none !important;
+    }
+    .mobile-navbar .mobile-hotline .hotline-number {
+      font-size: 1.07em;
+      margin-left: 3px;
+      font-weight: bold;
+      color: #0011ff;
+      letter-spacing: 0.5px;
+      text-decoration: none !important;
+    }
+    .mobile-navbar-menu {
+      display: none;
+      position: fixed;
+      top: 54px;
+      left: 0;
+      min-width: 180px;
+      width: max-content;
+      max-width: 92vw;
+      background: var(--primary-green);
+      color: #fff;
+      z-index: 12000;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+      border-radius: 0 0 10px 0;
+      padding: 0 0 16px 0;
+      animation: slideInMenu 0.18s;
+    }
+    .mobile-navbar-menu.open { display: block; }
+    @keyframes slideInMenu {
+      from { transform: translateX(-90%); opacity: 0.5; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .mobile-navbar-menu ul {
+      list-style: none;
+      margin: 0;
+      padding: 10px 0 0 0;
+    }
+    .mobile-navbar-menu li {
+      padding: 13px 0 9px 18px;
+      font-size: 1.12em;
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      transition: background 0.1s;
+    }
+    .mobile-navbar-menu li:active,
+    .mobile-navbar-menu li:hover {
+      background: #1c6e1b;
+    }
+    .mobile-navbar-menu li:last-child { border-bottom: none; }
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
   <div id="navbar-container">
     <div class="mobile-navbar">
       <button class="hamburger" id="hamburgerBtn" aria-label="Mở menu" tabindex="0">
         <i class="fa fa-bars"></i>
       </button>
-      <a href="index.html" class="navbar-title" id="navbarTitleLink" style="text-decoration:none;">
+      <a href="index.html" class="navbar-title" style="text-decoration:none;">
         <span class="brand-main">Coffee & Beer</span>
         <span class="brand-sub">DJ GooDjn</span>
       </a>
@@ -424,7 +382,6 @@
         <span class="hotline-number">0902 926 636</span>
       </a>
     </div>
-    <!-- Mobile Hamburger menu overlay -->
     <nav class="mobile-navbar-menu" id="mobileMenu">
       <ul>
         <li data-href="index.html">Đặt dịch vụ</li>
@@ -433,153 +390,102 @@
         <li id="mobileLogoutTab" style="display:none;">Đăng xuất</li>
       </ul>
     </nav>
-    <!-- Desktop Navbar (tải động qua JS) -->
     <div class="desktop-navbar"></div>
   </div>
-  <script>
-    // Tải navbar.html vào desktop-navbar (ẩn trên mobile)
+  <script defer>
     fetch('navbar.html')
       .then(response => response.text())
-      .then(html => { document.querySelector('#navbar-container .desktop-navbar').innerHTML = html; showLogoutTabIfLoggedIn(); });
+      .then(html => {
+        document.querySelector('#navbar-container .desktop-navbar').innerHTML = html;
+        showLogoutTabIfLoggedIn();
+      });
 
-    // Mobile Hamburger menu JS
-    document.addEventListener('DOMContentLoaded', function(){
-      var hamburger = document.getElementById('hamburgerBtn');
-      var menu = document.getElementById('mobileMenu');
-      document.addEventListener('click', function(e){
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburger = document.getElementById('hamburgerBtn');
+      const menu = document.getElementById('mobileMenu');
+      document.addEventListener('click', e => {
         if (menu.classList.contains('open') && !menu.contains(e.target) && !hamburger.contains(e.target)) {
           menu.classList.remove('open');
         }
       });
-      hamburger.onclick = function(e){
+      hamburger.onclick = e => {
         e.stopPropagation();
         menu.classList.toggle('open');
       };
-      menu.querySelectorAll('li[data-href]').forEach(function(tab){
-        tab.onclick = function(){
+      menu.querySelectorAll('li[data-href]').forEach(tab => {
+        tab.onclick = () => {
           menu.classList.remove('open');
           window.location.href = tab.getAttribute('data-href');
         };
       });
-      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
-      if(mobileLogoutTab) {
-        mobileLogoutTab.onclick = function() { logout(); };
-      }
+      const mobileLogoutTab = document.getElementById('mobileLogoutTab');
+      if (mobileLogoutTab) mobileLogoutTab.onclick = logout;
       showLogoutTabIfLoggedIn();
+
+      function showLogoutTabIfLoggedIn() {
+        const logoutTab = document.getElementById('logoutTab');
+        const mobileLogoutTab = document.getElementById('mobileLogoutTab');
+        const isAdmin = localStorage.getItem('isAdmin') === '1';
+        if (logoutTab) logoutTab.style.display = isAdmin ? '' : 'none';
+        if (mobileLogoutTab) mobileLogoutTab.style.display = isAdmin ? '' : 'none';
+      }
+
+      function logout() {
+        localStorage.removeItem('isAdmin');
+        localStorage.removeItem('isLoggedIn');
+        window.location.replace('login.html');
+      }
     });
-    function showLogoutTabIfLoggedIn() {
-      var logoutTab = document.getElementById('logoutTab');
-      var mobileLogoutTab = document.getElementById('mobileLogoutTab');
-      if(localStorage.getItem('isAdmin') === '1') {
-        if (logoutTab) logoutTab.style.display = '';
-        if (mobileLogoutTab) mobileLogoutTab.style.display = '';
-      } else {
-        if (logoutTab) logoutTab.style.display = 'none';
-        if (mobileLogoutTab) mobileLogoutTab.style.display = 'none';
-      }
-    }
-    function logout() {
-      localStorage.removeItem('isAdmin');
-      localStorage.removeItem('isLoggedIn');
-      window.location.replace('login.html');
-    }
-  </script>
-  <div class="site-content">
-    <div class="container">
-      <div class="bc-control-bar">
-        <label for="bcType">Chọn loại báo cáo</label>
-        <select id="bcType" class="bc-type-select">
-          <option value="" selected disabled>v</option>
-          <option value="ngay">BC ngày</option>
-          <option value="thang">BC tháng</option>
-          <option value="nam">BC năm</option>
-        </select>
-        <input id="bcInput" class="bc-input" placeholder="" style="display:inline-block;">
-        <select id="bcYearSelect" class="bc-input" style="display:none;"></select>
-        <button class="bc-btn-search" id="bcSearchBtn">Search</button>
-        <button class="bc-btn-reset" id="bcResetBtn">Xóa</button>
-      </div>
-      <!-- Đặt span ở dòng riêng bên dưới .bc-control-bar -->
-      <div style="width:100%; text-align:center;">
-  <span id="dateHelp" style="display:none; color:#101feb; font-size:1.07em; font-weight:600; margin:8px 0 2px 0;">Hãy chọn ngày trong ô</span>
-</div>
-      <div class="bc-note" id="bcNote"></div>
-      <div class="bc-table-wrap" id="bcTableWrap"></div>
-    </div>
-  </div>
-  <!-- FOOTER -->
-  <div id="footer-container">
-    <div>
-      © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
-      63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
-    </div>
-  </div>
-  <script src="Xlbaocao.js"></script>
-  <script>
-    // Chặn truy cập nếu không phải admin
-    if(localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
-    // Footer auto-hide on mobile input focus
-    (function(){
+
+    if (localStorage.getItem('isAdmin') !== '1') window.location.replace('login.html');
+
+    (function() {
       function isMobile() { return window.innerWidth <= 768; }
-      function hideFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = 'none';
-      }
-      function showFooter() {
-        var f = document.getElementById('footer-container');
-        if(f) f.style.display = '';
-      }
-      document.addEventListener('DOMContentLoaded', function() {
-        if(!isMobile()) return;
-        var inputs = document.querySelectorAll('input, textarea, select');
-        inputs.forEach(function(el) {
+      function hideFooter() { document.getElementById('footer-container').style.display = 'none'; }
+      function showFooter() { document.getElementById('footer-container').style.display = ''; }
+      document.addEventListener('DOMContentLoaded', () => {
+        if (!isMobile()) return;
+        document.querySelectorAll('input, textarea, select').forEach(el => {
           el.addEventListener('focus', hideFooter);
           el.addEventListener('blur', showFooter);
         });
-        var oldHeight = window.innerHeight;
-        window.addEventListener('resize', function() {
-          if(!isMobile()) return;
-          if(window.innerHeight < oldHeight - 80) hideFooter();
+        let oldHeight = window.innerHeight;
+        window.addEventListener('resize', () => {
+          if (!isMobile()) return;
+          if (window.innerHeight < oldHeight - 80) hideFooter();
           else showFooter();
           oldHeight = window.innerHeight;
         });
       });
     })();
   </script>
-  <script>
-// Đặt tên key lưu thời điểm truy cập
-const ADMIN_LOGIN_TIME_KEY = 'adminLoginTime_BC';
-
-// Hàm logout
-function autoLogout() {
-  localStorage.removeItem('isAdmin');
-  localStorage.removeItem('isLoggedIn');
-  localStorage.removeItem(ADMIN_LOGIN_TIME_KEY);
-  window.location.replace('login.html');
-}
-
-// Khi vào trang, nếu là admin thì:
-if (localStorage.getItem('isAdmin') === '1') {
-  // Nếu chưa có thời gian login, set vào
-  if (!localStorage.getItem(ADMIN_LOGIN_TIME_KEY)) {
-    localStorage.setItem(ADMIN_LOGIN_TIME_KEY, Date.now());
-  }
-
-  // Hàm kiểm tra mỗi phút
-  setInterval(function() {
-    const loginTime = parseInt(localStorage.getItem(ADMIN_LOGIN_TIME_KEY) || '0', 10);
-    if (loginTime > 0) {
-      const now = Date.now();
-      const TWO_HOURS = 2 * 60 * 60 * 1000; // 2 giờ tính bằng ms
-      if (now - loginTime >= TWO_HOURS) {
-        autoLogout();
-      }
-    }
-  }, 60 * 1000); // 1 phút kiểm tra 1 lần
-}
-
-// Nếu admin đổi tab hoặc reload lại, vẫn giữ đúng thời gian login
-// Nếu logout thủ công, sẽ xóa luôn thời gian
-</script>
-</body>
+  <div class="site-content">
+    <div class="container">
+      <div class="bc-control-bar">
+        <label for="bcType">Chọn loại báo cáo</label>
+        <select id="bcType" class="bc-type-select">
+          <option value="" selected disabled>Chọn loại</option>
+          <option value="ngay">BC ngày</option>
+          <option value="thang">BC tháng</option>
+          <option value="nam">BC năm</option>
+        </select>
+        <input id="bcInput" class="bc-input" type="date" max="2025-07-22" placeholder="Chọn ngày (dd/mm/yyyy)">
+        <select id="bcYearSelect" class="bc-input" style="display:none;"></select>
+        <button class="bc-btn-search" id="bcSearchBtn">Search</button>
+        <button class="bc-btn-reset" id="bcResetBtn">Xóa</button>
+      </div>
+      <div style="width:100%; display:flex;">
+        <span id="dateHelp" style="display:none; color:#101feb; font-size:1.07em; font-weight:600; margin:6px 0 2px 2px;">Hãy chọn ngày trong ô</span>
+      </div>
+      <div class="bc-note" id="bcNote"></div>
+      <div class="bc-table-wrap" id="bcTableWrap"></div>
+    </div>
+  </div>
+  <div id="footer-container">
+    <div>
+      © 2025 Coffee & Beer DJ GooDjn. All rights reserved.<br>
+      63-65 Ngô Quyền, Phường 6, Quận 10, Hồ Chí Minh
+    </div>
+  </div>
+  <script src="Xlbaocao.js" defer></script>
 </html>
