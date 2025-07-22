@@ -99,7 +99,7 @@ style.textContent = `
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-right: 0; /* Loại bỏ margin vì không có text */
+  margin-right: 0;
   vertical-align: middle;
 }
 @keyframes spin {
@@ -288,6 +288,21 @@ function updateInputByType() {
 
 bcType.addEventListener('change', updateInputByType);
 
+// Gọi updateInputByType khi trang tải để đồng bộ hóa ban đầu
+document.addEventListener('DOMContentLoaded', function() {
+  updateInputByType(); // Đồng bộ hóa ban đầu
+  const dateHelp = document.getElementById('dateHelp');
+  if (bcInput && dateHelp && bcType) {
+    bcInput.addEventListener('input', function() {
+      if (bcType.value === 'ngay' && bcInput.value) dateHelp.style.display = 'none';
+      else if (bcType.value === 'ngay') dateHelp.style.display = '';
+    });
+    bcInput.addEventListener('change', function() {
+      if (bcType.value === 'ngay' && !bcInput.value) dateHelp.style.display = '';
+    });
+  }
+});
+
 bcResetBtn.onclick = function() {
   bcType.value = '';
   updateInputByType();
@@ -319,7 +334,7 @@ async function fetchThongke(type, day, year) {
 }
 
 bcSearchBtn.onclick = debounce(async function() {
-  bcNote.className = 'bc-note bc-note-loading'; // Bật spinner, không có text
+  bcNote.className = 'bc-note bc-note-loading';
   bcTableWrap.innerHTML = '';
 
   const type = bcType.value;
@@ -328,28 +343,34 @@ bcSearchBtn.onclick = debounce(async function() {
 
   if (type === 'ngay') {
     const dateStr = (bcInput.value || '').trim();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-      bcNote.className = 'bc-note'; // Tắt spinner
-      bcNote.textContent = 'Vui lòng chọn ngày!';
+    if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      bcNote.className = 'bc-note';
+      bcNote.textContent = 'Vui lòng chọn ngày hợp lệ!';
       return;
     }
     const [yyyy, mm, dd] = dateStr.split('-');
     dayStr = `${dd}/${mm}/${yyyy}`;
   } else if (type === 'thang') {
     yearStr = bcYearSelect?.value?.trim() || '';
-    if (!/^\d{4}$/.test(yearStr)) {
-      bcNote.className = 'bc-note'; // Tắt spinner
+    if (!yearStr || !/^\d{4}$/.test(yearStr)) {
+      bcNote.className = 'bc-note';
       bcNote.textContent = 'Vui lòng chọn năm!';
       return;
     }
+  } else if (type === 'nam') {
+    // Không cần day hoặc year cho loại 'nam'
+  } else {
+    bcNote.className = 'bc-note';
+    bcNote.textContent = 'Vui lòng chọn loại báo cáo!';
+    return;
   }
 
   try {
     const rows = await fetchThongke(type, dayStr, yearStr);
-    bcNote.className = 'bc-note'; // Tắt spinner khi hoàn tất
+    bcNote.className = 'bc-note';
     renderReport(type, rows, dayStr, yearStr);
   } catch (err) {
-    bcNote.className = 'bc-note'; // Tắt spinner khi lỗi
+    bcNote.className = 'bc-note';
     bcNote.textContent = `Không thể lấy dữ liệu: ${err.message}`;
   }
 }, 300);
@@ -433,16 +454,3 @@ function renderReport(type, rows, dayStr, yearStr) {
     bcTableWrap.appendChild(fragment);
   }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  const dateHelp = document.getElementById('dateHelp');
-  if (bcInput && dateHelp && bcType) {
-    bcInput.addEventListener('input', function() {
-      if (bcType.value === 'ngay' && bcInput.value) dateHelp.style.display = 'none';
-      else if (bcType.value === 'ngay') dateHelp.style.display = '';
-    });
-    bcInput.addEventListener('change', function() {
-      if (bcType.value === 'ngay' && !bcInput.value) dateHelp.style.display = '';
-    });
-  }
-});
