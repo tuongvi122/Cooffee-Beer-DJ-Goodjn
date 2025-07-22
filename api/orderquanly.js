@@ -155,7 +155,7 @@ function telegramOrderText({
 👤 Khách hàng: ${name}
 📞 SĐT: ${phone}
 ✉️ Email: ${email}
-🪑 Bàn số: ${table}
+🪑 Thẻ bàn số: ${table}
 📝 Ghi chú: ${note || "_Không có_"}
 
 *Danh sách dịch vụ:*
@@ -209,7 +209,7 @@ function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table
         <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${contact}</td>
       </tr>
       <tr>
-        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Bàn số</th>
+        <th style="background:#f2f7fa;width:38%;font-weight:600;border:1px solid #dbe5ec;padding:7px 8px 7px 12px;text-align:left;font-size:14px;vertical-align:top;">Thẻ bàn số</th>
         <td style="background:#fff;color:#222;border:1px solid #dbe5ec;padding:7px 8px;text-align:left;font-size:14px;vertical-align:top;">${tableNum}</td>
       </tr>
       <tr>
