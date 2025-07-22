@@ -652,7 +652,7 @@
         <div style="position:relative;">
   <input id="table-number"
          autocomplete="off"
-         placeholder="Chọn hoặc nhập số bàn..."
+         placeholder="Chọn hoặc nhập thẻ bàn..."
          style="width:100%;margin:5px 0 0 0;padding:8px;border-radius:5px;border:1px solid #ccc;cursor:pointer;"
          onfocus="showTableDropdown()"
          oninput="handleTableInput()"
@@ -1068,7 +1068,7 @@ async function handleOrderConfirm(yes) {
   alertSuccess.style.display = 'none';
 
   if (!name || !phone || !contact || !tableNum) {
-    alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số bàn";
+    alertOrder.innerText = "Vui lòng điền đầy đủ Họ và tên, Số điện thoại, Email, Số thẻ bàn";
     alertOrder.style.display = 'block';
     enableOrderButtons();
     document.getElementById('popupLoading').style.display = 'none'; // Hide overlay
@@ -1309,7 +1309,7 @@ function renderTableDropdownPage() {
     html += `<div class="table-dropdown-item"
       data-table="${filteredTables[i]}"
       style="padding:8px 16px;cursor:pointer;">
-    Bàn số ${filteredTables[i]}
+    Thẻ bàn số ${filteredTables[i]}
     </div>`;
   }
   if (tableDropdownPage === 0) dropdown.innerHTML = html;
@@ -1349,12 +1349,12 @@ function validateTableNumber() {
   }
   const numVal = Number(value);
   if (!Number.isInteger(numVal) || numVal < 1 || numVal > 150) {
-    error.innerText = `Vui lòng nhập số bàn từ 1 đến 150 hoặc chọn trong danh sách`;
+    error.innerText = `Vui lòng nhập số thẻ bàn từ 1 đến 150 hoặc chọn trong danh sách`;
     error.style.display = 'block';
     return false;
   }
   if (!availableTables.includes(numVal)) {
-    error.innerText = `Bàn số ${value} đang có khách vui lòng chọn số bàn có trong list`;
+    error.innerText = `Thẻ bàn số ${value} đang có khách vui lòng chọn số thẻ bàn có trong list`;
     error.style.display = 'block';
     return false;
   }
