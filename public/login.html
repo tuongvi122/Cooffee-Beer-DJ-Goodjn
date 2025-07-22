@@ -17,6 +17,7 @@
       min-height: 100vh;
       height: 100%;
     }
+    /* Navbar styles */
     #navbar-container {
       width: 100vw;
       background: #fff;
@@ -28,11 +29,8 @@
     }
     .desktop-navbar { display: block !important; min-height:54px;}
     .mobile-navbar, .mobile-navbar-menu { display: none !important; }
-    @media (max-width: 768px) {
-      .mobile-navbar { display: block !important; }
-      .mobile-navbar-menu { display: none !important; }
-      .desktop-navbar { display: none !important; }
-    }
+
+    /* Login container styles */
     .login-container {
       max-width: 390px;
       margin: 110px auto 80px auto;
@@ -86,25 +84,72 @@
       display: none;
     }
     h2 { text-align:center; color:#228B22; margin-bottom:20px; }
-    @media (max-width: 768px) {
-      .login-container {
-        max-width: 98vw;
-        width: 98vw;
-        min-width: 0;
-        margin: 78px auto 75px auto !important;
-        padding: 16px 7vw 17px 7vw;
-        box-shadow: 0 2px 14px #0001;
-      }
-      .login-container input, .login-container select, .login-container button {
-        font-size: 15px;
-        padding: 10px 10px;
-        margin-bottom: 14px;
-      }
-      h2 { font-size: 1.18em; }
+
+    /* Password field with toggle */
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+      margin-bottom: 18px;
     }
+    .password-wrapper input {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0;
+      padding-right: 38px;
+    }
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #444;
+      font-size: 1.18em;
+      z-index: 3;
+      line-height: 1;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      outline: none;
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+    .toggle-password:focus, .toggle-password:hover {
+      color: #228B22;
+    }
+
+    /* Footer styles */
+    #footer-container {
+      background: #228B22;
+      color: #fff;
+      width: 100vw;
+      min-height: 54px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 0 10px;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 999;
+    }
+    #footer-container div {
+      width: 100%;
+      text-align: center;
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    /* Responsive styles */
     @media (max-width: 768px) {
-      #navbar-container { padding: 0; min-height: 54px; height: 54px; }
-      .mobile-navbar { position: relative; display: flex !important; align-items: center; width: 100vw; background: #228B22; min-height: 54px; height: 54px; z-index: 10001; }
+      .desktop-navbar { display: none !important; }
+      .mobile-navbar { display: flex !important; position: relative; align-items: center; width: 100vw; background: #228B22; min-height: 54px; height: 54px; z-index: 10001; }
       .mobile-navbar .hamburger { padding: 12px 12px 12px 7px; font-size: 27px; color: #fff; background: none; border: none; outline: none; margin-right: 6px; cursor: pointer; display: flex; align-items: center; }
       .mobile-navbar .navbar-title { flex: 1 1 70%; display: flex; flex-direction: column; line-height: 1.1; min-width: 0; white-space: nowrap; overflow: hidden; }
       .mobile-navbar .navbar-title .brand-main { color: #e1ba0a; font-weight: bold; font-size: 1.13em; line-height: 1.1; margin-bottom: 0; }
@@ -116,21 +161,21 @@
       .mobile-navbar .mobile-hotline:hover,
       .mobile-navbar .mobile-hotline:active { text-decoration: none !important; }
       .mobile-navbar-menu {
-  display: none;
-  position: fixed;
-  top: 54px;
-  left: 0;
-  min-width: 180px;
-  width: max-content;
-  max-width: 92vw;
-  background: #228B22;
-  color: #fff;
-  z-index: 12000;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.13);
-  border-radius: 0 0 10px 0;
-  padding: 0 0 16px 0;
-  animation: slideInMenu 0.18s;
-}      
+        display: none;
+        position: fixed;
+        top: 54px;
+        left: 0;
+        min-width: 180px;
+        width: max-content;
+        max-width: 92vw;
+        background: #228B22;
+        color: #fff;
+        z-index: 12000;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.13);
+        border-radius: 0 0 10px 0;
+        padding: 0 0 16px 0;
+        animation: slideInMenu 0.18s;
+      }
       .mobile-navbar-menu.open { display: block !important; }
       @keyframes slideInMenu { from { transform: translateX(-90%); opacity: 0.5; } to { transform: translateX(0); opacity: 1; } }
       .mobile-navbar-menu ul { list-style: none; margin: 0; padding: 10px 0 0 0; }
@@ -138,28 +183,58 @@
       .mobile-navbar-menu li:active,
       .mobile-navbar-menu li:hover { background: #1c6e1b; }
       .mobile-navbar-menu li:last-child { border-bottom: none; }
+
+      .password-wrapper { margin-bottom: 14px; }
+      .password-wrapper input { font-size: 15px; }
+      .login-container {
+        max-width: 98vw;
+        width: 98vw;
+        min-width: 0;
+        margin: 78px auto 75px auto !important;
+        padding: 16px 7vw 17px 7vw;
+        box-shadow: 0 2px 14px #0001;
+      }
+      .login-container input,
+      .login-container select,
+      .login-container button {
+        font-size: 15px;
+        padding: 10px 10px;
+        margin-bottom: 14px;
+      }
+      h2 { font-size: 1.18em; }
+      #footer-container { font-size: 0.96em; padding: 0 3px; min-height: 54px; height: 54px; }
+    }
+    @media (max-width: 600px) {
+      #footer-container {
+        min-height: 54px;
+        font-size: 0.9em;
+        padding: 0 7px;
+        position: fixed;
+        text-align: center;
+        align-items: center; 
+        justify-content: center;
+      }
+      #footer-container div {
+        width: 100%;
+        text-align: center;
+        line-height: 1.15;  
+        white-space: nowrap;
+      }
     }
     @media (min-width: 769px) {
       .mobile-navbar, .mobile-navbar-menu { display: none !important; }
-    }
-    #footer-container { background: #228B22; color: #fff; width: 100vw; min-height: 54px; height: 54px; display: flex; align-items: center; justify-content: center; font-size: 1em; box-sizing: border-box; text-align: center; padding: 0 10px; position: fixed; left: 0; bottom: 0; z-index: 999; }
-    #footer-container div { width: 100%; text-align: center; line-height: 1.15; word-break: break-word; }
-    @media (max-width: 768px) {
-      #footer-container { font-size: 0.96em; padding: 0 3px; min-height: 54px; height: 54px; }
     }
   </style>
 </head>
 <body>
 <script>
 window.addEventListener('pageshow', function(event) {
-  // Luôn reset form đăng nhập khi load lại trang login.html (kể cả từ cache/back)
   var userInput = document.getElementById('loginUser');
   var passInput = document.getElementById('loginPass');
   var roleInput = document.getElementById('loginRole');
   if (userInput) userInput.value = '';
   if (passInput) passInput.value = '';
-  if (roleInput) roleInput.selectedIndex = 0; // hoặc chọn lại vai trò mặc định
-  // Ngoài ra có thể reset thông báo lỗi, nút trạng thái nếu cần
+  if (roleInput) roleInput.selectedIndex = 0;
   var err = document.getElementById('loginError');
   if (err) err.style.display = 'none';
 });
@@ -194,7 +269,12 @@ window.addEventListener('pageshow', function(event) {
       <option value="Nhân viên">Nhân viên</option>
     </select>
     <input id="loginUser" type="text" placeholder="Tên đăng nhập" autocomplete="username">
-    <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
+    <div class="password-wrapper">
+      <input id="loginPass" type="password" placeholder="Mật khẩu" autocomplete="current-password">
+      <span class="toggle-password" id="togglePassword" tabindex="0" aria-label="Hiện/mật khẩu">
+        <i class="fa fa-eye" id="eyeIcon"></i>
+      </span>
+    </div>
     <div id="loginError"></div>
     <button type="submit" id="loginBtn">Đăng nhập</button>
   </form>
@@ -229,6 +309,31 @@ window.addEventListener('pageshow', function(event) {
           window.location.href = tab.getAttribute('data-href');
         };
       });
+
+      // Xử lý ẩn/hiện mật khẩu
+      var passInput = document.getElementById('loginPass');
+      var toggleBtn = document.getElementById('togglePassword');
+      var eyeIcon = document.getElementById('eyeIcon');
+      if(toggleBtn) {
+        toggleBtn.addEventListener('click', function(){
+          if (passInput.type === 'password') {
+            passInput.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+          } else {
+            passInput.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+          }
+        });
+        // Cho phép nhấn phím Enter hoặc Space trên icon cũng đổi trạng thái
+        toggleBtn.addEventListener('keydown', function(e){
+          if(e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleBtn.click();
+          }
+        });
+      }
     });
 
     // Xử lý đăng nhập tối ưu mobile: touchend + blur + submit sau khi đóng bàn phím
@@ -288,17 +393,17 @@ window.addEventListener('pageshow', function(event) {
         });
         const data = await resp.json();
         if (data.success) {
-  localStorage.setItem('isLoggedIn', '1'); // <--- THÊM DÒNG NÀY
-  if (role === 'Quản lý') {
-    localStorage.setItem('isAdmin', '1');
-    window.location.href = 'quanly.html';
-  } else if (role === 'Nhân viên') {
-    localStorage.removeItem('isAdmin');
-    window.location.href = 'inbill.html';
-  } else {
-    localStorage.removeItem('isAdmin');
-    window.location.href = 'index.html';
-  }
+          localStorage.setItem('isLoggedIn', '1');
+          if (role === 'Quản lý') {
+            localStorage.setItem('isAdmin', '1');
+            window.location.href = 'quanly.html';
+          } else if (role === 'Nhân viên') {
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'inbill.html';
+          } else {
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'index.html';
+          }
         } else {
           err.innerText = data.message || 'Sai thông tin đăng nhập hoặc vai trò!';
           err.style.display = 'block';
