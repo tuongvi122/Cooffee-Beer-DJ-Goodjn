@@ -70,7 +70,29 @@
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      position: relative; /* Để nút "Đánh thức" căn theo container */
     }
+  .wake-btn-absolute {
+  position: absolute;
+  top: 18px;           /* Chỉnh cao/thấp tùy vị trí */
+  right: 26px;         /* Chỉnh sát/xa biên phải */
+  background: #ffb300;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  padding: 4px 12px;
+  font-size: 0.98em;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+}
+.wake-btn-absolute i {
+  margin-right: 6px;
+  font-size: 1.1em;
+}
     h2 {
       text-align: center;
       margin: 12px 0 18px;
@@ -920,6 +942,9 @@
   </div>
   <div class="site-content">
     <div class="container">
+    <button id="wake-btn" class="wake-btn-absolute" title="Làm mới dữ liệu">
+    <i class="fa fa-bolt"></i> Đánh thức
+    </button>
       <h2>DANH SÁCH ĐƠN HÀNG TRONG 24H</h2>
       <div id="ordersEmptyNote" style="display:none;"></div>
       <div class="table-actions">
@@ -1769,6 +1794,11 @@ function checkAndLogoutAtMidnight() {
     }
 }
 setInterval(checkAndLogoutAtMidnight, 5000);
+</script>
+<script>
+document.getElementById('wake-btn').onclick = function() {
+  window.location.reload();
+};
 </script>
 </body>
 </html>
