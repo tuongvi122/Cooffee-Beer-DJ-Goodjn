@@ -1,18 +1,17 @@
 import { google } from 'googleapis';
 import nodemailer from 'nodemailer';
+import NodeCache from 'node-cache';
 
 if (typeof fetch === 'undefined') global.fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-// ==================
-// === KHAI BÁO BIẾN TELEGRAM ===
-// ==================
+const cache = new NodeCache({ stdTTL: 30 }); // Cache 30 giây
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
 
 // ==================
 // === HELPER FUNCTIONS ===
 // ==================
-function cleanNumber(val) {
+function cleanNumber(val) { 
   if (!val) return 0;
   return Number(String(val).replace(/[^\d]/g, "")) || 0;
 }
@@ -63,7 +62,7 @@ const ORDERS_SHEET = "Orders";
 const PRODUCTS_SHEET = "Products";
 const COLS = {
   A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, G: 6, H: 7, I: 8, J: 9, K: 10, L: 11,
-  M: 12, N: 13, O: 14, P: 15, Q: 16, R: 17, S: 18, T: 19, U: 20
+  M: 12, N: 13, O: 14, P: 15, Q: 16, T: 19
 };
 async function getOrdersSheetId() {
   const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
@@ -80,10 +79,8 @@ async function sendEmail(to, subject, html) {
 }
 
 // ==================
-// === GỬI TELEGRAM (giống submitOrder.js) ===
+// === GỬI TELEGRAM ===
 // ==================
-
-// Gửi telegram cho 1 chatId
 async function sendTelegram(chatId, message) {
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   try {
@@ -105,7 +102,6 @@ async function sendTelegram(chatId, message) {
   }
 }
 
-// Lấy map Telegram từ sheet IDDISCORD!A2:B
 async function getTelegramMap() {
   const teleData = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
@@ -114,11 +110,9 @@ async function getTelegramMap() {
   return Object.fromEntries((teleData.data.values || []).map(([maNV, teleId]) => [maNV, teleId]));
 }
 
-// Gửi telegram đến nhân viên (không trùng) và quản lý
 async function sendTelegramToStaffAndManager(maNVs, content) {
   const mapTele = await getTelegramMap();
   const sent = new Set();
-  // Gửi từng nhân viên (loại trùng)
   for (const maNV of maNVs) {
     const teleId = mapTele[maNV];
     if (teleId && !sent.has(teleId)) {
@@ -126,13 +120,11 @@ async function sendTelegramToStaffAndManager(maNVs, content) {
       sent.add(teleId);
     }
   }
-  // Gửi quản lý (luôn luôn)
   if (TELEGRAM_MANAGER_ID) {
     await sendTelegram(TELEGRAM_MANAGER_ID, content);
   }
 }
 
-// Tạo nội dung thông báo cho Telegram
 function telegramOrderText({
   titleIcon,
   titleText,
@@ -171,7 +163,6 @@ ${ghiChu ? `\n📝 *Ghi chú quản lý:* ${ghiChu}` : ''}
   );
 }
 
-// Email HTML xác nhận (giữ nguyên logic cũ)
 function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table, note, staffList, total }) {
   const contact = email;
   const orderCode = orderId;
@@ -238,7 +229,7 @@ function htmlOrderConfirmEmailV2({ orderId, timeVNStr, name, phone, email, table
   </div>`;
 }
 
-// Gửi Email/Telegram sau khi lưu đơn (gửi từng người, giống submitOrder.js)
+// Gửi Email/Telegram sau khi lưu đơn
 async function sendMailAndTelegram({ staffList, orderId, name, phone, email, table, note, ghiChu, tongcong }) {
   let allCancel = staffList.every(s => (s.trangThai === "Hủy đơn"));
   let staffDongY = staffList.filter(s => s.trangThai === "Đồng ý" && cleanNumber(s.donGia) > 0);
@@ -273,7 +264,6 @@ async function sendMailAndTelegram({ staffList, orderId, name, phone, email, tab
     console.error('LỖI gửi Telegram:', e.message);
   }
 
-  // Email xác nhận (giữ nguyên)
   if (staffDongY.length > 0) {
     try {
       await sendEmail(
@@ -295,7 +285,6 @@ async function sendMailAndTelegram({ staffList, orderId, name, phone, email, tab
       console.error('LỖI gửi Email xác nhận:', e.message);
     }
   }
-  // Email hủy đơn vẫn giữ như cũ (gửi cho khách)
   if (allCancel) {
     try {
       await sendEmail(email, "Hủy đơn hàng", `
@@ -315,15 +304,23 @@ async function sendMailAndTelegram({ staffList, orderId, name, phone, email, tab
 // ==== API ROUTE HANDLER ====
 // ==========================
 export default async function handler(req, res) {
-  // --- GET products ---
-  if (req.method === 'GET' && req.query && req.query.products === '1') {
-    try {
+  try {
+    // --- GET products ---
+    if (req.method === 'GET' && req.query && req.query.products === '1') {
+      const cached = cache.get('products');
+      if (cached) {
+        res.status(200).json({ products: cached });
+        return;
+      }
       const result = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
         range: PRODUCTS_SHEET
       });
       const rows = result.data.values;
-      if (!rows || rows.length < 2) return res.status(200).json({ products: [] });
+      if (!rows || rows.length < 2) {
+        res.status(200).json({ products: [] });
+        return;
+      }
       const products = rows.slice(1)
         .filter(row => {
           const status = (row[5] || '').toString().trim();
@@ -337,20 +334,26 @@ export default async function handler(req, res) {
           status: row[5],
           lockStatus: row[6],
         }));
-      return res.status(200).json({ products });
-    } catch (error) {
-      return res.status(500).json({ products: [], error: error.message });
+      cache.set('products', products);
+      res.status(200).json({ products });
+      return;
     }
-  }
-  // Endpoint: /api/orderquanly?productsAll=1 -> trả về tất cả nhân viên
-  if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
-    try {
+    // Endpoint: /api/orderquanly?productsAll=1 -> trả về tất cả nhân viên
+    if (req.method === 'GET' && req.query && req.query.productsAll === '1') {
+      const cached = cache.get('productsAll');
+      if (cached) {
+        res.status(200).json({ products: cached });
+        return;
+      }
       const result = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
         range: PRODUCTS_SHEET
       });
       const rows = result.data.values;
-      if (!rows || rows.length < 2) return res.status(200).json({ products: [] });
+      if (!rows || rows.length < 2) {
+        res.status(200).json({ products: [] });
+        return;
+      }
       const products = rows.slice(1)
         .map(row => ({
           maNV: row[1],
@@ -359,157 +362,161 @@ export default async function handler(req, res) {
           status: row[5],
           lockStatus: row[6],
         }));
-      return res.status(200).json({ products });
-    } catch (error) {
-      return res.status(500).json({ products: [], error: error.message });
+      cache.set('productsAll', products);
+      res.status(200).json({ products });
+      return;
     }
-  }
 
-  // --- POST: Lưu/cập nhật đơn hàng, gửi mail và Telegram ---
-  if (req.method === 'POST') {
-    try {
-      const {
-        orderId, staffList, ghiChu, huydon, tongcong,
-        name, phone, email, table, note
-      } = req.body;
-      if (!orderId || !Array.isArray(staffList) || !staffList.length) {
-        return res.status(400).json({ error: 'Thiếu thông tin đơn hàng hoặc danh sách nhân viên' });
-      }
-
-      // 1. Đọc toàn bộ sheet vào rows (để xác định dòng cần xóa)
-      const getRes = await sheets.spreadsheets.values.get({
-        spreadsheetId: sheetId,
-        range: ORDERS_SHEET + '!A1:U2500'
-      });
-      const header = getRes.data.values[0];
-      const rows = getRes.data.values.slice(1);
-
-      // 2. Xác định index dòng cần xóa của đơn hàng cũ
-      const oldRowsIdx = [];
-      for (let i = 0; i < rows.length; i++) {
-        if (String(rows[i][COLS.B]) === String(orderId)) oldRowsIdx.push(i);
-      }
-
-      // 3. Lấy giá trị giảm giá cũ từ cột K, nếu có
-      let oldDiscount = 0;
-      if (oldRowsIdx.length > 0) oldDiscount = cleanNumber(rows[oldRowsIdx[0]][COLS.K]);
-
-      // 4. Xóa vật lý các dòng cũ bằng batchUpdate/deleteDimension (nếu có)
-      if (oldRowsIdx.length > 0) {
-        const ordersSheetId = await getOrdersSheetId();
-        // Chuyển về index của sheet (bao gồm header), rows[0] là dòng 2 trên sheet
-        // oldRowsIdx là index trong mảng rows, sheet là dòng oldRowsIdx+1 (do header là dòng 1)
-        // Chuẩn bị các range liên tiếp
-        const sortedIdx = oldRowsIdx.map(i => i + 1).sort((a, b) => a - b); // sheet index (header dòng 0)
-        let requests = [];
-        let start = sortedIdx[0];
-        let end = start + 1;
-        for (let i = 1; i < sortedIdx.length; i++) {
-          if (sortedIdx[i] === sortedIdx[i - 1] + 1) {
-            end = sortedIdx[i] + 1;
-          } else {
-            requests.push({
-              deleteDimension: {
-                range: {
-                  sheetId: ordersSheetId,
-                  dimension: 'ROWS',
-                  startIndex: start,
-                  endIndex: end
-                }
-              }
-            });
-            start = sortedIdx[i];
-            end = start + 1;
-          }
+    // --- POST: Lưu/cập nhật đơn hàng, gửi mail và Telegram ---
+    if (req.method === 'POST') {
+      try {
+        const {
+          orderId, staffList, ghiChu, huydon, tongcong,
+          name, phone, email, table, note
+        } = req.body;
+        if (!orderId || !Array.isArray(staffList) || !staffList.length) {
+          res.status(400).json({ error: 'Thiếu thông tin đơn hàng hoặc danh sách nhân viên' });
+          return;
         }
-        requests.push({
-          deleteDimension: {
-            range: {
-              sheetId: ordersSheetId,
-              dimension: 'ROWS',
-              startIndex: start,
-              endIndex: end
+
+        // 1. Đọc toàn bộ sheet vào rows (để xác định dòng cần xóa)
+        const getRes = await sheets.spreadsheets.values.get({
+          spreadsheetId: sheetId,
+          range: ORDERS_SHEET + '!A1:U2500'
+        });
+        const header = getRes.data.values[0];
+        const rows = getRes.data.values.slice(1);
+
+        // 2. Xác định index dòng cần xóa của đơn hàng cũ
+        const oldRowsIdx = [];
+        for (let i = 0; i < rows.length; i++) {
+          if (String(rows[i][COLS.B]) === String(orderId)) oldRowsIdx.push(i);
+        }
+
+        // 3. Lấy giá trị giảm giá cũ từ cột K, nếu có
+        let oldDiscount = 0;
+        if (oldRowsIdx.length > 0) oldDiscount = cleanNumber(rows[oldRowsIdx[0]][COLS.K]);
+
+        // 4. Xóa vật lý các dòng cũ bằng batchUpdate/deleteDimension (nếu có)
+        if (oldRowsIdx.length > 0) {
+          const ordersSheetId = await getOrdersSheetId();
+          const sortedIdx = oldRowsIdx.map(i => i + 1).sort((a, b) => a - b); // sheet index (header dòng 0)
+          let requests = [];
+          let start = sortedIdx[0];
+          let end = start + 1;
+          for (let i = 1; i < sortedIdx.length; i++) {
+            if (sortedIdx[i] === sortedIdx[i - 1] + 1) {
+              end = sortedIdx[i] + 1;
+            } else {
+              requests.push({
+                deleteDimension: {
+                  range: {
+                    sheetId: ordersSheetId,
+                    dimension: 'ROWS',
+                    startIndex: start,
+                    endIndex: end
+                  }
+                }
+              });
+              start = sortedIdx[i];
+              end = start + 1;
             }
           }
-        });
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId: sheetId,
-          requestBody: { requests }
-        });
-      }
-
-      // 5. Tạo dòng mới cho đơn hàng
-      let nowStr = getVNDatetimeString();
-      let newOrderRows = staffList.map((s, idx) => {
-        let state = s.trangThai || "Đồng ý";
-        let colO = "", colP = "", colQ = "", colI = 0;
-        if (state === "Đồng ý") {
-          colO = colP = "V";
-          colI = cleanNumber(s.donGia);
-          colQ = "";
-        } else if (state === "Không tham gia") {
-          colO = colP = "Không tham gia";
-          colI = 0;
-          colQ = "Hủy đơn hàng";
-        } else if (state === "Hủy đơn") {
-          colO = colP = "X";
-          colI = 0;
-          colQ = "Hủy đơn hàng";
+          requests.push({
+            deleteDimension: {
+              range: {
+                sheetId: ordersSheetId,
+                dimension: 'ROWS',
+                startIndex: start,
+                endIndex: end
+              }
+            }
+          });
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: sheetId,
+            requestBody: { requests }
+          });
         }
-        let row = [];
-        row[COLS.A] = nowStr;
-        row[COLS.B] = cleanNumber(orderId);
-        row[COLS.C] = cleanText(name);
-        row[COLS.D] = cleanText(phone);
-        row[COLS.E] = cleanText(email);
-        row[COLS.F] = cleanText(s.maNV);
-        row[COLS.G] = cleanNumber(s.caLV);
-        row[COLS.H] = cleanNumber(s.donGia);
-        row[COLS.I] = colI;
-        row[COLS.J] = (idx === 0) ? cleanNumber(tongcong) : "";
-        row[COLS.K] = (idx === 0) ? oldDiscount : "";
-        row[COLS.L] = (idx === 0) ? (cleanNumber(tongcong) - oldDiscount) : "";
-        row[COLS.M] = cleanNumber(table);
-        row[COLS.N] = cleanText(note);
-        row[COLS.O] = colO;
-        row[COLS.P] = colP;
-        row[COLS.Q] = colQ;
-        row[COLS.T] = cleanText(ghiChu);
-        return row;
-      });
 
-      // 6. Append dòng mới vào sheet Orders
-      await sheets.spreadsheets.values.append({
-        spreadsheetId: sheetId,
-        range: ORDERS_SHEET + "!A1",
-        valueInputOption: 'USER_ENTERED',
-        insertDataOption: 'INSERT_ROWS',
-        requestBody: { values: newOrderRows }
-      });
+        // 5. Tạo dòng mới cho đơn hàng
+        let nowStr = getVNDatetimeString();
+        let newOrderRows = staffList.map((s, idx) => {
+          let state = s.trangThai || "Đồng ý";
+          let colO = "", colP = "", colQ = "", colI = 0;
+          if (state === "Đồng ý") {
+            colO = colP = "V";
+            colI = cleanNumber(s.donGia);
+            colQ = "";
+          } else if (state === "Không tham gia") {
+            colO = colP = "Không tham gia";
+            colI = 0;
+            colQ = "Hủy đơn hàng";
+          } else if (state === "Hủy đơn") {
+            colO = colP = "X";
+            colI = 0;
+            colQ = "Hủy đơn hàng";
+          }
+          let row = [];
+          row[COLS.A] = nowStr;
+          row[COLS.B] = cleanNumber(orderId);
+          row[COLS.C] = cleanText(name);
+          row[COLS.D] = cleanText(phone);
+          row[COLS.E] = cleanText(email);
+          row[COLS.F] = cleanText(s.maNV);
+          row[COLS.G] = cleanNumber(s.caLV);
+          row[COLS.H] = cleanNumber(s.donGia);
+          row[COLS.I] = colI;
+          row[COLS.J] = (idx === 0) ? cleanNumber(tongcong) : "";
+          row[COLS.K] = (idx === 0) ? oldDiscount : "";
+          row[COLS.L] = (idx === 0) ? (cleanNumber(tongcong) - oldDiscount) : "";
+          row[COLS.M] = cleanNumber(table);
+          row[COLS.N] = cleanText(note);
+          row[COLS.O] = colO;
+          row[COLS.P] = colP;
+          row[COLS.Q] = colQ;
+          row[COLS.T] = cleanText(ghiChu);
+          return row;
+        });
 
-      // ... Gửi Email + Telegram giữ nguyên như cũ ...
-      await sendMailAndTelegram({
-        staffList, orderId, name, phone, email, table, note, ghiChu, tongcong
-      });
+        // 6. Append dòng mới vào sheet Orders
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range: ORDERS_SHEET + "!A1",
+          valueInputOption: 'USER_ENTERED',
+          insertDataOption: 'INSERT_ROWS',
+          requestBody: { values: newOrderRows }
+        });
 
-      return res.status(200).json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: error.message || 'Internal server error' });
+        // Gửi Email + Telegram
+        await sendMailAndTelegram({
+          staffList, orderId, name, phone, email, table, note, ghiChu, tongcong
+        });
+
+        // Xóa cache để làm mới dữ liệu
+        cache.del('orders');
+        res.status(200).json({ success: true });
+        return;
+      } catch (error) {
+        res.status(500).json({ error: error.message || 'Internal server error' });
+        return;
+      }
     }
-    return;
-  }
 
-  // --- GET: Trả về dữ liệu Orders đã lọc và SẮP XẾP, xác định trạng thái nút xác nhận ---
-  if (req.method === 'GET') {
-    try {
+    // --- GET: Trả về dữ liệu Orders đã lọc và SẮP XẾP, xác định trạng thái nút xác nhận ---
+    if (req.method === 'GET') {
+      const cached = cache.get('orders');
+      if (cached) {
+        res.status(200).json({ orders: cached });
+        return;
+      }
       const result = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
         range: ORDERS_SHEET + '!A2:T'
       });
-      const rows = result.data.values;
+      const rows = result.data.values || [];
       let ordersMap = {};
 
-      for (let i = 1; i < rows.length; i++) {
+      for (let i = 0; i < rows.length; i++) {
         let row = rows[i];
         let orderId = row[COLS.B];
         if (!orderId) continue;
@@ -573,12 +580,15 @@ export default async function handler(req, res) {
         let dateB = parseVNTimeString(b.time);
         return dateB - dateA;
       });
+      cache.set('orders', ordersArr);
       res.status(200).json({ orders: ordersArr });
-    } catch (error) {
-      res.status(500).json({ error: error.message || 'Internal server error' });
+      return;
     }
+
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Internal server error' });
     return;
   }
-
-  res.status(405).json({ error: 'Method not allowed' });
 }
