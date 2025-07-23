@@ -146,6 +146,7 @@
       letter-spacing: 0.01em; text-shadow: 0 1px 6px #e1f0fe;
     }
     .order-list-panel {
+      position: relative;
       background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.09);
       padding: 26px 42px 28px 42px; width: 100%;
       min-width: 950px; max-width: 1100px; margin-top: 24px; font-size: 1.03em; box-sizing: border-box;
@@ -904,6 +905,27 @@
   overflow-wrap: break-word;
   max-width: 150px; /* hoặc tuỳ chỉnh theo giao diện */
 }
+.wake-btn-absolute {
+  position: absolute;
+  top: 18px;           /* chỉnh lên/xuống theo ý */
+  right: 20px;         /* chỉnh sát/xa biên phải */
+  background: #ffb300;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  padding: 4px 12px;
+  font-size: 1em;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+}
+.wake-btn-absolute i {
+  margin-right: 6px;
+  font-size: 1.1em;
+}
 </style>
 </head>
 <body>`
@@ -914,6 +936,9 @@
   <div class="site-content">
     <div class="main-flex-container">
       <div class="order-list-panel">
+        <button id="wake-btn" class="wake-btn-absolute" title="Làm mới dữ liệu">
+          <i class="fa fa-bolt"></i> Đánh thức
+        </button>
         <div class="order-list-title">Danh sách đơn hàng</div>
         <div class="order-pagination-container">
           <div>
@@ -1817,6 +1842,11 @@ function checkAndLogoutAtMidnight() {
     }
 }
 setInterval(checkAndLogoutAtMidnight, 12000);
+</script>
+<script>
+document.getElementById('wake-btn').onclick = function() {
+  window.location.reload();
+};
 </script>
 </body>
 </html>
