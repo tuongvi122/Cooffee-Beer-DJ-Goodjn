@@ -350,7 +350,7 @@ export default async function handler(req, res) {
         range: PRODUCTS_SHEET
       });
       const rows = result.data.values;
-      if (!rows || rows.length < 2) return res.status(200).json({ products: [] });
+      if (!Array.isArray(rows) || rows.length === 0) return res.status(200).json({ orders: [] });
       const products = rows.slice(1)
         .map(row => ({
           maNV: row[1],
