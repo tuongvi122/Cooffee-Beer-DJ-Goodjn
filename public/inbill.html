@@ -148,10 +148,10 @@
     .order-list-panel {
       background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.09);
       padding: 26px 42px 28px 42px; width: 100%;
-      min-width: 800px; max-width: 1100px; margin-top: 24px; font-size: 1.03em; box-sizing: border-box;
+      min-width: 950px; max-width: 1100px; margin-top: 24px; font-size: 1.03em; box-sizing: border-box;
     }
     .order-list-table {
-      width: 100%; border-collapse: separate; border-spacing: 0; background: #fcfcfc; margin-bottom: 8px;
+      width: 100%; border-collapse: separate; border-spacing: 0; background: #fcfcfc; margin-bottom: 8px;min-width: 850px;
     }
     .order-list-table th, .order-list-table td { padding: 5px 6px; font-size: 1em; }
     .order-list-table th { background: #e8f2ff; font-weight: 600; color: #1663b1; font-size: 0.9em; }
@@ -897,6 +897,13 @@
 .modal-body {
   padding: 0;
 }
+/* Cho phép cột Thời gian xuống dòng như tên khách hàng */
+.order-list-table td.thoi-gian, .order-list-table th.thoi-gian {
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 150px; /* hoặc tuỳ chỉnh theo giao diện */
+}
 </style>
 </head>
 <body>`
@@ -928,6 +935,7 @@
           <thead>
             <tr>
               <th style="width: 42px;">Stt</th>
+              <th style="width: 150px;">Thời gian</th>
               <th style="width: 70px;">Số đơn</th>
               <th class="ten-khach-hang" style="width: 18%;">Tên khách hàng</th>
               <th style="width: 60px;">Thẻ bàn số</th>
@@ -1266,6 +1274,7 @@
         const o = data[i];
         html += `<tr>
           <td>${i + 1}</td>
+          <td class="thoi-gian">${o.timestamp || ''}</td>
           <td>${o.orderCode}</td>
           <td class="ten-khach-hang" style="text-align:left;">${o.customerName}</td>
           <td>${o.tableNum}</td>
