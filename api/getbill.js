@@ -80,7 +80,16 @@ module.exports = async (req, res) => {
     }));
 
     // Thêm ngày thực hiện (giờ khi gọi API)
-    const nowStr = new Date().toLocaleString('vi-VN', { hour12: false });
+  const nowStr = new Intl.DateTimeFormat('vi-VN', {
+  hour12: false,
+  timeZone: 'Asia/Ho_Chi_Minh',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+}).format(new Date());
 
     // Lưu vào cache
     cache.set(orderCode, { bill, now: nowStr, cacheTime: Date.now() });
