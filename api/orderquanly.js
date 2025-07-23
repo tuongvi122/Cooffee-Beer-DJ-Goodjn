@@ -350,6 +350,7 @@ export default async function handler(req, res) {
         range: PRODUCTS_SHEET
       });
       const rows = result.data.values;
+      if (!rows || rows.length < 2) return res.status(200).json({ products: [] });
       const products = rows.slice(1)
         .map(row => ({
           maNV: row[1],
@@ -506,7 +507,7 @@ export default async function handler(req, res) {
         range: ORDERS_SHEET + '!A2:T'
       });
       const rows = result.data.values;
-      if (!rows || rows.length < 1) return res.status(200).json({ orders: [] });
+      if (!Array.isArray(rows) || rows.length === 0) return res.status(200).json({ orders: [] });
       let ordersMap = {};
 
       for (let i = 1; i < rows.length; i++) {
