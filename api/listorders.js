@@ -299,7 +299,7 @@ if (linesToRemove.length) {
 // ========= CACHE =========
 let cache = null;
 let cacheTime = 0;
-const CACHE_TTL = 4; // giây
+const CACHE_TTL = 30; // giây
 
 function bustCache() {
   cache = null;
