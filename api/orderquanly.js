@@ -507,7 +507,6 @@ export default async function handler(req, res) {
         range: ORDERS_SHEET + '!A2:T'
       });
       const rows = result.data.values;
-      if (!Array.isArray(rows) || rows.length === 0) return res.status(200).json({ orders: [] });
       let ordersMap = {};
 
       for (let i = 1; i < rows.length; i++) {
