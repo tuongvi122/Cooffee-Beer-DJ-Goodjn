@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
     range: `'KHđánh giá'!A6`,
-    valueInputOption: 'USER_ENTERED',
+    valueInputOption: 'RAW', // <--- THAY ĐỔI
     requestBody: { values: rows }
   });
 
@@ -87,7 +87,7 @@ module.exports = async (req, res) => {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
         range: `'Orders'!${colR}${i + 1}`,
-        valueInputOption: 'USER_ENTERED',
+        valueInputOption: 'RAW', // <--- THAY ĐỔI
         requestBody: { values: [['Đã đánh giá']] }
       });
       if (firstReviewRow === -1) {
@@ -100,7 +100,7 @@ module.exports = async (req, res) => {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: `'Orders'!${colS}${firstReviewRow + 1}`,
-      valueInputOption: 'USER_ENTERED',
+      valueInputOption: 'RAW', // <--- THAY ĐỔI
       requestBody: { values: [[order.point || 10]] }
     });
   }
