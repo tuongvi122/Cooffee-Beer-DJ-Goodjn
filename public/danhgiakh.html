@@ -477,18 +477,20 @@
         color: #41501b;
         font-size: 1em;
       }
-  .modal-dialog {
-    max-height: calc(100vh - 64px) !important; /* Modal không vượt quá chiều cao màn hình */
-    margin: 32px auto !important;             /* Cách lề trên/dưới 16px */
-    width: 98vw !important;                   /* Modal rộng tối đa */
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    .modal-dialog {
+    max-width: 98vw !important;
+    width: 98vw !important;
+    margin: auto !important; /* Center the dialog horizontally on mobile */
+    padding: 0;
   }
+
   .modal-content {
-    max-height: 100%;
-    overflow-y: auto !important;              /* Nội dung dài sẽ xuất hiện thanh cuộn dọc */
+    border-radius: 13px !important;
+    margin: 0 1vw !important;
+    padding: 8px 0 10px 0 !important;
     box-sizing: border-box;
+    max-height: calc(100vh - 40px); /* Adjust max-height for mobile to leave some space from top/bottom */
+    overflow-y: auto; /* Ensure scrolling */
   }
       .modal-header {
         padding: 11px 10px 0 10px !important;
@@ -496,10 +498,11 @@
       .modal-title {
         font-size: 1.09em !important;
       }
-      .modal-body {
-        padding: 10px 6vw 10px 6vw !important; /* Lề trái/phải vừa phải, không sát mép */
-        box-sizing: border-box;
-      }
+    .modal-body {
+    padding: 10px 6vw 10px 6vw !important; /* Lề trái/phải vừa phải, không sát mép */
+    box-sizing: border-box;
+    overflow-y: auto; /* Explicitly ensure scrolling for the body */
+  }
       .input-row label {
         width: 88px !important;
         font-size: 0.97em;
