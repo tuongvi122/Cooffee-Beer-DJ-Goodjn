@@ -322,7 +322,6 @@
     align-items: center !important;
     min-height: 100vh !important;
     display: flex !important;
-    max-height: calc(100vh - 48px) !important; /* Modal cách lề trên/dưới 24px, KHÔNG tràn ra ngoài màn hình */
   }
    .modal-content {
     width: 95vw !important;
@@ -332,7 +331,7 @@
     padding-right: 10px;
     box-sizing: border-box;
     /* THÊM DÒNG DƯỚI ĐÂY */
-    max-height: 100% !important;               /* Chiều cao khung modal tối đa bằng modal-dialog */
+    max-height: calc(100vh - 48px) !important;
     overflow-y: auto !important;
     overflow-x: hidden !important; /* Thêm để ngăn tràn ngang */
   }
@@ -667,8 +666,8 @@
 
 <!-- Đặt textarea sát ngay dưới input số bàn, đồng bộ chiều rộng, margin-top nhỏ -->
 <textarea placeholder="Ghi chú" id="note" name="note"
-  style="width:100%;margin-top:7px;margin-bottom:5px;padding:8px;border-radius:5px;border:1px solid #ccc;box-sizing:border-box;resize:vertical;"></textarea>
-<div class="form-buttons" style="margin-bottom:5px;">
+  style="width:100%;margin-top:7px;margin-bottom:8px;padding:8px;border-radius:5px;border:1px solid #ccc;box-sizing:border-box;resize:vertical;"></textarea>
+<div class="form-buttons" style="margin-bottom:8px;">
   <button class="confirm-btn" onclick="submitOrder()">Đặt dịch vụ</button>
   <button class="close-btn" onclick="closeCartModal()">Đóng</button>
 </div>
