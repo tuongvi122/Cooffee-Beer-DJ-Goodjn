@@ -477,20 +477,24 @@
         color: #41501b;
         font-size: 1em;
       }
-      .modal-dialog {
-        max-width: 98vw !important;
-        width: 98vw !important;
-        margin: 6vw auto !important;
-        padding: 0;
-      }
-      .modal-content {
-        border-radius: 13px !important;
-        margin: 0 1vw !important;
-        padding: 8px 0 10px 0 !important;
-        box-sizing: border-box;
-        max-height: calc(100vh - 40px);
-        overflow-y: auto;
-      }
+    .modal-dialog {
+    max-width: 98vw !important;
+    width: 98vw !important;
+    margin: 16px auto !important;
+    padding: 0;
+    max-height: calc(100vh - 32px) !important;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .modal-content {
+    border-radius: 13px !important;
+    margin: 0 1vw !important;
+    padding: 8px 0 10px 0 !important;
+    box-sizing: border-box;
+    max-height: 100%;
+    overflow-y: auto !important;
+  }
       .modal-header {
         padding: 11px 10px 0 10px !important;
       }
