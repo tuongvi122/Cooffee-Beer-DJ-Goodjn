@@ -747,6 +747,20 @@
 .search-row button#clearBtn:hover {
   background: #b71c1c;
 }
+@media (max-width: 600px) {
+  .modal-dialog {
+    max-width: 99vw !important;
+    min-width: 0;
+  }
+  .modal-content {
+    width: 95vw !important;
+    max-width: 98vw !important;
+    margin: 0 auto !important;
+    max-height: calc(100vh - 40px) !important;
+    overflow-y: auto !important;
+    box-sizing: border-box;
+  }
+}
   </style>
 </head>
 <body>
