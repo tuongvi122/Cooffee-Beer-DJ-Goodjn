@@ -28,60 +28,66 @@ module.exports = async (req, res) => {
   });
 
   const rows = result.data.values || [];
-  const mapOrders = {};
   const inputPhone = String(phone).replace(/\D/g, '');
 
+  // Nhóm các dòng theo orderId, chỉ lấy các dòng có phone khớp
+  const orderGroups = {};
+  for (const row of rows) {
+    const sdt = String(row[3] || '').replace(/\D/g, '');
+    if (sdt !== inputPhone) continue;
+    const orderId = row[1] || 'undefined';
+    if (!orderGroups[orderId]) orderGroups[orderId] = [];
+    orderGroups[orderId].push(row);
+  }
+
+  const mapOrders = {};
   let foundAny = false;
   let foundNotCompleted = false;
 
-  for (let row of rows) {
-  const sdt = String(row[3] || '').replace(/\D/g, '');
-  if (sdt !== inputPhone) continue;
-  foundAny = true;
-  const status = (row[16] || '').trim().toLowerCase();
+  for (const orderId in orderGroups) {
+    const group = orderGroups[orderId];
+    foundAny = true;
+    // Nếu có ít nhất 1 dòng đã thanh toán, lấy dòng đầu tiên
+    if (group.some(r => (r[16] || '').trim().toLowerCase() === 'đã thanh toán')) {
+      const row = group[0];
+      // Xác định đã đánh giá: nếu bất kỳ dòng nào trong nhóm có cột R (index 17) KHÁC rỗng => đã đánh giá
+      const reviewed = group.some(r => (r[17] || '').trim() !== '');
+      const point = reviewed ? Number(row[18]) || 0 : 0;
 
-  if (status !== 'đã thanh toán') {
-    foundNotCompleted = true;
-    continue;
+      // StaffList gồm toàn bộ staff của các dòng
+      const staffList = [];
+      const staffCodes = [];
+      for (const r of group) {
+        const staffCode = r[5] || '';
+        const shift = r[6] || '';
+        if (staffCode) {
+          staffCodes.push(staffCode);
+          staffList.push({ code: staffCode, shift, stars: 5 });
+        }
+      }
+
+      mapOrders[orderId] = {
+        orderId,
+        time: row[0] || '',
+        name: row[2] || '',
+        phone: row[3] || '',
+        email: row[4] || '',
+        table: row[12] || '',
+        total: Number((row[11] || '').replace(/[^0-9]/g, '')) || 0,
+        reviewed,
+        status: reviewed ? 'Đã đánh giá' : '',
+        point,
+        staffCodes,
+        staffList,
+        reviewButton: reviewed ? 'Đã đánh giá' : 'Đánh giá',
+        locked: reviewed
+      };
+    } else {
+      // Nếu không có dòng nào đã thanh toán nhưng có dòng khớp sdt, đánh dấu để trả về message not_completed nếu không có đơn nào đủ điều kiện
+      foundNotCompleted = true;
+    }
   }
 
-  const orderId = row[1] || 'undefined';
-
-  // Nếu là dòng đầu tiên gặp orderId, lưu lại thông tin & điểm thưởng
-if (!mapOrders[orderId]) {
-  // Tìm tất cả các dòng cùng orderId
-  const allRowsSameOrder = rows.filter(
-    r => (r[1] || 'undefined') === orderId
-  );
-  // Nếu bất kỳ dòng nào cột R (index 17) KHÁC rỗng => đã đánh giá
-  const reviewed = allRowsSameOrder.some(r => (r[17] || '').trim() !== '');
-  const point = reviewed ? Number(row[18]) || 0 : 0;
-
-  mapOrders[orderId] = {
-    orderId,
-    time: row[0] || '',
-    name: row[2] || '',
-    phone: row[3] || '',
-    email: row[4] || '',
-    table: row[12] || '',
-    total: Number((row[11] || '').replace(/[^0-9]/g, '')) || 0,
-    reviewed,
-    status: reviewed ? 'Đã đánh giá' : '',
-    point,
-    staffCodes: [],
-    staffList: [],
-    reviewButton: reviewed ? 'Đã đánh giá' : 'Đánh giá',
-    locked: reviewed
-  };
-}
-  // Dòng nào cũng có thể có staffCode/shift, nên vẫn bổ sung vào staffList
-  const staffCode = row[5] || '';
-  const shift = row[6] || '';
-  if (staffCode) {
-    mapOrders[orderId].staffCodes.push(staffCode);
-    mapOrders[orderId].staffList.push({ code: staffCode, shift, stars: 5 });
-  }
-}
   const orders = Object.values(mapOrders);
   orders.sort((a, b) => new Date(b.time) - new Date(a.time));
   const totalPoint = orders.reduce((sum, o) => sum + (o.point || 0), 0);
