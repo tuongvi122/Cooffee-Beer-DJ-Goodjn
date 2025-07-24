@@ -171,27 +171,27 @@ if (linesToRemove.length) {
   let nowStr = getVNTimeForSheet();
   let values = nhanVien.map((nv, idx) => {
   let row = []; 
-  row[0]  = nowStr;                              // A: Thời gian (đã đồng bộ timezone VN)
-  row[1]  = orderCode;                           // B: Mã đơn hàng
-  row[2]  = customer.name;                       // C: Tên KH
-  row[3]  = String(customer.phone);                      // D: SĐT
-  row[4]  = customer.email;                      // E: Email
-  row[5]  = nv.maNV;                             // F: Mã NV
-  row[6]  = nv.caLV;                             // G: Ca làm việc
-  row[7]  = nv.donGia;                           // H: Đơn giá
-  row[8]  = nv.thanhTien || '';                       // I: Thành tiền
-  row[9]  = idx === 0 ? tongCong : '';           // J: Tổng cộng (dòng đầu)
-  row[10] = idx === 0 ? giamGia : '';            // K: Giảm giá (dòng đầu)
-  row[11] = idx === 0 ? tongThu : '';            // L: Tổng thu (dòng đầu)
-  row[12] = tableNum || '';                      // M: Số bàn
-  row[13] = ghiChu || '';                        // N: Ghi chú
-  row[14] = 'V';                                 // O: Cố định 'V'
-  row[15] = 'V';                                 // P: Cố định 'V'
-  row[16] = oldTrangThai = '';
-  row[17] = oldDanhGia;     
-  row[18] = idx === 0 ? oldDiemDanhGia : ''; 
-  row[19] = noteQuanLy || '';
-  row[20] = oldInBill;
+  row[0]  = nowStr;                                   // A: Thời gian
+  row[1]  = Number(orderCode);                        // B: Mã đơn hàng (number)
+  row[2]  = customer.name;                            // C: Tên KH
+  row[3]  = String(customer.phone);                   // D: SĐT
+  row[4]  = customer.email;                           // E: Email
+  row[5]  = nv.maNV;                                  // F: Mã NV
+  row[6]  = Number(nv.caLV);                          // G: Ca làm việc (number)
+  row[7]  = Number(nv.donGia);                        // H: Đơn giá (number)
+  row[8]  = Number(nv.thanhTien || 0);                // I: Thành tiền (number)
+  row[9]  = idx === 0 ? Number(tongCong) : '';        // J: Tổng cộng (number, dòng đầu)
+  row[10] = idx === 0 ? Number(giamGia) : '';         // K: Giảm giá (number, dòng đầu)
+  row[11] = idx === 0 ? Number(tongThu) : '';         // L: Tổng thu (number, dòng đầu)
+  row[12] = Number(tableNum || 0);                    // M: Số bàn (number)
+  row[13] = ghiChu || '';                             // N: Ghi chú
+  row[14] = 'V';                                      // O: Cố định 'V'
+  row[15] = 'V';                                      // P: Cố định 'V'
+  row[16] = oldTrangThai;                             // Q: Trạng thái
+  row[17] = oldDanhGia;                               // R: Đánh giá
+  row[18] = idx === 0 ? Number(oldDiemDanhGia || 0) : ''; // S: Điểm đánh giá (number, dòng đầu)
+  row[19] = noteQuanLy || '';                         // T: Ghi chú quản lý
+  row[20] = oldInBill; 
   return row;
 });
 
