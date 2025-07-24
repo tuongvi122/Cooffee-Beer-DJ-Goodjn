@@ -198,7 +198,7 @@ if (linesToRemove.length) {
   await sheets.spreadsheets.values.append({
     spreadsheetId,
     range: `${sheetName}!A1`,
-    valueInputOption: 'USER_ENTERED',
+    valueInputOption: 'RAW', // <--- THAY ĐỔI THÀNH 'RAW'
     insertDataOption: 'INSERT_ROWS',
     requestBody: { values }
   });
