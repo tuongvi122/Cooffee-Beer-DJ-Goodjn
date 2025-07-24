@@ -748,17 +748,27 @@
   background: #b71c1c;
 }
 @media (max-width: 600px) {
+  .modal {
+    overflow-y: hidden !important;
+  }
   .modal-dialog {
     max-width: 99vw !important;
+    width: 99vw !important;
+    margin: 0 auto !important;
     min-width: 0;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .modal-content {
-    width: 95vw !important;
-    max-width: 98vw !important;
+    max-height: calc(100vh - 32px) !important;
+    width: 96vw !important;
     margin: 0 auto !important;
-    max-height: calc(100vh - 40px) !important;
     overflow-y: auto !important;
     box-sizing: border-box;
+    border-radius: 13px;
+    padding: 8px 0 10px 0;
   }
 }
   </style>
