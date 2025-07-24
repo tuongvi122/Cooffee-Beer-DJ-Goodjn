@@ -1,4 +1,3 @@
-// baocaodt.js
 import { google } from 'googleapis';
 
 const sheetId = process.env.GOOGLE_SHEET_ID;
@@ -8,14 +7,14 @@ const key = (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
 const auth = new google.auth.JWT(emailService, null, key, ['https://www.googleapis.com/auth/spreadsheets']);
 const sheets = google.sheets({ version: 'v4', auth });
 
-const ORDERS_SHEET = "Orders!A:Q"; // Chỉ lấy cột A-Q
+const ORDERS_SHEET = "Orders!A:Q";
 const THONGKE_SHEET = "THONGKE!A:Q";
 const BCTH_SHEET = "BC TONGHOP!A:C";
 
 let sheetCache = {
-  orders: { data: null, updated: 0, expires: 300, lock: false },
-  thongke: { data: null, updated: 0, expires: 300, lock: false },
-  bctonghop: { data: null, updated: 0, expires: 300, lock: false },
+  orders: { data: null, updated: 0, expires: 60, lock: false },
+  thongke: { data: null, updated: 0, expires: 60, lock: false },
+  bctonghop: { data: null, updated: 0, expires: 60, lock: false },
 };
 
 async function fetchSheetData({ spreadsheetId, range, cacheKey }) {
@@ -31,7 +30,7 @@ async function fetchSheetData({ spreadsheetId, range, cacheKey }) {
   try {
     const result = await sheets.spreadsheets.values.get({ spreadsheetId, range });
     let rows = result.data.values || [];
-    if (rows.length > 1) rows = rows.slice(1); // Bỏ header
+    if (rows.length > 1) rows = rows.slice(1);
     c.data = rows;
     c.updated = Date.now();
     return rows;
@@ -41,6 +40,24 @@ async function fetchSheetData({ spreadsheetId, range, cacheKey }) {
   } finally {
     c.lock = false;
   }
+}
+
+function getFirstPaidRowsByDay(rows, dayStr) {
+  let rowsOfDay = rows.filter(r => (r[0] || '').split(' ')[0] === dayStr);
+  let orderGroups = {};
+  for (let r of rowsOfDay) {
+    let maDH = r[1];
+    if (!orderGroups[maDH]) orderGroups[maDH] = [];
+    orderGroups[maDH].push(r);
+  }
+  let filtered = [];
+  for (let maDH in orderGroups) {
+    let group = orderGroups[maDH];
+    if (group.some(r => (r[16] || '').trim() === "Đã thanh toán")) {
+      filtered.push(group[0]);
+    }
+  }
+  return filtered;
 }
 
 async function getOrdersRows() {
@@ -72,11 +89,7 @@ export default async function handler(req, res) {
     if (type === 'ngay' && day) {
       const [ordersRows, thongkeRows] = await Promise.all([getOrdersRows(), getThongkeRows()]);
       let allRows = [...ordersRows, ...thongkeRows];
-      const seen = new Map();
-      let filtered = allRows.filter(r => {
-        let rawDate = (r[0] || '').split(' ')[0];
-        return rawDate === day && (r[16] || '').trim() === "Đã thanh toán" && !seen.has(r[1]) && seen.set(r[1], true);
-      });
+      let filtered = getFirstPaidRowsByDay(allRows, day);
       return res.status(200).json({ rows: filtered });
     } else if (type === 'thang' && year) {
       const bcTonghopRows = await getBcTonghopRows();
@@ -95,11 +108,8 @@ export default async function handler(req, res) {
 
       if (year === sysYYYY) {
         const ordersRows = await getOrdersRows();
-        const todayRows = ordersRows.filter(r => {
-          let rawDate = (r[0] || '').split(' ')[0];
-          return rawDate === sysDayStr && (r[16] || '').trim() === "Đã thanh toán";
-        });
-        const totalToday = todayRows.reduce((t, r) => t + (Number((r[11] || '').replace(/\./g, '')) || 0), 0);
+        const filtered = getFirstPaidRowsByDay(ordersRows, sysDayStr);
+        const totalToday = filtered.reduce((t, r) => t + (Number((r[11] || '').replace(/\./g, '')) || 0), 0);
         monthMap[sysMM] = (monthMap[sysMM] || 0) + totalToday;
       }
 
@@ -126,11 +136,8 @@ export default async function handler(req, res) {
 
       if (yearMap[sysYYYY] !== undefined) {
         const ordersRows = await getOrdersRows();
-        const todayRows = ordersRows.filter(r => {
-          let rawDate = (r[0] || '').split(' ')[0];
-          return rawDate === sysDayStr && (r[16] || '').trim() === "Đã thanh toán";
-        });
-        const totalToday = todayRows.reduce((t, r) => t + (Number((r[11] || '').replace(/\./g, '')) || 0), 0);
+        const filtered = getFirstPaidRowsByDay(ordersRows, sysDayStr);
+        const totalToday = filtered.reduce((t, r) => t + (Number((r[11] || '').replace(/\./g, '')) || 0), 0);
         yearMap[sysYYYY] += totalToday;
       }
 
