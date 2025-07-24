@@ -482,7 +482,7 @@ export default async function handler(req, res) {
         await sheets.spreadsheets.values.append({
           spreadsheetId: sheetId,
           range: ORDERS_SHEET + "!A1",
-          valueInputOption: 'USER_ENTERED',
+          valueInputOption: 'RAW',
           insertDataOption: 'INSERT_ROWS',
           requestBody: { values: newOrderRows }
         });
