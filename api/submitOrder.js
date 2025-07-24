@@ -13,9 +13,9 @@ const sheets = google.sheets({ version: 'v4', auth });
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
 
-// Cache Telegram ID (5 phút)
+// Cache Telegram ID (1 phút)
 let telegramCache = { value: null, expires: 0 };
-const TELEGRAM_CACHE_TTL = 5 * 60 * 1000;
+const TELEGRAM_CACHE_TTL = 60 * 1000;
 
 function formatCurrency(num) {
   return Number(num).toLocaleString('vi-VN') + "₫";
