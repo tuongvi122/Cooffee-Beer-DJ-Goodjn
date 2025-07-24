@@ -1225,6 +1225,7 @@ window.openPopup = idx => {
 
   reviewModal.classList.add('show');
   reviewModal.style.display = 'block';
+  document.body.style.overflow = 'hidden'; // Ngăn cuộn nền
   reviewForm.dataset.idx = idx;
   document.getElementById('popupOrderId').textContent = `Mã đơn hàng: ${o.orderId}`;
   ['Name','Phone','Email','Table','Total'].forEach(k => {
@@ -1242,8 +1243,8 @@ window.openPopup = idx => {
 window.closePopup = () => {
   reviewModal.classList.remove('show');
   reviewModal.style.display = 'none';
+  document.body.style.overflow = ''; // Khôi phục cuộn nền
 };
-
 // Xử lý gửi đánh giá
 reviewForm.addEventListener('submit', async e => {
   e.preventDefault();
