@@ -120,15 +120,17 @@ async function updateOrder(req, res, sheets, spreadsheetId, sheetName) {
       linesToRemove.push(idx + 2); // +2 vì header 1, 1-based index
     }
   });
-  // === LẤY GIÁ TRỊ CŨ CỦA 3 TRƯỜNG: ĐÁNH GIÁ, ĐIỂM ĐÁNH GIÁ, TRẠNG THÁI IN BILL ===
-let oldDanhGia = '', oldDiemDanhGia = '', oldInBill = '', oldTrangThai = '';
-const oldRow = dataRows.find(r => (r[1] || '').toString().trim() === orderCode);
-if (oldRow) {
-  oldTrangThai = oldRow[16] || '';      // Lấy trạng thái cũ từ sheet
-  oldDanhGia = oldRow[17] || '';
-  oldDiemDanhGia = oldRow[18] || '';
-  oldInBill = oldRow[20] || '';
-}
+// === LẤY GIÁ TRỊ CŨ TRẠNG THÁI và ĐIỂM ĐÁNH GIÁ THEO TỪNG DÒNG NV ===
+const oldRows = dataRows.filter(r => (r[1] || '').toString().trim() === orderCode);
+// Tạo Map với key là maNV_caLV để tra cứu nhanh
+const oldRowsMap = new Map();
+oldRows.forEach(r => {
+  const key = `${r[5] || ''}_${r[6] || ''}`; // maNV_caLV
+  oldRowsMap.set(key, {
+    trangThai: r[16] || '',
+    diemDanhGia: r[18] || ''
+  });
+});
   // Xóa các dòng cũ 
 if (linesToRemove.length) {
   const realSheetId = await getSheetId(sheets, spreadsheetId, sheetName);
@@ -187,9 +189,11 @@ if (linesToRemove.length) {
   row[13] = ghiChu || '';                             // N: Ghi chú
   row[14] = 'V';                                      // O: Cố định 'V'
   row[15] = 'V';                                      // P: Cố định 'V'
-  row[16] = oldTrangThai;                             // Q: Trạng thái
-  row[17] = oldDanhGia;                               // R: Đánh giá
-  row[18] = idx === 0 ? Number(oldDiemDanhGia || 0) : ''; // S: Điểm đánh giá (number, dòng đầu)
+const oldKey = `${nv.maNV || ''}_${nv.caLV || ''}`;
+const old = oldRowsMap.get(oldKey) || {};
+  row[16] = old.trangThai || ''; // Q: Trạng thái - lấy riêng cho từng dòng
+  row[17] = oldDanhGia;          // R: Đánh giá - giữ nguyên như code cũ, không sửa theo từng dòng
+  row[18] = idx === 0 ? Number(old.diemDanhGia || 0) : ''; // S: Điểm đánh giá - riêng từng dòng, nhưng chỉ ghi dòng đầu
   row[19] = noteQuanLy || '';                         // T: Ghi chú quản lý
   row[20] = oldInBill; 
   return row;
