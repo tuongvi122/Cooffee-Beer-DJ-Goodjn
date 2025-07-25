@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
   // 2. Đọc sheet Orders để xác định staff đã thanh toán và lấy tổng tiền dòng đầu
   const ordersResult = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `'Orders'!A2:T`
+    range: `'Orders'!A1:T`
   });
   const orderRows = ordersResult.data.values || [];
 
