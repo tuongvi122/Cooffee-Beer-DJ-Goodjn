@@ -131,6 +131,13 @@ oldRows.forEach(r => {
     diemDanhGia: r[18] || ''
   });
 });
+// === LẤY GIÁ TRỊ CŨ CỦA oldDanhGia và oldInBill (giữ nguyên logic cũ) ===
+let oldDanhGia = '', oldInBill = '';
+const oldRow = dataRows.find(r => (r[1] || '').toString().trim() === orderCode);
+if (oldRow) {
+  oldDanhGia = oldRow[17] || '';
+  oldInBill = oldRow[20] || '';
+}
   // Xóa các dòng cũ 
 if (linesToRemove.length) {
   const realSheetId = await getSheetId(sheets, spreadsheetId, sheetName);
@@ -169,9 +176,9 @@ if (linesToRemove.length) {
   });
   await sheets.spreadsheets.batchUpdate({ spreadsheetId, requestBody: { requests } });
 }
-  // Chuẩn bị data mới để ghi lại
-  let nowStr = getVNTimeForSheet();
-  let values = nhanVien.map((nv, idx) => {
+ // Chuẩn bị data mới để ghi lại
+let nowStr = getVNTimeForSheet();
+let values = nhanVien.map((nv, idx) => {
   let row = []; 
   row[0]  = nowStr;                                   // A: Thời gian
   row[1]  = Number(orderCode);                        // B: Mã đơn hàng (number)
@@ -189,11 +196,17 @@ if (linesToRemove.length) {
   row[13] = ghiChu || '';                             // N: Ghi chú
   row[14] = 'V';                                      // O: Cố định 'V'
   row[15] = 'V';                                      // P: Cố định 'V'
-const oldKey = `${nv.maNV || ''}_${nv.caLV || ''}`;
-const old = oldRowsMap.get(oldKey) || {};
+
+  const oldKey = `${nv.maNV || ''}_${nv.caLV || ''}`;
+  const old = oldRowsMap.get(oldKey) || {};
+
   row[16] = old.trangThai || ''; // Q: Trạng thái - lấy riêng cho từng dòng
   row[17] = oldDanhGia;          // R: Đánh giá - giữ nguyên như code cũ, không sửa theo từng dòng
-  row[18] = idx === 0 ? (old.diemDanhGia !== undefined && old.diemDanhGia !== '' ? Number(old.diemDanhGia) : '') : '';
+  row[18] = idx === 0 
+    ? (old.diemDanhGia !== undefined && old.diemDanhGia !== '' && Number(old.diemDanhGia) > 0 
+        ? Number(old.diemDanhGia) 
+        : '') 
+    : '';
   row[19] = noteQuanLy || '';                         // T: Ghi chú quản lý
   row[20] = oldInBill; 
   return row;
