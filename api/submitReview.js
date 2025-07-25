@@ -37,44 +37,67 @@ module.exports = async (req, res) => {
   const sheets = google.sheets({ version: 'v4', auth });
   const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
-  // 2. Ghi vào sheet "KHđánh giá" với thời gian VN
-  const nowStr = getVNTimeForSheet();
+  // 2. Đọc sheet Orders để xác định staff đã thanh toán và lấy tổng tiền dòng đầu
+  const ordersResult = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `'Orders'!A2:T`
+  });
+  const orderRows = ordersResult.data.values || [];
 
-  const rows = staffReviews.map((nv, idx) => ([
-    nowStr,                // Thời gian
-    order.orderId,         // Mã đơn
-    order.name,            // Tên KH
-    order.phone,           // SĐT
-    order.email,           // Email
-    order.table,           // Số bàn (nếu cần)
-    nv.code,               // Mã NV
-    nv.shift,              // Ca LV
-    nv.stars,              // Đánh giá sao NV
-    serviceStars,          // Đánh giá sao quán
-    speed,                 // Tốc độ phục vụ
-    comment,               // Nhận xét chung
-    idx === 0 ? (order.point || 10) : '' // <-- CHỈ DÒNG ĐẦU ghi điểm thưởng
+  // Lọc staff đã thanh toán
+  const paidStaffs = [];
+  let orderFirstRow = null;
+  for (let i = 1; i < orderRows.length; i++) {
+    const row = orderRows[i];
+    if (row[1] && row[1].toString().trim() === order.orderId.toString().trim()) {
+      if (!orderFirstRow) orderFirstRow = row;
+      if ((row[16] || '').trim().toLowerCase() === 'đã thanh toán') {
+        // Lấy staff review truyền lên khớp mã code
+        const found = staffReviews.find(s => s.code === row[5]);
+        if (found) {
+          paidStaffs.push({
+            ...found,
+            shift: row[6]   // Ca làm việc từ sheet
+          });
+        }
+      }
+    }
+  }
+  if (paidStaffs.length === 0) {
+    return res.status(400).json({ error: 'Không có nhân viên đã thanh toán để đánh giá' });
+  }
+  const totalValue = orderFirstRow ? Number((orderFirstRow[11] || '').replace(/[^0-9]/g, '')) || 0 : (order.total || 0);
+
+  // Thời gian và số điện thoại kiểu chuỗi (nhưng không thêm dấu nháy đơn)
+  const nowStr = getVNTimeForSheet();
+  const phoneStr = String(order.phone);
+
+  // 3. Ghi vào sheet "KHđánh giá"
+  // Nếu cần bổ sung cột tổng tiền, hãy đảm bảo Google Sheet có cột đó
+  const rows = paidStaffs.map((nv, idx) => ([
+    nowStr,                           // Thời gian (chuỗi, không dấu ')
+    order.orderId,                    // Mã đơn
+    order.name,                       // Tên KH
+    phoneStr,                         // SĐT (chuỗi, không dấu ')
+    order.email,                      // Email
+    order.table,                      // Số bàn
+    nv.code,                          // Mã NV
+    nv.shift,                         // Ca LV
+    nv.stars,                         // Đánh giá sao NV
+    serviceStars,                     // Đánh giá sao quán
+    speed,                            // Tốc độ phục vụ
+    comment,                          // Nhận xét chung
+    idx === 0 ? (order.point || 10) : '',      // Chỉ dòng đầu ghi điểm thưởng
   ]));
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SHEET_ID,
     range: `'KHđánh giá'!A6`,
-    valueInputOption: 'RAW', // <--- THAY ĐỔI
+    valueInputOption: 'RAW',
     requestBody: { values: rows }
   });
 
-  // 3. Cập nhật trạng thái và điểm đánh giá vào sheet "Orders"
-  // Đọc toàn bộ sheet Orders để xác định vị trí cần update
-  const ordersResult = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `'Orders'!A1:T` // Đảm bảo đủ tới cột S
-  });
-  const orderRows = ordersResult.data.values || [];
-
-  if (orderRows.length < 2) {
-    return res.status(400).json({ error: 'Orders sheet empty' });
-  }
-
+  // 4. Cập nhật trạng thái và điểm đánh giá vào sheet "Orders"
   // Xác định vị trí cột: R (17) cho trạng thái đánh giá, S (18) cho điểm thưởng
   const colR = 'R'; // Trạng thái đánh giá
   const colS = 'S'; // Điểm thưởng
@@ -87,7 +110,7 @@ module.exports = async (req, res) => {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
         range: `'Orders'!${colR}${i + 1}`,
-        valueInputOption: 'RAW', // <--- THAY ĐỔI
+        valueInputOption: 'RAW',
         requestBody: { values: [['Đã đánh giá']] }
       });
       if (firstReviewRow === -1) {
@@ -100,7 +123,7 @@ module.exports = async (req, res) => {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: `'Orders'!${colS}${firstReviewRow + 1}`,
-      valueInputOption: 'RAW', // <--- THAY ĐỔI
+      valueInputOption: 'RAW',
       requestBody: { values: [[order.point || 10]] }
     });
   }
