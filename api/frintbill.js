@@ -17,23 +17,23 @@ module.exports = async (req, res) => {
       range: `${sheetName}!A1:U`,
     });
     const dataRows = rows.data.values.slice(1);
-
     const getVal = (arr, idx) => (arr[idx] !== undefined ? arr[idx] : '');
-
-    // Tìm index các dòng cần cập nhật
-    const updates = [];
-    dataRows.forEach((r, idx) => {
-      const code = getVal(r, 1).toString().trim();
-      const maNV = getVal(r, 5).toString().trim();
-      const caLV = getVal(r, 6).toString().trim();
-      if (
-        code === order &&
-        items.some(it => it.maNV === maNV && it.caLV == caLV)
-      ) {
-        updates.push(idx + 2); // +2 vì header + 1-based index của Sheets
-      }
-    });
-
+// Tìm index các dòng cần cập nhật
+const updates = [];
+dataRows.forEach((r, idx) => {
+  const code = getVal(r, 1).toString().trim();
+  const maNV = getVal(r, 5).toString().trim();
+  const caLV = getVal(r, 6).toString().trim();
+  const tinhTrangQ = getVal(r, 16).toString().trim(); // cột Q
+  if (
+    code === order &&
+    items.some(it => it.maNV === maNV && it.caLV == caLV) &&
+    tinhTrangQ === '' // <-- chỉ cập nhật nếu cột Q đang rỗng
+  ) {
+    updates.push(idx + 2); // +2 vì header + 1-based index của Sheets
+  }
+});
+    
     if (!updates.length) return res.json({ updated: 0 });
 
     // --- Cập nhật nhanh bằng batchUpdate ---
