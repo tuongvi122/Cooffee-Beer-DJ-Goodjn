@@ -193,7 +193,7 @@ const oldKey = `${nv.maNV || ''}_${nv.caLV || ''}`;
 const old = oldRowsMap.get(oldKey) || {};
   row[16] = old.trangThai || ''; // Q: Trạng thái - lấy riêng cho từng dòng
   row[17] = oldDanhGia;          // R: Đánh giá - giữ nguyên như code cũ, không sửa theo từng dòng
-  row[18] = idx === 0 ? Number(old.diemDanhGia || 0) : ''; // S: Điểm đánh giá - riêng từng dòng, nhưng chỉ ghi dòng đầu
+  row[18] = idx === 0 ? (old.diemDanhGia !== undefined && old.diemDanhGia !== '' ? Number(old.diemDanhGia) : '') : '';
   row[19] = noteQuanLy || '';                         // T: Ghi chú quản lý
   row[20] = oldInBill; 
   return row;
