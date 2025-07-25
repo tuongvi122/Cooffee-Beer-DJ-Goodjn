@@ -49,15 +49,18 @@ module.exports = async (req, res) => {
     foundAny = true;
     // Nếu có ít nhất 1 dòng đã thanh toán, lấy dòng đầu tiên
     if (group.some(r => (r[16] || '').trim().toLowerCase() === 'đã thanh toán')) {
+      // Tìm dòng đầu tiên của đơn hàng (dù có phải đã thanh toán hay không)
       const row = group[0];
+
       // Xác định đã đánh giá: nếu bất kỳ dòng nào trong nhóm có cột R (index 17) KHÁC rỗng => đã đánh giá
       const reviewed = group.some(r => (r[17] || '').trim() !== '');
       const point = reviewed ? Number(row[18]) || 0 : 0;
 
-      // StaffList gồm toàn bộ staff của các dòng
+      // StaffList chỉ gồm các staff của các dòng có Q = "Đã thanh toán"
       const staffList = [];
       const staffCodes = [];
       for (const r of group) {
+        if ((r[16] || '').trim().toLowerCase() !== 'đã thanh toán') continue;
         const staffCode = r[5] || '';
         const shift = r[6] || '';
         if (staffCode) {
