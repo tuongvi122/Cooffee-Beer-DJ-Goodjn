@@ -11,7 +11,7 @@ const auth = new google.auth.JWT(
 const sheets = google.sheets({ version: 'v4', auth });
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
+const TELEGRAM_MANAGER_IDS = process.env.TELEGRAM_MANAGER_IDS;
 
 // Cache Telegram ID (1 phút)
 let telegramCache = { value: null, expires: 0 };
@@ -163,8 +163,8 @@ ${items.map(i => `- *${i.maNV}*: Ca LV ${i.caLV} Giá: ${formatCurrency(i.donGia
         sent.add(telegramId);
       }
     }
-    if (TELEGRAM_MANAGER_ID) {
-      telegramPromises.push(sendTelegram(TELEGRAM_MANAGER_ID, telegramMsg));
+    if (TELEGRAM_MANAGER_IDS) {
+      telegramPromises.push(sendTelegram(TELEGRAM_MANAGER_IDS, telegramMsg));
     }
     await Promise.all(telegramPromises);
 
