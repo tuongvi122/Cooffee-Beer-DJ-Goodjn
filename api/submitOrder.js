@@ -163,8 +163,8 @@ ${items.map(i => `- *${i.maNV}*: Ca LV ${i.caLV} Giá: ${formatCurrency(i.donGia
         sent.add(telegramId);
       }
     }
-    if (TELEGRAM_MANAGER_ID) {
-      telegramPromises.push(sendTelegram(TELEGRAM_MANAGER_ID, telegramMsg));
+    if (TELEGRAM_MANAGER_IDS) {
+      telegramPromises.push(sendTelegram(TELEGRAM_MANAGER_IDS, telegramMsg));
     }
     await Promise.all(telegramPromises);
 
