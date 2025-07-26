@@ -6,7 +6,7 @@ if (typeof fetch === 'undefined') global.fetch = (...args) => import('node-fetch
 
 const cache = new NodeCache({ stdTTL: 30 }); // Cache 30 giây
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_MANAGER_ID = process.env.TELEGRAM_MANAGER_ID;
+const TELEGRAM_MANAGER_IDS = process.env.TELEGRAM_MANAGER_IDS;
 
 // ==================
 // === HELPER FUNCTIONS ===
@@ -120,8 +120,8 @@ async function sendTelegramToStaffAndManager(maNVs, content) {
       sent.add(teleId);
     }
   }
-  if (TELEGRAM_MANAGER_ID) {
-    await sendTelegram(TELEGRAM_MANAGER_ID, content);
+  if (TELEGRAM_MANAGER_IDS) {
+    await sendTelegram(TELEGRAM_MANAGER_IDS, content);
   }
 }
 
