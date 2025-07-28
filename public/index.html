@@ -841,7 +841,7 @@
     let cardClass = isFull ? "product-card disabled" : "product-card";
     html += `
       <div class="${cardClass}" id="card_${maNV}" style="cursor:${isFull ? 'not-allowed' : 'pointer'}" ${isFull ? '' : `onclick="showProductDetail('${maNV}')"`}>
-        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x173?text=' + maNV}" alt="Ảnh sản phẩm" loading="lazy">
+        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/240x320?text=' + maNV}" alt="Ảnh sản phẩm" loading="lazy">
         <div style="font-weight: bold; margin-top: 8px; font-size: 20px;">${maNV}</div>
         ${isFull ? `<div class="full-note">Đã full</div>` : ""}
       </div>
@@ -863,7 +863,7 @@
 
       let html = `
         <div style="text-align:center;">
-        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/260x173?text=' + maNV}" alt="Ảnh sản phẩm" class="popup-emp-img">  
+        <img src="${emp.linkAnhNV && emp.linkAnhNV.length > 10 ? emp.linkAnhNV : 'https://via.placeholder.com/240x320?text=' + maNV}" alt="Ảnh sản phẩm" class="popup-emp-img">  
         </div>
         <ul class="ca-list" style="margin-top:18px;">
       `;
