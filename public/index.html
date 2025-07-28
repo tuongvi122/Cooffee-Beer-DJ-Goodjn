@@ -73,7 +73,7 @@
       border-radius: 10px;
       padding: 10px;
       width: 100%;
-      max-width: 260px;
+      max-width: 240px;
       text-align: center;
       box-sizing: border-box;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -84,7 +84,7 @@
       position: relative;
       transition: box-shadow 0.2s;
     }
-    .product-card img { width: 100%; height: 173px; object-fit: cover; border-radius: 6px;aspect-ratio: 3/2; }
+    .product-card img { width: 100%; height: 320px; object-fit: cover; border-radius: 6px;aspect-ratio: 3/4; }
     .product-card .full-note { color: #d32f2f; font-weight: bold; font-size: 15px; margin-top: 5px; }
     .product-card.disabled { opacity: 0.65; pointer-events: none; }
     .ca-list { margin: 12px 0 0 0; padding: 0; list-style: none; }
@@ -290,14 +290,14 @@
       }
       .product-card {
         width: 100%;
-        min-width: 0;
+        max-width: 150px;
         margin-bottom: 0;
         box-sizing: border-box;
       }
       .product-card img {
-        height: 115px;   /* 173 x 0.66 ~ 115 (tức 1/2 màn hình, vẫn giữ tỷ lệ 3:2) */
+        height: 200px;   /* 173 x 0.66 ~ 115 (tức 1/2 màn hình, vẫn giữ tỷ lệ 3:2) */
         border-radius: 5px;
-        aspect-ratio: 3/2;
+        aspect-ratio: 3/4;
       }
     .form-buttons {
     display: flex !important;
